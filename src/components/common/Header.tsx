@@ -8,23 +8,27 @@ import { FiMenu } from "react-icons/fi";
 import Sidebar from "./Sidebar";
 
 import logo from "@/public/logo.svg";
+import { useRouter } from "next/router";
 
 const cn = classNames.bind(styles);
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const { isVerified } = useUserStore();
+  const router = useRouter();
 
   return (
     <header className={cn("header")}>
       <div className={cn("headerContainer")}>
-        <div className={cn("headerLogo")}>
+        <div className={cn("headerLogo")} onClick={() => router.push("/")}>
           <Image src={logo} alt="logo" width={100} height={22} />
         </div>
 
         <div className={cn("headerMenu")}>
           <ul>
-            <li className={cn("headerMenuList")}>이용 안내</li>
+            <li className={cn("headerMenuList")}>
+              <button>이용 안내</button>
+            </li>
           </ul>
           <div className={cn("headerLogin")}>
             {!isVerified ? (

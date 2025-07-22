@@ -56,7 +56,6 @@ a {
 
 .container {
   width: 100%;
-  height: calc(100vh - 6rem);
   margin: 0 auto;
 }
 
