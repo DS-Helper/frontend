@@ -1,0 +1,41 @@
+.home {
+  width: 100%;
+  height: 100%;
+}
+
+.homePage1 {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6.4rem;
+  align-items: center;
+  justify-content: center;
+
+  .homePage1Content {
+    display: flex;
+    gap: 7.3rem;
+  }
+
+  .homePage1Title {
+    font-size: 7.8rem;
+    font-weight: 700;
+    color: #222222;
+    line-height: 1.4;
+  }
+
+  .homePage1Button {
+    padding: 1.7rem 3.5rem;
+    background-color: var(--primary-color);
+    border-radius: 10rem;
+    color: #fff;
+    font-size: 2.2rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: var(--primary-color-soft);
+      color: var(--primary-color);
+    }
+  }
+}
