@@ -19,11 +19,17 @@ import calendar from "@/public/calendar.svg";
 import story from "@/public/story.svg";
 
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 const cn = classNames.bind(styles);
 
 export default function Home() {
   const [activeButton, setActiveButton] = useState(0);
+  const router = useRouter();
+  
+  const handleHelp = () => {
+    router.push("/help");
+  }
 
   return (
     <div className={cn("home")}>
@@ -41,7 +47,8 @@ export default function Home() {
               height={329}
             />
           </div>
-          <button className={cn("homePage1Button")}>도움 요청하기</button>
+          <button className={cn("homePage1Button")}
+          onClick={handleHelp}>도움 요청하기</button>
         </div>
 
         {/* 2페이지 */}
