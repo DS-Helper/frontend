@@ -16,6 +16,7 @@ export default function Sidebar({ onClose }: { onClose: () => void }) {
         <ul className={cn("sidebarMenuList")}>
           <li>도움 요청하기</li>
           <li>도움 요청 내역</li>
+          <li>고객 문의</li>
           <li>채팅 상담</li>
           <li>로그아웃</li>
         </ul>
