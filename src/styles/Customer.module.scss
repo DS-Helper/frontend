@@ -44,11 +44,28 @@
 
 .emptyBox{
     text-align: center;
-    padding: 10rem 0;
+    padding: 20rem 0;
 }
 
 .emptyMessage{
     font-size: 1.5rem;
     color: #777;
     text-align: center;
+}
+
+.registerForm{
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.formGroup{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    label{
+        font-weight: 500;
+        font-size: 14px;
+    }
 }
