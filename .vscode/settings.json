@@ -1,0 +1,37 @@
+{
+  "typescript.suggest.autoImports": true,
+  "typescript.suggest.includeCompletionsForModuleExports": true,
+  "typescript.suggest.includeCompletionsWithSnippetText": true,
+  "typescript.suggest.includeCompletionsWithClassMemberSnippets": true,
+  "typescript.suggest.includeCompletionsWithInsertText": true,
+  "typescript.suggest.includeCompletionsWithReplaceText": true,
+  "typescript.preferences.includePackageJsonAutoImports": "auto",
+  "typescript.preferences.includeCompletionsForImportStatements": true,
+  "typescript.preferences.includeCompletionsWithSnippetText": true,
+  "typescript.preferences.includeCompletionsWithClassMemberSnippets": true,
+  "typescript.preferences.includeCompletionsWithInsertText": true,
+  "typescript.preferences.includeCompletionsWithReplaceText": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": true
+  },
+  "editor.suggestOnTriggerCharacters": true,
+  "editor.acceptSuggestionOnCommitCharacter": true,
+  "editor.acceptSuggestionOnEnter": "on",
+  "editor.tabCompletion": "on",
+  "cursor.ai.enabled": true,
+  "cursor.ai.autoComplete": true,
+  "cursor.ai.inlineSuggestions": true,
+  "cursor.ai.suggestOnTriggerCharacters": true,
+  "github.copilot.enable": {
+    "*": true,
+    "typescript": true,
+    "typescriptreact": true,
+    "javascript": true,
+    "javascriptreact": true
+  },
+  "github.copilot.suggest.enable": true
+}

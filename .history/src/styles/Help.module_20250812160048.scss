@@ -1,0 +1,57 @@
+.sidebar {
+    width: 20%;
+    height: 100vh;
+    background-color: #fff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column; //세로 정렬
+    align-items: center;
+    padding-top:2rem;
+}
+
+.sidebarLogo {
+    width: 20rem;
+    height: 2.2rem;
+    margin-bottom: 4rem;
+  
+    img {
+        cursor: pointer;
+        width:100%;
+        height:auto;
+    }
+}
+
+.sidebarMenuList {
+    width: 100%;
+    font-size: 1.9rem;
+  
+    li {
+      width: 100%;
+      height: 5.2rem;
+      background-color: #fff;
+      padding: 1.3rem 3.6rem;
+      color: var(--grey-800);
+    }
+  
+    li:first-child {
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+}
+
+.help {
+  width: 100%;
+  background-color: #fff;
+  margin: 10rem auto 0;
+}
+
+.title {
+  font-size: 2.4rem;
+}
+
+.helpContent {
+  width: 100%;
+  background-color: #fff;
+}
