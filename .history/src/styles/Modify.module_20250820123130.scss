@@ -1,0 +1,140 @@
+.main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 4rem 0;
+}
+
+.form {
+  width: 100%;
+  max-width: 64rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+}
+
+.title {
+  font-size: 5rem;
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 1.6rem;
+}
+
+.toggleGroup {
+  display: flex;
+  gap: 1.6rem;
+}
+
+.toggleButton {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.6rem;
+  border: 1px solid #ccc;
+  border-radius: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  filter: grayscale(100%);
+}
+
+.toggleButton.active {
+  border-color: var(--primary-color);
+  background: #e6f9ec;
+  filter: none;
+}
+
+.toggleLabel {
+  font-size: 1.7rem;
+  letter-spacing: -1.5%;
+  font-weight: 600;
+}
+
+.icon {
+  font-size: 3.2rem;
+  margin-bottom: 0.8rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+
+  label {
+    font-weight: 500;
+    font-size: 1.7rem;
+    color: var(--grey-700);
+  }
+
+  input {
+    padding: 1.2rem;
+    border: 1px solid #ccc;
+    border-radius: 0.8rem;
+    outline: none;
+    font-size: 1.7rem;
+
+    &.success {
+      border: 1px solid var(--grey-800);
+    }
+  
+    &.error {
+      border: 1px solid var(--red-colordkan);
+    }
+  }
+}
+
+.required {
+  color: var(--red-color);
+}
+
+.errorMsg {
+  font-size: 1.7rem;
+  color: var(--red-color);
+  margin-top: 0.6rem;
+}
+
+.calendarPlaceholder {
+  border: 1px solid #ccc;
+  border-radius: 0.8rem;
+  padding: 1.6rem;
+  text-align: center;
+  color: #888;
+}
+
+.timeButtons {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.timeBtn {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 0.8rem;
+  padding: 0.8rem 0;
+  background: #f9f9f9;
+  cursor: pointer;
+}
+
+.timeBtn.active {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.submitBtn {
+  width: 100%;
+  background: var(--primary-color);
+  color: #fff;
+  padding: 1.4rem 0;
+  border-radius: 0.8rem;
+  font-size: 1.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  margin-top: 5.6rem;
+}
+
+.copy {
+  margin-top: 1.6rem;
+  font-size: 1.2rem;
+}
