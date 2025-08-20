@@ -23,6 +23,7 @@ export default function Help(){
     );
 } 
 
+// getLayout을 따로 정의하여 기본 헤더, 푸터 사용 X
 Help.getLayout = function getLayout(page: React.ReactNode){
     return page;
 }

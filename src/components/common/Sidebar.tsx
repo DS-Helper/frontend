@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import styles from "@/styles/Sidebar.module.scss";
 import classNames from "classnames/bind";
 import { FaAngleRight } from "react-icons/fa6";
@@ -5,6 +6,12 @@ import { FaAngleRight } from "react-icons/fa6";
 const cn = classNames.bind(styles);
 
 export default function Sidebar({ onClose }: { onClose: () => void }) {
+  const router = useRouter();
+  
+  const handleCustomer = () => {
+    router.push("/customer");
+  }
+
   return (
     <div className={cn("sidebarBackground")} onClick={onClose}>
       <div className={cn("sidebar")}>
@@ -16,7 +23,7 @@ export default function Sidebar({ onClose }: { onClose: () => void }) {
         <ul className={cn("sidebarMenuList")}>
           <li>도움 요청하기</li>
           <li>도움 요청 내역</li>
-          <li>고객 문의</li>
+          <li onClick={handleCustomer} style={{cursor:"pointer"}}>고객 문의</li>
           <li>채팅 상담</li>
           <li>로그아웃</li>
         </ul>
