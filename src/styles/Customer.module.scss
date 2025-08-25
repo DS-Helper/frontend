@@ -1,10 +1,15 @@
 .customer{
     width: 100%;
-    background-color: #fff;
+    max-width: 570px;
+    margin: 0 auto;
     padding-top: 10rem;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
+}
+
+.background{
+    background-color: #fff;
 }
 
 .title{
@@ -21,7 +26,7 @@
 }
 
 .tab{
-    font-size: 2 rem;
+    font-size: 2rem;
     padding: 8px 0;
     border: none;
     background: none;
@@ -39,7 +44,6 @@
 .tabContent{
     width: 100%;
     max-width: 800px; // 탭 컨텐츠 폭 제한
-    text-align: center;
 }
 
 .emptyBox{
@@ -67,5 +71,44 @@
     label{
         font-weight: 500;
         font-size: 14px;
+    }
+}
+
+.inquiryList{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    display:flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.inquiryItem{
+    padding: 28px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    
+    .status{
+        width: 65px;
+        height: 26px;
+        font-size: 13px;
+        font-weight: bold;
+        padding: 4px 8px;
+        border-radius: 7px;
+        &.waiting { background-color: #aeaeae; color: #fff;}
+        &.done { background-color: #0dba53; color: #fff;}
+    }
+
+    .content{
+        font-size: 17px;
+        color: #000;
+        a { color: #666; font-size: 17px; cursor: pointer;}
+    }
+    .date{
+        font-size: 15px;
+        color: #737272;
     }
 }
