@@ -1,0 +1,256 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.modalContent {
+  background-color: #f8f9fa;
+  width: 100%;
+  margin: 5rem auto 0;
+  border-radius: 2rem 2rem 0 0;
+  max-height: calc(100vh - 5rem);
+  position: relative;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.2s ease;
+
+  // 스크롤바 숨기기 (Webkit 브라우저)
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  // Firefox 스크롤바 숨기기
+  scrollbar-width: none;
+
+  // IE/Edge 스크롤바 숨기기
+  -ms-overflow-style: none;
+
+  .modalOverlay.visible & {
+    transform: translateY(0);
+  }
+}
+
+// 헤더
+.header {
+  width: 100%;
+  height: 5.6rem;
+  padding: 0 2.4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 0.1rem solid #e9ecef;
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1001;
+
+  &.scheduled {
+    background-color: var(--primary-color);
+  }
+
+  &.completed {
+    background-color: var(--grey-600);
+  }
+
+  &.cancelled {
+    background-color: var(--grey-200);
+  }
+}
+
+.statusContainer {
+  display: flex;
+  align-items: center;
+}
+
+.status {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #fff;
+
+  &.cancelled {
+    color: var(--grey-500);
+  }
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chevronIcon {
+  font-size: 2rem;
+
+  &.scheduled, &.completed {
+    color: #fff;
+  }
+
+  &.cancelled {
+    color: var(--grey-500);
+  }
+}
+
+// 메인 콘텐츠
+.mainContent {
+  max-width: 57rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin: 0 auto;
+  padding: 2.4rem;
+}
+
+.infoSection {
+  margin-bottom: 3rem;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+.infoDate {
+  padding: 2.4rem;
+  margin-bottom: 0;
+}
+
+.sectionTitle {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 1.6rem 0;
+  padding-bottom: 0.8rem;
+  border-bottom: 0.2rem solid #e9ecef;
+}
+
+.infoRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2rem;
+  margin-bottom: 1.2rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.icon {
+  font-size: 1.8rem;
+  min-width: 2.4rem;
+  text-align: center;
+}
+
+.infoText {
+  font-size: 1.6rem;
+  color: #495057;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.label {
+  font-size: 1.6rem;
+  color: #6c757d;
+  font-weight: 500;
+  min-width: 8rem;
+}
+
+.value {
+  font-size: 1.6rem;
+  color: #222;
+  font-weight: 500;
+}
+
+.contentText {
+  font-size: 1.6rem;
+  color: #495057;
+  line-height: 1.6;
+  word-break: keep-all;
+  margin: 0;
+
+  &.rejectionReason {
+    color: #dc3545;
+    font-weight: 500;
+  }
+}
+
+// 액션 섹션
+.actionSection {
+  max-width: 57rem;
+  margin: 0 auto;
+  padding: 2.4rem;
+  background-color: #fff;
+  border-top: 0.1rem solid #e9ecef;
+}
+
+.cancelButton {
+  width: 100%;
+  padding: 1.6rem;
+  background-color: #FFEBED;
+  color: var(--red-color);
+  border: none;
+  border-radius: 1.2rem;
+  font-size: 1.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+// 반응형 디자인
+@media (max-width: 768px) {
+  .modalContent {
+    margin: 5rem 0 0 0;
+    border-radius: 2rem 2rem 0 0;
+    width: 100%;
+  }
+
+  .header {
+    padding: 1.6rem 2rem;
+  }
+
+  .mainContent {
+    padding: 2rem;
+  }
+
+  .actionSection {
+    padding: 2rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: ;
+  }
+
+  .infoText,
+  .label,
+  .value,
+  .contentText {
+    font-size: 1.5rem;
+  }
+
+  .icon {
+    font-size: 1.6rem;
+    min-width: 2rem;
+  }
+}
