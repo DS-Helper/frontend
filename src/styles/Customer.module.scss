@@ -1,0 +1,114 @@
+.customer{
+    width: 100%;
+    max-width: 570px;
+    margin: 0 auto;
+    padding-top: 10rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.background{
+    background-color: #fff;
+}
+
+.title{
+    color: #000;
+    font-size: 3.0rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+.tabMenu{
+    display: flex;
+    gap: 20px;
+    margin-bottom:24px;
+}
+
+.tab{
+    font-size: 2rem;
+    padding: 8px 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #999;
+    border-bottom: 1px solid transparent;
+
+    &.active{
+        color: #000;
+        border-bottom: 2px solid #000;
+        font-weight: bold;
+    }
+}
+
+.tabContent{
+    width: 100%;
+    max-width: 800px; // 탭 컨텐츠 폭 제한
+}
+
+.emptyBox{
+    text-align: center;
+    padding: 20rem 0;
+}
+
+.emptyMessage{
+    font-size: 1.5rem;
+    color: #777;
+    text-align: center;
+}
+
+.registerForm{
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.formGroup{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    label{
+        font-weight: 500;
+        font-size: 14px;
+    }
+}
+
+.inquiryList{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    display:flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.inquiryItem{
+    padding: 28px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    
+    .status{
+        width: 65px;
+        height: 26px;
+        font-size: 13px;
+        font-weight: bold;
+        padding: 4px 8px;
+        border-radius: 7px;
+        &.waiting { background-color: #aeaeae; color: #fff;}
+        &.done { background-color: #0dba53; color: #fff;}
+    }
+
+    .content{
+        font-size: 17px;
+        color: #000;
+        a { color: #666; font-size: 17px; cursor: pointer;}
+    }
+    .date{
+        font-size: 15px;
+        color: #737272;
+    }
+}
