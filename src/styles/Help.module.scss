@@ -40,3 +40,69 @@
       font-weight: 600;
     }
 }
+
+.help {
+  width: 100%;
+  background-color: #fff;
+  margin-top: 10rem;
+}
+
+.title {
+  font-size: 5.0rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.helpContent {
+  background-color: #fff;
+  margin: 6rem auto 0;
+  display: flex;
+  flex-direction: column; // 세로 배치
+  align-items: center; // 가운데 정렬
+}
+
+.secondTitle {
+  font-size: 2.0rem;
+  font-weight: 600;
+}
+
+.list {
+  margin: 3rem 0 0;
+  display: inline-block;
+  text-align: left;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2.4rem;
+
+    input {
+      width: 2rem;
+      height: 2rem;
+    }
+
+    p {
+      font-size: 1.7rem;
+      font-weight: 400;
+    }
+  }
+}
+
+.nextButton {
+  padding: 1.4rem 17rem;
+  background-color: var(--primary-color);
+  border-radius: 8rem;
+  color: #fff;
+  margin: 5rem 0 8rem;
+}
+
+.bannerWrapper {
+  position: relative;
+  width: 100vw; // 화면 전체 너비
+  height: 30rem; // 원하는 높이
+}
+
+.bannerImage {
+  object-fit: cover;
+}

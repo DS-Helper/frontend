@@ -1,0 +1,175 @@
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --primary-color: #0dba53;
+  --primary-color-soft: #e4ffef;
+  --reject-color: #ffebed;
+  --red-color: #f14253;
+  --grey-800: #3c3b3b;
+  --grey-700: #525151;
+  --grey-600: #737272;
+  --grey-500: #8f8d8d;
+  --grey-400: #aeaeae;
+  --grey-300: #d5d5d5;
+  --grey-200: #ededed;
+  --grey-100: #f6f6f6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  line-height: 1.4;
+  font-size: 62.5%;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding-top: 6rem;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+.container {
+  width: 100%;
+  margin: 0 auto;
+}
+
+button {
+  outline: none;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+}
+
+ul {
+  list-style: none;
+}
+
+/* React Calendar 요일 스타일 오버라이드 */
+.react-calendar__month-view__weekdays__weekday {
+  text-align: center !important;
+  width: 14.2857% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-align: center !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+/* 일요일 색상 - 더 구체적인 선택자 사용 */
+.react-calendar__tile--weekend:first-child,
+.react-calendar__tile--weekend:nth-child(7n+1),
+.react-calendar__tile[data-date]:first-child,
+.react-calendar__tile[data-date]:nth-child(7n+1),
+.react-calendar__tile:first-child,
+.react-calendar__tile:nth-child(7n+1) {
+  color: #ff4444 !important;
+}
+
+/* 토요일 색상 - 더 구체적인 선택자 사용 */
+.react-calendar__tile--weekend:last-child,
+.react-calendar__tile--weekend:nth-child(7n),
+.react-calendar__tile[data-date]:last-child,
+.react-calendar__tile[data-date]:nth-child(7n),
+.react-calendar__tile:last-child,
+.react-calendar__tile:nth-child(7n) {
+  color: #0066ff !important;
+}
+
+/* 요일 헤더 강제 중앙 정렬 */
+.react-calendar__month-view__weekdays {
+  text-align: center !important;
+  width: 100% !important;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  text-align: center !important;
+  width: 14.2857% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-align: center !important;
+  display: block !important;
+  width: 100% !important;
+  font-weight: 600 !important;
+  font-size: 1.4rem !important;
+}
+
+/* 날짜 타일 정렬 */
+.react-calendar__month-view__days {
+  width: 100% !important;
+}
+
+.react-calendar__tile {
+  width: 14.2857% !important;
+  text-align: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* 달력 전체 테이블 정렬 */
+.react-calendar__month-view {
+  width: 100% !important;
+}
+
+.react-calendar__month-view__days {
+  width: 100% !important;
+  table-layout: fixed !important;
+}
+
+/* 강제로 일요일과 토요일 색상 적용 */
+.react-calendar__tile:nth-child(7n+1) {
+  color: #ff4444 !important;
+}
+
+.react-calendar__tile:nth-child(7n) {
+  color: #0066ff !important;
+}
+
+/* 요일 헤더와 날짜 정렬 강제 */
+.react-calendar__month-view__weekdays,
+.react-calendar__month-view__days {
+  display: table !important;
+  width: 100% !important;
+  table-layout: fixed !important;
+}
+
+.react-calendar__month-view__weekdays__weekday,
+.react-calendar__tile {
+  display: table-cell !important;
+  width: 14.2857% !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
