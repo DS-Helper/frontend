@@ -104,7 +104,9 @@ export default function Customer(){
                         <form className={cn("registerFrom")} onSubmit={handleSubmit}>
                             <div className={cn("formGroup")}>
                                 <label>문의 유형</label>
+                                <div className={cn("selectWrapper")}>
                                 <select 
+                                    className={cn("customSelect")}
                                     value={inquiryType}
                                     onChange={(e) => setInquiryType(e.target.value)}>
                                         <option value="help">도움 요청</option>
@@ -112,6 +114,7 @@ export default function Customer(){
                                         <option value="modify">서비스 개선 제안</option>
                                         <option value="etc">기타</option>
                                     </select>
+                                </div>
                             </div>
                         </form>
                     )}

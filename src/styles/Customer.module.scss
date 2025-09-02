@@ -70,7 +70,36 @@
 
     label{
         font-weight: 500;
-        font-size: 14px;
+        font-size: 17px;
+        color: #525151;
+    }
+}
+.selectWrapper{
+    position: relative;
+    width: 100%;
+}
+
+.customSelect{
+    appearance: none;
+    width: 100%;
+    padding: 14px 12px;
+    font-size: 17px;
+    border: 1px solid #d1d1d1;
+    border-radius: 10px;
+    background: #fff;
+    color: #222222;
+    cursor: pointer;
+    box-shadow: 0 0 12px rgba(0,0,0,0.12);
+
+    &:focus {
+        outline: none;
+        border-color: #999;
+    }
+
+    option{
+         font-size: 17px;
+         color: #222222;
+         padding: 12px;
     }
 }
 
