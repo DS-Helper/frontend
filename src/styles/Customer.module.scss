@@ -105,9 +105,16 @@
     .content{
         font-size: 17px;
         color: #000;
+        //더보기 버튼
         a { color: #666; font-size: 17px; cursor: pointer;}
     }
-    .date{
+    
+    .dateTime{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .date, .time{
         font-size: 15px;
         color: #737272;
     }
