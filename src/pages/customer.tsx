@@ -37,17 +37,19 @@ export default function Customer(){
         if (!answer) return; // 답변 없는 경우 클릭 x
         setSelectedAnswer(answer);
         setModalOpen(true);
-    }
+    };
+
     const closeModal = () => {
         setSelectedAnswer(null);
         setModalOpen(false);
-    }
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         // API 요청이나 처리 로직 추가하기
         console.log({ inquiryType, content });
-    }
+    };
+    
     return (
         <div className={cn("background")}>
             <div className={cn("customer")}>
@@ -110,20 +112,20 @@ export default function Customer(){
                                     </select>
                             </div>
                         </form>
-
                     )}
                 </div>
             </div>
 
-
-            {/* {isModalOpen && (
+            {/* 답변 내용 모달 */}
+            {isModalOpen && (
                 <div className={cn("modalOverlay")} onClick={closeModal}>
                     <div className={cn("modalContent")} onClick={(e) => e.stopPropagation()}>
                         <h2>답변 내용</h2>
-                        <button className={cn("closeBtn")} onClick={closeModal}>×</button>
+                        <button className={cn("closeBtn")} onClick={closeModal}>x</button>
                         <pre className={cn("answerText")}>{selectedAnswer}</pre>
                     </div>
-            )} */}
+                </div>
+            )}
         </div>
     );
 }
