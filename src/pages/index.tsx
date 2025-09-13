@@ -2,7 +2,7 @@ import styles from "@/styles/Home.module.scss";
 import classNames from "classnames/bind";
 import Image from "next/image";
 import { useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 // 이미지들
 import mainImage from "@/public/Hero-image.svg";

@@ -1,0 +1,182 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #fff;
+}
+
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  margin-bottom: 2rem;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  width: 37rem;
+  height: 6rem;
+  border: none;
+  border-radius: 1rem;
+  font-size: 2rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.03);
+  }
+
+  .icon {
+    font-size: 2.4rem;
+  }
+}
+
+.kakao {
+  background: #fee500;
+  color: #000;
+}
+
+.naver {
+  background: #03c75a;
+  color: #fff;
+
+  .icon {
+    font-size: 2rem;
+  }
+}
+
+.google {
+  background: #fff;
+  color: #000;
+  border: 1px solid #ddd;
+}
+
+.org {
+  background: #ff7e47;
+  color: #fff;
+}
+
+.contactInfo {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin: 6rem 0 1.2rem 0;
+}
+
+.contact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.phoneIcon {
+  font-size: 1.8rem;
+}
+
+.phoneNumber {
+  font-size: 1.9rem;
+  font-weight: 500;
+}
+
+.info {
+  font-size: 1.3rem;
+  color: var(--grey-600);
+}
+
+
+
+.orgContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #fff;
+
+  .formWrapper {
+    display: flex;
+    flex-direction: column;
+    width: 37.8rem;
+  }
+  
+  .title {
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin-bottom: 3.5rem;
+  }
+  
+  .form {
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+
+    .div {
+      display: flex;
+    }
+
+  }
+  
+  .label {
+    font-size: 1.7rem;
+    font-weight: 500;
+    margin-bottom: 0.8rem;
+  }
+  
+  .input {
+    padding: 0.9rem;
+    border: 1px solid var(--grey-300);
+    border-radius: 0.6rem;
+    font-size: 1.4rem;
+  
+    &:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+  }
+  
+  .loginBtn {
+    margin-top: 1rem;
+    padding: 0.9rem;
+    background: var(--primary-color);
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 0.6rem;
+    cursor: pointer;
+  
+    &:hover {
+      background: var(--primary-color);
+    }
+  }
+  
+  .links {
+    margin-top: 1.2rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    font-size: 1.3rem;
+    color: var(--grey-600);
+  
+    a {
+      color: var(--grey-600);
+      text-decoration: none;
+  
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  
+    span {
+      color: var(--grey-600);
+    }
+  }
+  
+}
+
