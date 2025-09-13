@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import styles from "@/styles/Modify.module.scss";
 import Image from "next/image"
 import classNames from "classnames/bind";
 import DateTimeSelector from "@/components/Calendar/DateTimeSelector";
+import { postReservation } from "@/lib/apis/reservation"; 
 
 const cn = classNames.bind(styles);
 
@@ -16,19 +17,20 @@ import both from "@/public/reservate_both.svg"
 export default function ModifyPage() {
   const router = useRouter();
   const [type, setType] = useState<"personal" | "org">("personal");
-  const [gender, setGender] = useState<"male" | "female" | "both" | null>("male");
+  const [recipientGenderType, setRecipientGenderType] = useState<"male" | "female" | "both" | null>("male");
 
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
-  const [helpContent, setHelpContent] = useState("");
-  const [peopleCount, setPeopleCount] = useState("");
+  const [requirement, setRequirement] = useState("");
+  const [recipientNumber, setRecipientNumber] = useState("");
   const [specialNotes, setSpecialNotes] = useState("");
+  const [visitDate, setVisitDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [validation, setValidation] = useState<{ [key: string]: string }>({});
 
-  
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const newValidation: { [key: string]: string } = {};
@@ -51,16 +53,16 @@ export default function ModifyPage() {
       newValidation.address = "success";
     }
 
-    if (!helpContent) {
-      newValidation.helpContent = "error";
+    if (!requirement) {
+      newValidation.requirement = "error";
     } else {
-      newValidation.helpContent = "success";
+      newValidation.requirement = "success";
     }
 
-    if (!peopleCount) {
-      newValidation.peopleCount = "error";
+    if (!recipientNumber) {
+      newValidation.recipientNumber = "error";
     } else {
-      newValidation.peopleCount = "success";
+      newValidation.recipientNumber = "success";
     }
 
     if (!specialNotes) {
@@ -72,7 +74,30 @@ export default function ModifyPage() {
     setValidation(newValidation);
 
     if (Object.values(newValidation).every((v) => v === "success")) {
-      router.push("/help/complete");
+      try {
+        const payload = {
+          name,
+          phoneNumber,
+          visitDate,
+          startTime,
+          endTime,
+          address,
+          requirement,
+          recipientGenderType,
+          recipientNumber,
+        };
+  
+        const res = await postReservation(payload);
+        console.log(res);
+        if (res) {
+          router.push("/help/complete");
+        } else {
+          alert("예약에 실패했습니다. 다시 시도해주세요.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("서버 에러가 발생했습니다.");
+      }
     }
   };
 
@@ -126,7 +151,11 @@ export default function ModifyPage() {
           </div>
 
           {/* 달력 자리 */}
-          <DateTimeSelector />
+          <DateTimeSelector onChange={(data) => {
+            setVisitDate(data.visitDate.toISOString());
+            setStartTime(data.startTime.toISOString());
+            setEndTime(data.endTime.toISOString());
+          }} />
 
           {/* 도움 요청 내용 */}
           <div className={cn("inputGroup")}>
@@ -134,11 +163,11 @@ export default function ModifyPage() {
             <input 
               type="text" 
               placeholder="도움 요청 내용을 입력해주세요" 
-              value={helpContent} 
-              onChange={(e) => setHelpContent(e.target.value)} 
-              className={cn(validation.helpContent)} 
+              value={requirement} 
+              onChange={(e) => setRequirement(e.target.value)} 
+              className={cn(validation.requirement)} 
             />
-            {validation.helpContent === "error" && <p className={cn("errorMsg")}>도움 요청 내용을 입력해주세요.</p>}
+            {validation.requirement === "error" && <p className={cn("errorMsg")}>도움 요청 내용을 입력해주세요.</p>}
           </div>
 
           {/* 성별 선택 */}
@@ -153,9 +182,9 @@ export default function ModifyPage() {
                 <button
                   key={g.value}
                   type="button"
-                  onClick={() => setGender(g.value)}
+                  onClick={() => setRecipientGenderType(g.value)}
                   className={`${cn("toggleButton")} ${
-                    gender === g.value ? cn("active") : ""
+                    recipientGenderType === g.value ? cn("active") : ""
                   }`}
                 >
                   <Image src={g.src} width={80} height={80} alt="성별 선택" />
@@ -171,11 +200,11 @@ export default function ModifyPage() {
             <input 
               type="text" 
               placeholder="1명" 
-              value={peopleCount} 
-              onChange={(e) => setPeopleCount(e.target.value)} 
-              className={cn(validation.peopleCount)} 
+              value={recipientNumber} 
+              onChange={(e) => setRecipientNumber(e.target.value)} 
+              className={cn(validation.recipientNumber)} 
             />
-            {validation.peopleCount === "error" && <p className={cn("errorMsg")}>도움 받는 사람 수를 입력해주세요.</p>}
+            {validation.recipientNumber === "error" && <p className={cn("errorMsg")}>도움 받는 사람 수를 입력해주세요.</p>}
           </div>
 
           {/* 특이사항 */}
