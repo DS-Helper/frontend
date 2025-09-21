@@ -74,7 +74,7 @@
         color: #525151;
     }
 }
-.selectWrapper{
+.CustomSelectWrapper{
     position: relative;
     width: 100%;
 }
@@ -101,6 +101,18 @@
          color: #222222;
          padding: 12px;
     }
+}
+
+// 화살표 커스텀 -> 근데 안보임 다시 해야할 듯
+.CustomSelectWrapper::after{
+    content: "▼";
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #AEAEAE;
+    pointer-events: none;
 }
 
 .inquiryList{
@@ -135,7 +147,7 @@
         font-size: 17px;
         color: #000;
         //더보기 버튼
-        a { color: #666; font-size: 17px; cursor: pointer;}
+        a { color: #666; font-size: 17px; cursor: pointer; &:hover{ text-decoration: underline;}}
     }
     
     .dateTime{
@@ -192,4 +204,54 @@
     font-size: 17px;
     color: #3c3b3b;
     //line-height:170%;
+}
+
+.moreBtn{
+    margin-left:4px;
+    color:#0075ff;
+    cursor:pointer;
+    font-weight:500;
+
+    &:hover{
+        text-decoration:underline;
+    }
+}
+
+.pagination{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+
+    button{
+        width: 36px;
+        height: 36px;
+        background-color: #fff;
+        font-size: 17px;
+        color: #333;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        //호버 효과 
+        &:hover:not(:disabled){
+            border-color: #666;
+            color: #000;
+        }
+
+        // 비활성화 상태 : 더이상 넘길 페이지가 없을 때 
+        &:disabled{
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        &.active{
+            color:#fff;
+            font-weight: bold;
+        }
+    }
+}
+
+.imageWrapper{
+    margin-top: 8px;
 }
