@@ -14,10 +14,20 @@ const cn = classNames.bind(styles);
 export default function LoginPage() {
   const router = useRouter();
 
+  const handleKakaoLogin = () => {
+    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID}&redirect_uri=${encodeURIComponent(
+      process.env.NODE_ENV === 'production' 
+        ? 'https://www.dshelper.kro.kr/oauth/kakao/login'
+        : 'http://localhost:8080/oauth/kakao/login'
+    )}&response_type=code`;
+    
+    window.location.href = kakaoAuthUrl;
+  };
+
   return (
     <div className={cn("container")}>
       <div className={cn("buttonGroup")}>
-        <button className={`${cn("btn")} ${cn("kakao")}`}>
+        <button className={`${cn("btn")} ${cn("kakao")}`} onClick={handleKakaoLogin}>
           <RiKakaoTalkFill className={cn("icon")} />
           카카오톡 로그인
         </button>

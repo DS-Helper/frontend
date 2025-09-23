@@ -12,7 +12,7 @@ const ITEMS_PER_PAGE = 10;
 
 export default function HelpListPage() {
   const router = useRouter();
-  const { user } = useUserStore();
+  const { user, isVerified } = useUserStore();
   const [activeTab, setActiveTab] = useState<"전체" | "예정" | "완료" | "취소">("전체");
   const [visibleItems, setVisibleItems] = useState<number>(ITEMS_PER_PAGE);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -90,7 +90,7 @@ export default function HelpListPage() {
   };
 
   // 유저가 로그인하지 않은 경우 안내 메시지 표시
-  if (!user) {
+  if (!isVerified) {
     return (
       <div className={cn("helpListPage")}>
         <div className={cn("loginRequired")}>
@@ -136,7 +136,7 @@ export default function HelpListPage() {
               {/* 내용 */}
               <div className={cn("cardContent")}>
                 <p className={cn("contentText")}>{request.content}</p>
-                {user.type === "기업" && (
+                {user?.type === "기업" && (
                   <div className={cn("organizationInfo")}>
                     <span className={cn("organizationTag")}>기관 요청</span>
                   </div>
