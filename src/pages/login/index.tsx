@@ -16,9 +16,7 @@ export default function LoginPage() {
 
   const handleKakaoLogin = () => {
     const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID}&redirect_uri=${encodeURIComponent(
-      process.env.NODE_ENV === 'production' 
-        ? 'https://www.dshelper.kro.kr/oauth/kakao/login'
-        : 'http://localhost:8080/oauth/kakao/login'
+      process.env.KAKAO_REDIRECT_URI || 'http://localhost:8080/oauth/kakao/login'
     )}&response_type=code`;
     
     window.location.href = kakaoAuthUrl;
