@@ -7,15 +7,15 @@ interface UserState {
   user: User | null;
   isVerified: boolean;
   accessToken: string | null;
-  setUser: (user: User) => void;
-  setAccessToken: (token: string) => void;
+  setUser: (user: User | null) => void;
+  setAccessToken: (token: string | null) => void;
   setIsVerified: (isVerified: boolean) => void;
   checkAuthStatus: () => void;
 }
 
 export const useUserStore = create(
   persist<UserState>(
-    (set, get) => ({
+    (set) => ({
       user: null,
       accessToken: null,
       isVerified: false,
