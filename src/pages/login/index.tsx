@@ -15,7 +15,7 @@ export default function LoginPage() {
   const router = useRouter();
 
   const handleKakaoLogin = () => {
-    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID}&redirect_uri=${encodeURIComponent(
+    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.KAKAO_REDIRECT_URI}&redirect_uri=${encodeURIComponent(
       process.env.KAKAO_REDIRECT_URI || 'http://localhost:8080/oauth/kakao/login'
     )}&response_type=code`;
     
