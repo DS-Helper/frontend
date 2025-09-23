@@ -1,5 +1,35 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
 
+## 환경 변수 설정
+
+프로젝트 루트에 `.env.local` 파일을 생성하고 다음 환경 변수들을 설정하세요:
+
+```env
+# 카카오 로그인 설정
+NEXT_PUBLIC_KAKAO_CLIENT_ID=your_kakao_client_id_here
+KAKAO_CLIENT_ID=your_kakao_client_id_here
+
+# 카카오 리다이렉트 URI 설정
+NEXT_PUBLIC_KAKAO_REDIRECT_URI=http://localhost:8080/oauth/kakao/login
+KAKAO_REDIRECT_URI=http://localhost:8080/oauth/kakao/login
+
+# 프로덕션 환경에서는 다음과 같이 설정하세요:
+# NEXT_PUBLIC_KAKAO_REDIRECT_URI=https://www.dshelper.kro.kr/oauth/kakao/login
+# KAKAO_REDIRECT_URI=https://www.dshelper.kro.kr/oauth/kakao/login
+
+# API URL
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
+
+### 카카오 개발자 콘솔 설정
+
+1. [카카오 개발자 콘솔](https://developers.kakao.com/) 접속
+2. 애플리케이션 생성 후 Client ID 확인
+3. 플랫폼 설정에서 Web 플랫폼 추가
+4. Redirect URI 설정:
+   - 개발: `http://localhost:8080/oauth/kakao/login`
+   - 프로덕션: `https://www.dshelper.kro.kr/oauth/kakao/login`
+
 ## Getting Started
 
 First, run the development server:
