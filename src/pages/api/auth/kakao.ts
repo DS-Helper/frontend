@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
-        client_id: process.env.KAKAO_CLIENT_ID!,
+        client_id: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID!,
         redirect_uri: process.env.NODE_ENV === 'production' 
           ? 'https://www.dshelper.kro.kr/oauth/kakao/login'
           : 'http://localhost:8080/oauth/kakao/login',
