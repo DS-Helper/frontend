@@ -26,7 +26,7 @@ export default function OrgLoginPage() {
     const res = await postLogin(payload);
     
 
-    if (res) {
+    if (res && res.data) {
       alert("로그인 성공!");
       setIsVerified(true);
       router.push("/");
@@ -42,24 +42,30 @@ export default function OrgLoginPage() {
 
         <form className={cn("form")} onSubmit={handleSubmit}>
           <div>
-            <label className={cn("label")}>이메일</label>
+            <label htmlFor="email" className={cn("label")}>이메일</label>
             <input
+              id="email"
+              name="email"
               type="email"
               placeholder="이메일"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={cn("input")}
+              autoComplete="email"
             />
           </div>
 
           <div>
-            <label className={cn("label")}>비밀번호</label>
+            <label htmlFor="password" className={cn("label")}>비밀번호</label>
             <input
+              id="password"
+              name="password"
               type="password"
               placeholder="비밀번호"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={cn("input")}
+              autoComplete="current-password"
             />
           </div>
 

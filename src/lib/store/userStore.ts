@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { User } from "@/types/userType";
 import { persist } from "zustand/middleware";
+import { getCookie } from "../utils/cookies";
 
 interface UserState {
   user: User | null;
@@ -9,17 +10,26 @@ interface UserState {
   setUser: (user: User) => void;
   setAccessToken: (token: string) => void;
   setIsVerified: (isVerified: boolean) => void;
+  checkAuthStatus: () => void;
 }
 
 export const useUserStore = create(
   persist<UserState>(
-    (set) => ({
+    (set, get) => ({
       user: null,
       accessToken: null,
       isVerified: false,
       setUser: (user) => set({ user }),
       setAccessToken: (token) => set({ accessToken: token }),
       setIsVerified: (isVerified) => set({ isVerified }),
+      checkAuthStatus: () => {
+        const token = getCookie('token');
+        if (token) {
+          set({ isVerified: true });
+        } else {
+          set({ isVerified: false, user: null, accessToken: null });
+        }
+      },
     }),
     { name: "user-store" }
   )

@@ -28,52 +28,25 @@ export default function ModifyPage() {
   const [visitDate, setVisitDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [validation, setValidation] = useState<{ [key: string]: string }>({});
+  const [showErrors, setShowErrors] = useState(false);
+
+  // 달력 변경 시 validation 상태 초기화
+  const handleDateTimeChange = (data: any) => {
+    setVisitDate(data.visitDate.toISOString());
+    setStartTime(data.startTime.toISOString());
+    setEndTime(data.endTime.toISOString());
+    // 달력 변경 시 에러 상태 초기화
+    setShowErrors(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setShowErrors(true);
 
-    const newValidation: { [key: string]: string } = {};
+    // 필수 필드 검증
+    const hasErrors = !name || !phoneNumber || !address || !requirement || !recipientNumber || !specialNotes;
 
-    if (!name) {
-      newValidation.name = "error";
-    } else {
-      newValidation.name = "success";
-    }
-
-    if (!phoneNumber) {
-      newValidation.phoneNumber = "error";
-    } else {
-      newValidation.phoneNumber = "success";
-    }
-
-    if (!address) {
-      newValidation.address = "error";
-    } else {
-      newValidation.address = "success";
-    }
-
-    if (!requirement) {
-      newValidation.requirement = "error";
-    } else {
-      newValidation.requirement = "success";
-    }
-
-    if (!recipientNumber) {
-      newValidation.recipientNumber = "error";
-    } else {
-      newValidation.recipientNumber = "success";
-    }
-
-    if (!specialNotes) {
-      newValidation.specialNotes = "error";
-    } else {
-      newValidation.specialNotes = "success";
-    }
-
-    setValidation(newValidation);
-
-    if (Object.values(newValidation).every((v) => v === "success")) {
+    if (!hasErrors) {
       try {
         const payload = {
           name,
@@ -134,28 +107,24 @@ export default function ModifyPage() {
           {/* 입력 필드 */}
           <div className={cn("inputGroup")}>
             <label>이름 <span className={cn("required")}>(필수)</span></label>
-            <input type="text" placeholder="홍길동" value={name} onChange={(e) => setName(e.target.value)} className={cn(validation.name)}  />
-            {validation.name === "error" && <p className={cn("errorMsg")}>이름을 입력해주세요.</p>}
+            <input type="text" placeholder="홍길동" value={name} onChange={(e) => setName(e.target.value)} className={showErrors && !name ? cn("error") : undefined}  />
+            {showErrors && !name && <p className={cn("errorMsg")}>이름을 입력해주세요.</p>}
           </div>
 
           <div className={cn("inputGroup")}>
             <label>전화번호 <span className={cn("required")}>(필수)</span></label>
-            <input type="text" placeholder="010-0000-0000" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className={cn(validation.phoneNumber)} />
-            {validation.phoneNumber === "error" && <p className={cn("errorMsg")}>전화번호를 입력해주세요.</p>}
+            <input type="text" placeholder="010-0000-0000" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className={showErrors && !phoneNumber ? cn("error") : undefined} />
+            {showErrors && !phoneNumber && <p className={cn("errorMsg")}>전화번호를 입력해주세요.</p>}
           </div>
 
           <div className={cn("inputGroup")}>
             <label>방문 주소 <span className={cn("required")}>(필수)</span></label>
-            <input type="text" placeholder="주소를 입력해주세요" value={address} onChange={(e) => setAddress(e.target.value)} className={cn(validation.address)} />
-            {validation.address === "error" && <p className={cn("errorMsg")}>주소를 입력해주세요.</p>}
+            <input type="text" placeholder="주소를 입력해주세요" value={address} onChange={(e) => setAddress(e.target.value)} className={showErrors && !address ? cn("error") : undefined} />
+            {showErrors && !address && <p className={cn("errorMsg")}>주소를 입력해주세요.</p>}
           </div>
 
           {/* 달력 자리 */}
-          <DateTimeSelector onChange={(data) => {
-            setVisitDate(data.visitDate.toISOString());
-            setStartTime(data.startTime.toISOString());
-            setEndTime(data.endTime.toISOString());
-          }} />
+          <DateTimeSelector onChange={handleDateTimeChange} />
 
           {/* 도움 요청 내용 */}
           <div className={cn("inputGroup")}>
@@ -165,9 +134,9 @@ export default function ModifyPage() {
               placeholder="도움 요청 내용을 입력해주세요" 
               value={requirement} 
               onChange={(e) => setRequirement(e.target.value)} 
-              className={cn(validation.requirement)} 
+              className={showErrors && !requirement ? cn("error") : undefined} 
             />
-            {validation.requirement === "error" && <p className={cn("errorMsg")}>도움 요청 내용을 입력해주세요.</p>}
+            {showErrors && !requirement && <p className={cn("errorMsg")}>도움 요청 내용을 입력해주세요.</p>}
           </div>
 
           {/* 성별 선택 */}
@@ -202,9 +171,9 @@ export default function ModifyPage() {
               placeholder="1명" 
               value={recipientNumber} 
               onChange={(e) => setRecipientNumber(e.target.value)} 
-              className={cn(validation.recipientNumber)} 
+              className={showErrors && !recipientNumber ? cn("error") : undefined} 
             />
-            {validation.recipientNumber === "error" && <p className={cn("errorMsg")}>도움 받는 사람 수를 입력해주세요.</p>}
+            {showErrors && !recipientNumber && <p className={cn("errorMsg")}>도움 받는 사람 수를 입력해주세요.</p>}
           </div>
 
           {/* 특이사항 */}
@@ -215,9 +184,9 @@ export default function ModifyPage() {
               placeholder="특이사항을 입력해주세요" 
               value={specialNotes} 
               onChange={(e) => setSpecialNotes(e.target.value)} 
-              className={cn(validation.specialNotes)} 
+              className={showErrors && !specialNotes ? cn("error") : undefined} 
             />
-            {validation.specialNotes === "error" && <p className={cn("errorMsg")}>특이사항을 입력해주세요.</p>}
+            {showErrors && !specialNotes && <p className={cn("errorMsg")}>특이사항을 입력해주세요.</p>}
           </div>
 
           <button type="submit" className={cn("submitBtn")}>
