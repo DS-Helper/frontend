@@ -4,6 +4,7 @@ import { useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import { useUserStore } from "@/lib/store/userStore";
 import { setCookie } from "@/lib/utils/cookies";
+import { getLogin } from "@/lib/apis/authUser";
 
 export default function KakaoLoginPage() {
   const router = useRouter();
@@ -13,35 +14,34 @@ export default function KakaoLoginPage() {
     try {
       console.log('카카오 로그인 처리 시작, code:', code);
       
-      // 카카오 로그인 API 호출
-      const response = await fetch('/api/auth/kakao', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ code }),
-      });
-
-      const data = await response.json();
-      console.log('API 응답:', data);
-
-      if (response.ok && data.token) {
-        // 토큰을 쿠키에 저장
-        setCookie('token', data.token, 7);
+      // getLogin API 호출 (code를 파라미터로 전달)
+      const response = await getLogin({ code });
+      
+      if (response && response.data) {
+        console.log('getLogin API 응답:', response.data);
         
-        // 사용자 정보 저장
-        if (data.user) {
-          const { setUser } = useUserStore.getState();
-          setUser(data.user);
+        const data = response.data;
+        
+        if (data.token) {
+          // 토큰을 쿠키에 저장
+          setCookie('token', data.token, 7);
+          
+          // 사용자 정보 저장
+          if (data.user) {
+            const { setUser } = useUserStore.getState();
+            setUser(data.user);
+          }
+          
+          // 인증 상태 업데이트
+          setIsVerified(true);
+          
+          alert('카카오 로그인 성공!');
+          router.push('/');
+        } else {
+          throw new Error(data.message || '로그인에 실패했습니다.');
         }
-        
-        // 인증 상태 업데이트
-        setIsVerified(true);
-        
-        alert('카카오 로그인 성공!');
-        router.push('/');
       } else {
-        throw new Error(data.message || '로그인에 실패했습니다.');
+        throw new Error('로그인 요청에 실패했습니다.');
       }
     } catch (error) {
       console.error('카카오 로그인 처리 중 오류:', error);
