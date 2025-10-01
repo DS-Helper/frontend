@@ -26,6 +26,9 @@ export default function KakaoLoginPage() {
           // 토큰을 쿠키에 저장
           setCookie('token', data.token, 7);
           
+          // localStorage에 인증 상태 저장 (httpOnly 쿠키 대신 사용)
+          localStorage.setItem('isAuthenticated', 'true');
+          
           // 사용자 정보 저장
           if (data.user) {
             const { setUser } = useUserStore.getState();

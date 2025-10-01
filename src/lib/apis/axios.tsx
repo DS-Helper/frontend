@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import { hasCookie, removeCookie } from "../utils/cookies";
+import { hasCookieSync, removeCookie } from "../utils/cookies";
 import { useUserStore } from "../store/userStore";
 
 export const instance: AxiosInstance = axios.create({
@@ -9,17 +9,17 @@ export const instance: AxiosInstance = axios.create({
 
 instance.interceptors.request.use(
   (config) => {
-    // httpOnly 쿠키 존재 여부 확인
-    const hasToken = hasCookie('token');
+    // 인증 상태 확인
+    const hasToken = hasCookieSync('token');
     console.log('=== API 요청 인터셉터 ===');
     console.log('API 요청 URL:', config.url);
-    console.log('쿠키 존재 여부:', hasToken);
+    console.log('인증 상태:', hasToken);
     
     // httpOnly 쿠키는 withCredentials: true로 자동 전송되므로 별도 헤더 설정 불필요
     if (hasToken) {
-      console.log('✅ httpOnly 쿠키가 존재하여 자동으로 전송됨');
+      console.log('✅ 인증된 상태로 요청 전송');
     } else {
-      console.log('❌ 쿠키가 없음');
+      console.log('❌ 인증되지 않은 상태');
     }
     console.log('========================');
     return config;
@@ -42,8 +42,10 @@ instance.interceptors.response.use(
     if (error.response?.status === 401) {
       console.log('인증 실패 - 자동 로그아웃');
       
-      // httpOnly 쿠키는 JavaScript로 삭제할 수 없으므로 백엔드에서 처리해야 함
-      // 스토어에서 사용자 상태만 초기화
+      // localStorage에서 인증 상태 제거
+      localStorage.removeItem('isAuthenticated');
+      
+      // 스토어에서 사용자 상태 초기화
       const { setIsVerified, setUser, setAccessToken } = useUserStore.getState();
       setIsVerified(false);
       setUser(null);
