@@ -3,7 +3,7 @@ import { getCookie, removeCookie } from "../utils/cookies";
 import { useUserStore } from "../store/userStore";
 
 export const instance: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: "https://www.dshelper.kro.kr",
   withCredentials: true,
 });
 
@@ -11,21 +11,12 @@ instance.interceptors.request.use(
   (config) => {
     // 쿠키에서 토큰 읽어오기
     const token = getCookie('token');
-    console.log('=== API 요청 인터셉터 ===');
-    console.log('API 요청 URL:', config.url);
-    console.log('쿠키에서 읽은 토큰:', token);
-    console.log('토큰 타입:', typeof token);
-    console.log('토큰 길이:', token?.length);
-    console.log('현재 모든 쿠키:', document.cookie);
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('✅ Authorization 헤더 추가됨:', config.headers.Authorization);
     } else {
       console.log('❌ 토큰이 없어서 Authorization 헤더를 추가하지 않음');
     }
-    console.log('최종 요청 헤더:', config.headers);
-    console.log('========================');
     return config;
   },
   (error) => Promise.reject(error)
