@@ -9,6 +9,17 @@ export const getCookie = (name: string): string | null => {
   return value || null; 
 };
 
+// httpOnly 쿠키는 JavaScript로 읽을 수 없으므로, 쿠키 존재 여부만 확인
+export const hasCookie = (name: string): boolean => {
+  if (typeof window === 'undefined') return false;
+  
+  // document.cookie에서 쿠키 이름이 포함되어 있는지 확인
+  const cookieExists = document.cookie.includes(`${name}=`);
+  console.log('쿠키 존재 여부 확인:', name, '존재:', cookieExists);
+  console.log('현재 모든 쿠키:', document.cookie);
+  return cookieExists;
+};
+
 export const setCookie = (name: string, value: string, days: number = 7): void => {
   if (typeof window === 'undefined') return;
   
