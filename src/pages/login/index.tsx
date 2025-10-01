@@ -8,18 +8,39 @@ import { MdHome } from "react-icons/md";
 import { FaPhoneAlt } from "react-icons/fa";
 import classNames from "classnames/bind";
 import { useRouter } from "next/router";
+import { getLoginUrl } from "@/lib/apis/authUser";
 
 const cn = classNames.bind(styles);
 
 export default function LoginPage() {
   const router = useRouter();
 
-  const handleKakaoLogin = () => {
-    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID}&redirect_uri=${encodeURIComponent(
-      process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || 'http://localhost:8080/oauth/kakao/login'
-    )}&response_type=code`;
-    
-    window.location.href = kakaoAuthUrl;
+  const handleKakaoLogin = async () => {
+    try {
+      console.log('카카오 로그인 URL 요청 시작');
+      
+      // getLoginUrl API 호출
+      const response = await getLoginUrl();
+      
+      if (response && response.data) {
+        console.log('카카오 로그인 URL 응답:', response.data);
+        
+        // 응답에서 URL 추출 (백엔드 응답 구조에 따라 조정 필요)
+        const loginUrl = response.data.url || response.data.loginUrl || response.data;
+        
+        if (loginUrl) {
+          // 카카오 로그인 페이지로 리다이렉트
+          window.location.href = loginUrl;
+        } else {
+          throw new Error('로그인 URL을 받아오지 못했습니다.');
+        }
+      } else {
+        throw new Error('로그인 URL 요청에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('카카오 로그인 URL 요청 중 오류:', error);
+      alert('카카오 로그인을 시작할 수 없습니다. 다시 시도해주세요.');
+    }
   };
 
   return (
