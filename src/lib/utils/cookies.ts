@@ -38,6 +38,9 @@ export const hasCookieSync = (name: string): boolean => {
   const isAuthenticated = authStatus === 'true';
   
   console.log('동기 인증 상태 확인:', name, '인증됨:', isAuthenticated);
+  console.log('localStorage isAuthenticated:', authStatus);
+  console.log('현재 모든 쿠키:', document.cookie);
+  
   return isAuthenticated;
 };
 
