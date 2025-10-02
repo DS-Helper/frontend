@@ -9,16 +9,28 @@ export const getCookie = (name: string): string | null => {
   return value || null; 
 };
 
-// httpOnly 쿠키는 JavaScript로 읽을 수 없으므로, localStorage로 인증 상태 확인
+// httpOnly 쿠키는 JavaScript로 읽을 수 없으므로, Zustand persist로 저장된 인증 상태 확인
 export const hasCookie = (name: string): boolean => {
   if (typeof window === 'undefined') return false;
   
-  // localStorage에서 인증 상태 확인
-  const authStatus = localStorage.getItem('isAuthenticated');
-  const isAuthenticated = authStatus === 'true';
+  // Zustand persist로 저장된 user-store에서 isVerified 확인
+  const userStoreData = localStorage.getItem('user-store');
+  let isVerified = false;
   
-  console.log('인증 상태 확인:', name, '인증됨:', isAuthenticated);
-  return isAuthenticated;
+  if (userStoreData) {
+    try {
+      const parsed = JSON.parse(userStoreData);
+      isVerified = parsed.state?.isVerified || false;
+    } catch (error) {
+      console.error('user-store 파싱 오류:', error);
+    }
+  }
+  
+  console.log('인증 상태 확인:', name, '인증됨:', isVerified);
+  console.log('user-store 데이터:', userStoreData);
+  console.log('현재 모든 쿠키:', document.cookie);
+  
+  return isVerified;
 };
 
 // 동기 버전 (기존 호환성을 위해)

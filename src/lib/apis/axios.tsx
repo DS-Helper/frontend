@@ -42,10 +42,7 @@ instance.interceptors.response.use(
     if (error.response?.status === 401) {
       console.log('인증 실패 - 자동 로그아웃');
       
-      // localStorage에서 인증 상태 제거
-      localStorage.removeItem('isAuthenticated');
-      
-      // 스토어에서 사용자 상태 초기화
+      // 스토어에서 사용자 상태 초기화 (Zustand persist로 자동 저장됨)
       const { setIsVerified, setUser, setAccessToken } = useUserStore.getState();
       setIsVerified(false);
       setUser(null);

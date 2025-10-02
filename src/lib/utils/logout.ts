@@ -13,10 +13,7 @@ export const handleLogout = async () => {
     // 쿠키에서 토큰 제거
     removeCookie('token');
     
-    // localStorage에서 인증 상태 제거
-    localStorage.removeItem('isAuthenticated');
-    
-    // 스토어에서 사용자 상태 초기화
+    // 스토어에서 사용자 상태 초기화 (Zustand persist로 자동 저장됨)
     const { setIsVerified, setUser, setAccessToken } = useUserStore.getState();
     setIsVerified(false);
     setUser(null);
@@ -29,7 +26,6 @@ export const handleLogout = async () => {
     
     // 에러가 발생해도 로컬 상태는 초기화
     removeCookie('token');
-    localStorage.removeItem('isAuthenticated');
     const { setIsVerified, setUser, setAccessToken } = useUserStore.getState();
     setIsVerified(false);
     setUser(null);
