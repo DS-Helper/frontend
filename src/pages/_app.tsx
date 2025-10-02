@@ -12,7 +12,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     // 앱 시작 시 인증 상태 확인
-    checkAuthStatus();
+    checkAuthStatus().catch(console.error);
   }, [checkAuthStatus]);
 
   return (
