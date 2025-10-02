@@ -11,40 +11,40 @@ export const getCookie = (name: string): string | null => {
 
 // httpOnly 쿠키는 JavaScript로 읽을 수 없으므로, Zustand persist로 저장된 인증 상태 확인
 export const hasCookie = (name: string): boolean => {
-  if (typeof window === 'undefined') return false;
+  console.log('=== hasCookie 함수 호출됨 ===');
+  console.log('함수 파라미터 name:', name);
+  
+  if (typeof window === 'undefined') {
+    console.log('window가 undefined - SSR 환경');
+    return false;
+  }
+  
+  console.log('브라우저 환경에서 실행됨');
   
   // Zustand persist로 저장된 user-store에서 isVerified 확인
   const userStoreData = localStorage.getItem('user-store');
   let isVerified = false;
   
+  console.log('localStorage에서 user-store 데이터:', userStoreData);
+  
   if (userStoreData) {
     try {
       const parsed = JSON.parse(userStoreData);
+      console.log('파싱된 user-store 데이터:', parsed);
       isVerified = parsed.state?.isVerified || false;
+      console.log('추출된 isVerified 값:', isVerified);
     } catch (error) {
       console.error('user-store 파싱 오류:', error);
     }
+  } else {
+    console.log('user-store 데이터가 없음');
   }
   
-  console.log('인증 상태 확인:', name, '인증됨:', isVerified);
-  console.log('user-store 데이터:', userStoreData);
+  console.log('최종 인증 상태:', isVerified);
   console.log('현재 모든 쿠키:', document.cookie);
+  console.log('=== hasCookie 함수 종료 ===');
   
   return isVerified;
-};
-
-// 동기 버전 (기존 호환성을 위해)
-export const hasCookieSync = (name: string): boolean => {
-  if (typeof window === 'undefined') return false;
-  
-  // localStorage에서 인증 상태 확인 (로그인 시 설정됨)
-  const authStatus = localStorage.getItem('isAuthenticated');
-  const isAuthenticated = authStatus === 'true';
-  
-  console.log('동기 인증 상태 확인:', name, '인증됨:', isAuthenticated);
-  console.log('localStorage isAuthenticated:', authStatus);
-  
-  return isAuthenticated;
 };
 
 export const setCookie = (name: string, value: string, days: number = 7): void => {

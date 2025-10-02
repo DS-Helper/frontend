@@ -23,6 +23,8 @@ export const useUserStore = create(
       setAccessToken: (token) => set({ accessToken: token }),
       setIsVerified: (isVerified) => set({ isVerified }),
       checkAuthStatus: () => {
+        console.log('=== checkAuthStatus 함수 호출됨 ===');
+        
         // localStorage에서 인증 상태 확인
         const hasToken = hasCookie('token');
         console.log('checkAuthStatus 호출 - 인증 상태:', hasToken);
@@ -34,6 +36,8 @@ export const useUserStore = create(
           set({ isVerified: false, user: null, accessToken: null });
           console.log('인증 상태: false로 설정');
         }
+        
+        console.log('=== checkAuthStatus 함수 종료 ===');
       },
     }),
     { name: "user-store" }
