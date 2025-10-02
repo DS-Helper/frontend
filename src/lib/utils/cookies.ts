@@ -9,24 +9,16 @@ export const getCookie = (name: string): string | null => {
   return value || null; 
 };
 
-// httpOnly 쿠키는 JavaScript로 읽을 수 없으므로, API 호출로 인증 상태 확인
-export const hasCookie = async (name: string): Promise<boolean> => {
+// httpOnly 쿠키는 JavaScript로 읽을 수 없으므로, localStorage로 인증 상태 확인
+export const hasCookie = (name: string): boolean => {
   if (typeof window === 'undefined') return false;
   
-  try {
-    // 백엔드에 인증 상태 확인 요청
-    const response = await fetch('https://www.dshelper.kro.kr/api/auth/check', {
-      method: 'GET',
-      credentials: 'include', // 쿠키 포함
-    });
-    
-    const isAuthenticated = response.ok;
-    console.log('인증 상태 확인:', name, '인증됨:', isAuthenticated);
-    return isAuthenticated;
-  } catch (error) {
-    console.error('인증 상태 확인 실패:', error);
-    return false;
-  }
+  // localStorage에서 인증 상태 확인
+  const authStatus = localStorage.getItem('isAuthenticated');
+  const isAuthenticated = authStatus === 'true';
+  
+  console.log('인증 상태 확인:', name, '인증됨:', isAuthenticated);
+  return isAuthenticated;
 };
 
 // 동기 버전 (기존 호환성을 위해)
@@ -39,7 +31,6 @@ export const hasCookieSync = (name: string): boolean => {
   
   console.log('동기 인증 상태 확인:', name, '인증됨:', isAuthenticated);
   console.log('localStorage isAuthenticated:', authStatus);
-  console.log('현재 모든 쿠키:', document.cookie);
   
   return isAuthenticated;
 };
