@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import { hasCookieSync, removeCookie } from "../utils/cookies";
+import { hasCookie, removeCookie } from "../utils/cookies";
 import { useUserStore } from "../store/userStore";
 
 export const instance: AxiosInstance = axios.create({
@@ -10,7 +10,7 @@ export const instance: AxiosInstance = axios.create({
 instance.interceptors.request.use(
   (config) => {
     // 인증 상태 확인
-    const hasToken = hasCookieSync('token');
+    const hasToken = hasCookie('token');
     console.log('=== API 요청 인터셉터 ===');
     console.log('API 요청 URL:', config.url);
     console.log('인증 상태:', hasToken);
