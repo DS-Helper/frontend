@@ -12,14 +12,10 @@ export default function KakaoLoginPage() {
 
   const handleKakaoLogin = useCallback(async (code: string) => {
     try {
-      console.log('카카오 로그인 처리 시작, code:', code);
-      
       // getLogin API 호출 (code를 파라미터로 전달)
       const response = await getLogin({ code });
       
       if (response && response.data) {
-        console.log('getLogin API 응답:', response.data);
-        
         const data = response.data;
         
         if (data.token) {
@@ -44,7 +40,6 @@ export default function KakaoLoginPage() {
         throw new Error('로그인 요청에 실패했습니다.');
       }
     } catch (error) {
-      console.error('카카오 로그인 처리 중 오류:', error);
       alert('로그인 처리 중 오류가 발생했습니다.');
       router.push('/login');
     }
@@ -57,7 +52,6 @@ export default function KakaoLoginPage() {
     const error = urlParams.get('error');
 
     if (error) {
-      console.error('카카오 로그인 에러:', error);
       alert('카카오 로그인에 실패했습니다.');
       router.push('/login');
       return;

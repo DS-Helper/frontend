@@ -9,7 +9,7 @@ export const getCookie = (name: string): string | null => {
   return value || null; 
 };
 
-// httpOnly 쿠키는 JavaScript로 읽을 수 없으므로, Zustand persist로 저장된 인증 상태 확인
+// httpOnly 쿠키는 JavaScript로 읽을 수 없으므로, localStorage에 저장된 인증 상태 확인
 export const hasCookie = (name: string): boolean => {
   console.log('=== hasCookie 함수 호출됨 ===');
   console.log('함수 파라미터 name:', name);
@@ -22,7 +22,7 @@ export const hasCookie = (name: string): boolean => {
   console.log('브라우저 환경에서 실행됨');
   
   try {
-    // localStorage 접근 시 예외 처리 추가
+    // localStorage에서 인증 상태 확인
     const userStoreData = localStorage.getItem('user-store');
     let isVerified = false;
     

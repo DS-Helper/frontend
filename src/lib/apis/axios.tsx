@@ -1,5 +1,4 @@
 import axios, { AxiosInstance } from "axios";
-import { hasCookie, removeCookie } from "../utils/cookies";
 import { useUserStore } from "../store/userStore";
 
 export const instance: AxiosInstance = axios.create({
@@ -9,19 +8,6 @@ export const instance: AxiosInstance = axios.create({
 
 instance.interceptors.request.use(
   (config) => {
-    // 인증 상태 확인
-    const hasToken = hasCookie('token');
-    console.log('=== API 요청 인터셉터 ===');
-    console.log('API 요청 URL:', config.url);
-    console.log('인증 상태:', hasToken);
-    
-    // httpOnly 쿠키는 withCredentials: true로 자동 전송되므로 별도 헤더 설정 불필요
-    if (hasToken) {
-      console.log('✅ 인증된 상태로 요청 전송');
-    } else {
-      console.log('❌ 인증되지 않은 상태');
-    }
-    console.log('========================');
     return config;
   },
   (error) => Promise.reject(error)
@@ -30,18 +16,15 @@ instance.interceptors.request.use(
 // 응답 인터셉터 추가
 instance.interceptors.response.use(
   (response) => {
-    console.log('✅ API 응답 성공:', response.status, response.config.url);
+    // API 호출 성공 시 인증 상태를 true로 설정
+    const { setIsVerified } = useUserStore.getState();
+    setIsVerified(true);
+    
     return response;
   },
   (error) => {
-    console.log('❌ API 응답 에러:', error.response?.status, error.config?.url);
-    console.log('에러 응답 데이터:', error.response?.data);
-    console.log('요청 헤더:', error.config?.headers);
-    
     // 401 에러 (인증 실패) 시 자동 로그아웃
     if (error.response?.status === 401) {
-      console.log('인증 실패 - 자동 로그아웃');
-      
       // 스토어에서 사용자 상태 초기화 (Zustand persist로 자동 저장됨)
       const { setIsVerified, setUser, setAccessToken } = useUserStore.getState();
       setIsVerified(false);
@@ -51,6 +34,17 @@ instance.interceptors.response.use(
       // 로그인 페이지로 리다이렉트
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
+      }
+    }
+    
+    // 403 에러 (권한 없음) 시 처리
+    if (error.response?.status === 403) {
+      console.error('403 에러: 권한이 없습니다.');
+      console.error('에러 응답:', error.response?.data);
+      
+      // 사용자에게 권한 에러 알림
+      if (typeof window !== 'undefined') {
+        alert('해당 기능에 대한 권한이 없습니다. 관리자에게 문의하세요.');
       }
     }
     
