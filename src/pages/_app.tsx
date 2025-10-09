@@ -11,10 +11,8 @@ export default function App({ Component, pageProps }: AppProps) {
   const { checkAuthStatus } = useUserStore();
 
   useEffect(() => {
-    console.log('=== _app.tsx useEffect 실행됨 ===');
     // 앱 시작 시 인증 상태 확인
     checkAuthStatus();
-    console.log('=== _app.tsx useEffect 종료 ===');
   }, [checkAuthStatus]);
 
   return (

@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { User } from "@/types/userType";
 import { persist } from "zustand/middleware";
 import { hasCookie } from "../utils/cookies";
+import { instance } from "../apis/axios";
 
 interface UserState {
   user: User | null;
@@ -29,16 +30,27 @@ export const useUserStore = create(
         const currentState = get();
         console.log('현재 스토어 상태:', currentState);
         
-        // localStorage에서 인증 상태 확인
+        // localStorage에서 기존 인증 상태 확인
         const hasToken = hasCookie('token');
-        console.log('checkAuthStatus 호출 - 인증 상태:', hasToken);
+        console.log('localStorage 기반 인증 상태:', hasToken);
         
         if (hasToken) {
-          set({ isVerified: true });
-          console.log('인증 상태: true로 설정');
+          // localStorage에 인증 상태가 있으면 실제 API 호출로 확인
+          console.log('localStorage에 인증 상태 있음 - API 호출로 확인');
+          
+          // 간단한 API 호출로 쿠키 존재 여부 확인
+          instance.get('/oauth/kakao/login-url') // 기존에 있는 간단한 엔드포인트
+            .then((response) => {
+              console.log('✅ 쿠키 확인 성공 - 인증 상태: true');
+              set({ isVerified: true });
+            })
+            .catch((error) => {
+              console.log('❌ 쿠키 확인 실패 - 인증 상태: false');
+              set({ isVerified: false, user: null, accessToken: null });
+            });
         } else {
+          console.log('localStorage에 인증 상태 없음 - 인증 상태: false');
           set({ isVerified: false, user: null, accessToken: null });
-          console.log('인증 상태: false로 설정');
         }
         
         console.log('=== checkAuthStatus 함수 종료 ===');

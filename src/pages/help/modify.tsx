@@ -4,7 +4,8 @@ import styles from "@/styles/Modify.module.scss";
 import Image from "next/image"
 import classNames from "classnames/bind";
 import DateTimeSelector from "@/components/Calendar/DateTimeSelector";
-import { postReservation } from "@/lib/apis/reservation"; 
+import { postReservation } from "@/lib/apis/reservation";
+import { useUserStore } from "@/lib/store/userStore"; 
 
 const cn = classNames.bind(styles);
 
@@ -16,6 +17,7 @@ import both from "@/public/reservate_both.svg"
 
 export default function ModifyPage() {
   const router = useRouter();
+  const { user } = useUserStore();
   const [type, setType] = useState<"personal" | "org">("personal");
   const [recipientGenderType, setRecipientGenderType] = useState<"male" | "female" | "both" | null>("male");
 
@@ -32,9 +34,19 @@ export default function ModifyPage() {
 
   // 달력 변경 시 validation 상태 초기화
   const handleDateTimeChange = (data: any) => {
+    // 날짜는 ISO 문자열로 전송
     setVisitDate(data.visitDate.toISOString());
-    setStartTime(data.startTime.toISOString());
-    setEndTime(data.endTime.toISOString());
+    
+    // 시간은 HH:mm 형식으로 전송 (LocalTime 형식)
+    const formatTime = (date: Date) => {
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
+    };
+    
+    setStartTime(formatTime(data.startTime));
+    setEndTime(formatTime(data.endTime));
+    
     // 달력 변경 시 에러 상태 초기화
     setShowErrors(false);
   };
@@ -60,7 +72,12 @@ export default function ModifyPage() {
           recipientNumber,
         };
   
-        const res = await postReservation(payload);
+        // 사용자 타입에 따라 적절한 API 호출
+        const userType = user?.type || 'personal';
+        console.log('현재 사용자:', user);
+        console.log('사용자 타입:', userType);
+        
+        const res = await postReservation(payload, userType);
         console.log(res);
         if (res) {
           router.push("/help/complete");
