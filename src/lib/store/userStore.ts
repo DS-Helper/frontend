@@ -15,7 +15,7 @@ interface UserState {
 
 export const useUserStore = create(
   persist<UserState>(
-    (set) => ({
+    (set, get) => ({
       user: null,
       accessToken: null,
       isVerified: false,
@@ -23,6 +23,12 @@ export const useUserStore = create(
       setAccessToken: (token) => set({ accessToken: token }),
       setIsVerified: (isVerified) => set({ isVerified }),
       checkAuthStatus: () => {
+        console.log('=== checkAuthStatus 함수 호출됨 ===');
+        
+        // 현재 상태에서 isVerified 확인 (하이드레이션된 상태)
+        const currentState = get();
+        console.log('현재 스토어 상태:', currentState);
+        
         // localStorage에서 인증 상태 확인
         const hasToken = hasCookie('token');
         console.log('checkAuthStatus 호출 - 인증 상태:', hasToken);
@@ -34,8 +40,23 @@ export const useUserStore = create(
           set({ isVerified: false, user: null, accessToken: null });
           console.log('인증 상태: false로 설정');
         }
+        
+        console.log('=== checkAuthStatus 함수 종료 ===');
       },
     }),
-    { name: "user-store" }
+    { 
+      name: "user-store",
+      // 하이드레이션 완료 후 콜백 추가
+      onRehydrateStorage: () => (state) => {
+        console.log('=== Zustand 하이드레이션 완료 ===');
+        if (state) {
+          console.log('하이드레이션된 상태:', state);
+          // 하이드레이션 완료 후 인증 상태 재확인
+          setTimeout(() => {
+            state.checkAuthStatus();
+          }, 100);
+        }
+      }
+    }
   )
 );
