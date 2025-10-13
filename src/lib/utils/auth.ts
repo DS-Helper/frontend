@@ -8,8 +8,8 @@ export const isAuthenticated = async (): Promise<boolean> => {
     const { getCheckAuth } = await import('../apis/authUser');
     const response = await getCheckAuth();
     // true = 로그아웃, false = 로그인이므로 반대로 처리
-    return response && response.data === false;
-  } catch (error) {
+    return !!(response && response.data === false);
+  } catch {
     return false;
   }
 };
