@@ -22,6 +22,30 @@ export const clearAuthState = (): void => {
   }
 };
 
+// 모든 쿠키를 나열하는 함수 (디버깅용)
+export const listAllCookies = (): void => {
+  console.log('=== 모든 쿠키 목록 ===');
+  console.log('document.cookie:', document.cookie);
+  
+  if (document.cookie) {
+    const cookies = document.cookie.split(';');
+    console.log('총 쿠키 개수:', cookies.length);
+    
+    cookies.forEach((cookie, index) => {
+      const [name, value] = cookie.trim().split('=');
+      console.log(`쿠키 ${index + 1}:`, { name, value });
+    });
+  } else {
+    console.log('쿠키가 없습니다.');
+  }
+  
+  // js-cookie로도 확인
+  console.log('js-cookie로 token 읽기:', Cookies.get('token'));
+  console.log('js-cookie로 accessToken 읽기:', Cookies.get('accessToken'));
+  console.log('js-cookie로 refreshToken 읽기:', Cookies.get('refreshToken'));
+  console.log('js-cookie로 모든 쿠키:', Cookies.get());
+};
+
 // 쿠키 설정 테스트 함수 (디버깅용)
 export const testCookieSetting = (): void => {
   console.log('=== 쿠키 설정 테스트 시작 ===');
@@ -31,9 +55,10 @@ export const testCookieSetting = (): void => {
   // 잠시 후 확인
   setTimeout(() => {
     console.log('=== 쿠키 설정 테스트 결과 ===');
-    const retrievedValue = Cookies.get('token');
+    listAllCookies();
+    const retrievedValue = Cookies.get('accessToken'); // 실제 쿠키 이름으로 확인
     console.log('설정한 값:', testValue);
-    console.log('읽어온 값:', retrievedValue);
+    console.log('읽어온 값 (accessToken):', retrievedValue);
     console.log('테스트 성공:', retrievedValue === testValue);
   }, 100);
 };

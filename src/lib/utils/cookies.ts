@@ -4,15 +4,20 @@ import Cookies from 'js-cookie';
 export const getCookie = (name: string): string | null => {
   if (typeof window === 'undefined') return null;
   
-  const value = Cookies.get(name);
-  console.log('쿠키 읽기 시도:', name, '값:', value);
+  // name이 'token'인 경우 'accessToken'으로 변경
+  const actualCookieName = name === 'token' ? 'accessToken' : name;
+  const value = Cookies.get(actualCookieName);
+  console.log('쿠키 읽기 시도:', name, '->', actualCookieName, '값:', value);
   return value || null; 
 };
 
 // 쿠키 존재 여부 확인 (실제 쿠키와 localStorage 모두 확인)
 export const hasCookie = (name: string): boolean => {
+  // name이 'token'인 경우 'accessToken'으로 변경
+  const actualCookieName = name === 'token' ? 'accessToken' : name;
   console.log('=== hasCookie 함수 호출됨 ===');
   console.log('함수 파라미터 name:', name);
+  console.log('실제 사용할 쿠키 이름:', actualCookieName);
   
   if (typeof window === 'undefined') {
     console.log('window가 undefined - SSR 환경');
@@ -26,22 +31,51 @@ export const hasCookie = (name: string): boolean => {
     console.log('현재 모든 쿠키:', document.cookie);
     console.log('쿠키 개수:', document.cookie ? document.cookie.split(';').length : 0);
     
-    // 1. 먼저 실제 쿠키 확인
-    const actualCookie = Cookies.get(name);
+    // 1. 먼저 실제 쿠키 확인 (올바른 이름 사용)
+    const actualCookie = Cookies.get(actualCookieName);
     console.log('실제 쿠키 값:', actualCookie);
     console.log('쿠키 값 타입:', typeof actualCookie);
     console.log('쿠키 값 길이:', actualCookie ? actualCookie.length : 0);
     
-    // 1-1. 다른 방법으로도 쿠키 확인
+    // 1-1. 다른 방법으로도 쿠키 확인 (올바른 이름 사용)
     const cookieFromDocument = document.cookie
       .split('; ')
-      .find(row => row.startsWith(name + '='));
+      .find(row => row.startsWith(actualCookieName + '='));
     console.log('document.cookie에서 찾은 쿠키:', cookieFromDocument);
     
     if (cookieFromDocument) {
       const cookieValue = cookieFromDocument.split('=')[1];
       console.log('document.cookie에서 추출한 값:', cookieValue);
     }
+    
+    // 1-2. 모든 쿠키를 나열하여 확인
+    console.log('=== 현재 모든 쿠키 상세 분석 ===');
+    if (document.cookie) {
+      const cookies = document.cookie.split(';');
+      cookies.forEach((cookie, index) => {
+        const trimmedCookie = cookie.trim();
+        const [cookieName, cookieValue] = trimmedCookie.split('=');
+        console.log(`쿠키 ${index + 1}:`, { 
+          name: cookieName, 
+          value: cookieValue,
+          isToken: cookieName === actualCookieName,
+          fullString: trimmedCookie
+        });
+      });
+    }
+    
+    // 1-3. 다양한 방법으로 token 쿠키 찾기
+    const tokenCookies = [];
+    if (document.cookie) {
+      const cookies = document.cookie.split(';');
+      cookies.forEach(cookie => {
+        const trimmedCookie = cookie.trim();
+        if (trimmedCookie.toLowerCase().includes('token')) {
+          tokenCookies.push(trimmedCookie);
+        }
+      });
+    }
+    console.log('token이 포함된 쿠키들:', tokenCookies);
     
     // 2. localStorage에서 인증 상태 확인
     const userStoreData = localStorage.getItem('user-store');
@@ -87,7 +121,7 @@ export const hasCookie = (name: string): boolean => {
     
     const isAuthenticated = hasActualCookie || hasValidLocalStorage;
     console.log('최종 인증 상태:', isAuthenticated);
-    console.log('인증 상태 결정 이유:', hasActualCookie ? '쿠키 존재' : (hasValidLocalStorage ? 'localStorage 유효' : '둘 다 없음'));
+    console.log('인증 상태 결정 이유:', hasActualCookie ? `쿠키 존재 (${actualCookieName})` : (hasValidLocalStorage ? 'localStorage 유효' : '둘 다 없음'));
     
     return isAuthenticated;
   } catch (error) {
@@ -102,6 +136,10 @@ export const setCookie = (name: string, value: string, days: number = 7): void =
   console.log('쿠키 이름:', name);
   console.log('쿠키 값:', value);
   console.log('유효 기간:', days, '일');
+  
+  // name이 'token'인 경우 'accessToken'으로 변경
+  const actualCookieName = name === 'token' ? 'accessToken' : name;
+  console.log('실제 설정할 쿠키 이름:', actualCookieName);
   
   if (typeof window === 'undefined') {
     console.log('window가 undefined - SSR 환경에서 쿠키 설정 불가');
@@ -126,19 +164,19 @@ export const setCookie = (name: string, value: string, days: number = 7): void =
   
   try {
     // 쿠키 설정 전 현재 상태 확인
-    console.log('설정 전 쿠키 값:', Cookies.get(name));
+    console.log('설정 전 쿠키 값:', Cookies.get(actualCookieName));
     console.log('설정 전 모든 쿠키:', document.cookie);
     
     // 방법 1: js-cookie 라이브러리 사용
-    Cookies.set(name, value, options);
+    Cookies.set(actualCookieName, value, options);
     
     // 방법 2: 직접 document.cookie 설정 (백업)
-    const cookieString = `${name}=${value}; path=/; max-age=${days * 24 * 60 * 60}`;
+    const cookieString = `${actualCookieName}=${value}; path=/; max-age=${days * 24 * 60 * 60}`;
     document.cookie = cookieString;
     console.log('직접 설정한 쿠키 문자열:', cookieString);
     
     // 쿠키 설정 후 확인
-    const setCookieValue = Cookies.get(name);
+    const setCookieValue = Cookies.get(actualCookieName);
     console.log('설정 후 쿠키 값:', setCookieValue);
     console.log('설정 후 모든 쿠키:', document.cookie);
     
@@ -158,7 +196,7 @@ export const setCookie = (name: string, value: string, days: number = 7): void =
     }
     
     // 디버깅을 위한 로그
-    console.log('쿠키 설정 완료:', name, '=', value, '옵션:', options);
+    console.log('쿠키 설정 완료:', name, '->', actualCookieName, '=', value, '옵션:', options);
   } catch (error) {
     console.error('❌ 쿠키 설정 오류:', error);
   }
@@ -169,13 +207,16 @@ export const setCookie = (name: string, value: string, days: number = 7): void =
 export const removeCookie = (name: string): void => {
   if (typeof window === 'undefined') return;
   
+  // name이 'token'인 경우 'accessToken'으로 변경
+  const actualCookieName = name === 'token' ? 'accessToken' : name;
+  
   try {
     const isHttps = window.location.protocol === 'https:';
-    Cookies.remove(name, { 
+    Cookies.remove(actualCookieName, { 
       path: '/',
       secure: isHttps // HTTPS 환경에서는 secure 옵션 추가
     });
-    console.log('쿠키 삭제:', name);
+    console.log('쿠키 삭제:', name, '->', actualCookieName);
   } catch (error) {
     console.error('쿠키 삭제 오류:', error);
   }
