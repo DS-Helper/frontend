@@ -57,8 +57,13 @@ export const useUserStore = create(
         console.log('=== Zustand 하이드레이션 완료 ===');
         if (state) {
           console.log('하이드레이션된 상태:', state);
+          console.log('하이드레이션된 isVerified:', state.isVerified);
+          console.log('하이드레이션된 user:', state.user);
+          console.log('하이드레이션된 accessToken:', state.accessToken);
+          
           // 하이드레이션 완료 후 인증 상태 재확인
           setTimeout(() => {
+            console.log('=== 하이드레이션 후 인증 상태 재확인 시작 ===');
             state.checkAuthStatus();
           }, 100);
         }
