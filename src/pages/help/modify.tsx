@@ -19,7 +19,7 @@ export default function ModifyPage() {
   const router = useRouter();
   const { user } = useUserStore();
   const [type, setType] = useState<"personal" | "org">("personal");
-  const [recipientGenderType, setRecipientGenderType] = useState<"male" | "female" | "both" | null>("male");
+  const [recipientGenderType, setRecipientGenderType] = useState<"남" | "여" | null>("남");
 
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -161,9 +161,8 @@ export default function ModifyPage() {
             <label>도움 받는 사람의 성별</label>
             <div className={cn("toggleGroup")}>
               {([
-                { value: "male", label: "남자", src: male },
-                { value: "female", label: "여자", src: female },
-                { value: "both", label: "둘 다 있음", src: both },
+                { value: "남", label: "남자", src: male },
+                { value: "여", label: "여자", src: female },
               ] as const).map((g) => (
                 <button
                   key={g.value}
@@ -185,7 +184,7 @@ export default function ModifyPage() {
             <label>도움 받는 사람 수 <span className={cn("required")}>(필수)</span></label>
             <input 
               type="text" 
-              placeholder="1명" 
+              placeholder="1" 
               value={recipientNumber} 
               onChange={(e) => setRecipientNumber(e.target.value)} 
               className={showErrors && !recipientNumber ? cn("error") : undefined} 

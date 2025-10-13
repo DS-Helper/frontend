@@ -5,6 +5,7 @@ import styles from "@/styles/HelpList.module.scss";
 import { HelpRequestStatus, HelpRequest } from "@/types/helpList"
 import { helpRequests } from "@/mocks/helpList";
 import { useUserStore } from "@/lib/store/userStore";
+import { getPersonalReservation } from "@/lib/apis/reservation";
 
 const cn = classNames.bind(styles);
 
@@ -16,10 +17,75 @@ export default function HelpListPage() {
   const [activeTab, setActiveTab] = useState<"전체" | "예정" | "완료" | "취소">("전체");
   const [visibleItems, setVisibleItems] = useState<number>(ITEMS_PER_PAGE);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [apiRequests, setApiRequests] = useState<HelpRequest[]>([]);
+  const [isApiLoading, setIsApiLoading] = useState<boolean>(false);
   const observerRef = useRef<HTMLDivElement>(null);
 
-  // 유저가 로그인하지 않은 경우 빈 배열 반환
-  const userRequests = user ? helpRequests.filter((request: HelpRequest) => request.userId === user.id) : [];
+  // API에서 데이터를 가져오는 함수
+  const fetchReservations = async (status?: string) => {
+    setIsApiLoading(true);
+    try {
+      const params = {
+        params: {
+          page: 0,
+          size: 10, // 충분한 데이터를 가져오기 위해 큰 사이즈 설정
+          ...(status && status !== "전체" && { reservationStatus: status })
+        }
+      };
+      
+      console.log('API 요청 파라미터:', params);
+      const response = await getPersonalReservation(params);
+      
+      if (response && response.data) {
+        console.log('API 응답 데이터:', response.data);
+        const rawData = response.data.content || response.data || [];
+        
+        // API 응답 데이터를 HelpRequest 형식으로 매핑
+        const mappedData = rawData.map((item: any) => ({
+          id: item.id || item.reservationId || Math.random().toString(),
+          userId: item.userId || user?.id || '',
+          date: item.visitDate ? new Date(item.visitDate).toLocaleDateString('ko-KR') : '',
+          dayOfWeek: item.visitDate ? new Date(item.visitDate).toLocaleDateString('ko-KR', { weekday: 'short' }) : '',
+          content: item.requirement || item.content || '',
+          startTime: item.startTime || '',
+          endTime: item.endTime || '',
+          status: item.reservationStatus || item.status || '예정'
+        }));
+        
+        console.log('매핑된 데이터:', mappedData);
+        setApiRequests(mappedData);
+      } else {
+        console.log('API 응답이 없거나 빈 데이터');
+        setApiRequests([]);
+      }
+    } catch (error) {
+      console.error('예약 목록 조회 실패:', error);
+      setApiRequests([]);
+    } finally {
+      setIsApiLoading(false);
+    }
+  };
+
+  // 탭 변경 시 API 호출
+  useEffect(() => {
+    if (isVerified) {
+      fetchReservations(activeTab);
+    }
+  }, [activeTab, isVerified]);
+
+  // 로그인 상태 변경 시 API 호출
+  useEffect(() => {
+    if (isVerified) {
+      fetchReservations(activeTab);
+    } else {
+      setApiRequests([]);
+    }
+  }, [isVerified]);
+
+  // API 데이터를 사용하거나, 없으면 목업 데이터 사용
+  const userRequests = apiRequests.length > 0 
+    ? apiRequests 
+    : (user ? helpRequests.filter((request: HelpRequest) => request.userId === user.id) : []);
   
   const filteredRequests = activeTab === "전체" 
     ? userRequests 
@@ -61,6 +127,12 @@ export default function HelpListPage() {
   useEffect(() => {
     setVisibleItems(ITEMS_PER_PAGE);
   }, [activeTab]);
+
+  // 탭 변경 핸들러
+  const handleTabChange = (tab: "전체" | "예정" | "완료" | "취소") => {
+    setActiveTab(tab);
+    setVisibleItems(ITEMS_PER_PAGE);
+  };
 
   const getStatusColor = (status: HelpRequestStatus) => {
     switch (status) {
@@ -109,7 +181,8 @@ export default function HelpListPage() {
             <button
               key={tab}
               className={cn("tabButton", { active: activeTab === tab })}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => handleTabChange(tab)}
+              disabled={isApiLoading}
             >
               {tab}
             </button>
@@ -120,7 +193,23 @@ export default function HelpListPage() {
       {/* 도움 요청 목록 */}
       <main className={cn("mainContent")}>
         <div className={cn("helpList")}>
-          {displayedRequests.map((request: HelpRequest) => (
+          {/* API 로딩 중일 때 */}
+          {isApiLoading && (
+            <div className={cn("loadingIndicator")}>
+              <div className={cn("spinner")}></div>
+              <span>예약 목록을 불러오는 중...</span>
+            </div>
+          )}
+          
+          {/* 데이터가 없을 때 */}
+          {!isApiLoading && displayedRequests.length === 0 && (
+            <div className={cn("emptyState")}>
+              <p>해당 상태의 예약이 없습니다.</p>
+            </div>
+          )}
+          
+          {/* 예약 목록 */}
+          {!isApiLoading && displayedRequests.map((request: HelpRequest) => (
             <div key={request.id} className={cn("helpCard")}>
               {/* 날짜 및 상태 */}
               <div className={cn("cardHeader")}>

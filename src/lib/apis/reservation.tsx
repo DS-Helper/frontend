@@ -11,6 +11,16 @@ export const postPersonalReservation = async (data: any) => {
   }
 };
 
+export const getPersonalReservation = async (params: any) => {
+  try {
+    const res = await instance.get("/personal-reservations", params);
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
 // 조직 사용자 예약
 export const postOrganizationReservation = async (data: any) => {
   try {
