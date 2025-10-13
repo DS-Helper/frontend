@@ -25,6 +25,7 @@ export const hasCookie = (name: string): boolean => {
     // localStorage에서 인증 상태 확인
     const userStoreData = localStorage.getItem('user-store');
     let isVerified = false;
+    let hasValidUser = false;
     
     console.log('localStorage에서 user-store 데이터:', userStoreData);
     
@@ -32,20 +33,27 @@ export const hasCookie = (name: string): boolean => {
       try {
         const parsed = JSON.parse(userStoreData);
         console.log('파싱된 user-store 데이터:', parsed);
+        
+        // isVerified와 user 데이터 모두 확인
         isVerified = parsed.state?.isVerified || false;
+        hasValidUser = !!(parsed.state?.user && parsed.state.user.id);
+        
         console.log('추출된 isVerified 값:', isVerified);
+        console.log('유효한 사용자 데이터 존재:', hasValidUser);
+        
+        // 둘 다 true여야만 인증된 상태로 간주
+        const isAuthenticated = isVerified && hasValidUser;
+        console.log('최종 인증 상태:', isAuthenticated);
+        
+        return isAuthenticated;
       } catch (error) {
         console.error('user-store 파싱 오류:', error);
+        return false;
       }
     } else {
       console.log('user-store 데이터가 없음');
+      return false;
     }
-    
-    console.log('최종 인증 상태:', isVerified);
-    console.log('현재 모든 쿠키:', document.cookie);
-    console.log('=== hasCookie 함수 종료 ===');
-    
-    return isVerified;
   } catch (error) {
     console.error('localStorage 접근 오류:', error);
     console.log('localStorage 접근 실패 - 인증 상태: false 반환');

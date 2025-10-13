@@ -42,14 +42,20 @@ export const useUserStore = create(
           instance.get('/oauth/kakao/login-url') // 기존에 있는 간단한 엔드포인트
             .then((response) => {
               console.log('✅ 쿠키 확인 성공 - 인증 상태: true');
+              // API 호출 성공 시에만 인증 상태를 true로 설정
               set({ isVerified: true });
             })
             .catch((error) => {
               console.log('❌ 쿠키 확인 실패 - 인증 상태: false');
+              console.log('API 오류:', error);
+              // API 호출 실패 시 모든 인증 관련 데이터 초기화
               set({ isVerified: false, user: null, accessToken: null });
+              // localStorage도 정리
+              localStorage.removeItem('user-store');
             });
         } else {
           console.log('localStorage에 인증 상태 없음 - 인증 상태: false');
+          // 인증 상태가 없으면 모든 데이터 초기화
           set({ isVerified: false, user: null, accessToken: null });
         }
         
