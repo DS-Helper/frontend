@@ -27,12 +27,12 @@ export const useUserStore = create(
         getCheckAuth()
           .then((response) => {
             if (response && response.data === true) {
-              // 서버에서 로그아웃 상태 확인됨 (true = 로그아웃)
+              // 서버에서 로그인 상태 확인됨 (true = 로그인)
+              set({ isVerified: true });
+            } else {
+              // 서버에서 로그아웃 상태 확인됨 (false = 로그아웃)
               set({ isVerified: false, user: null, accessToken: null });
               localStorage.removeItem('user-store');
-            } else {
-              // 서버에서 로그인 상태 확인됨 (false = 로그인)
-              set({ isVerified: true });
             }
           })
           .catch(() => {
