@@ -35,7 +35,7 @@ export const useUserStore = create(
               set({ isVerified: true });
             }
           })
-          .catch((error) => {
+          .catch(() => {
             // API 호출 실패 시 로그아웃 상태로 처리
             set({ isVerified: false, user: null, accessToken: null });
             localStorage.removeItem('user-store');
