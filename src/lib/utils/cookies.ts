@@ -25,6 +25,8 @@ export const hasCookie = (name: string): boolean => {
     // 1. 먼저 실제 쿠키 확인
     const actualCookie = Cookies.get(name);
     console.log('실제 쿠키 값:', actualCookie);
+    console.log('쿠키 값 타입:', typeof actualCookie);
+    console.log('쿠키 값 길이:', actualCookie ? actualCookie.length : 0);
     
     // 2. localStorage에서 인증 상태 확인
     const userStoreData = localStorage.getItem('user-store');
@@ -32,11 +34,16 @@ export const hasCookie = (name: string): boolean => {
     let hasValidUser = false;
     
     console.log('localStorage에서 user-store 데이터:', userStoreData);
+    console.log('user-store 데이터 타입:', typeof userStoreData);
+    console.log('user-store 데이터 길이:', userStoreData ? userStoreData.length : 0);
     
     if (userStoreData) {
       try {
         const parsed = JSON.parse(userStoreData);
         console.log('파싱된 user-store 데이터:', parsed);
+        console.log('parsed.state:', parsed.state);
+        console.log('parsed.state.isVerified:', parsed.state?.isVerified);
+        console.log('parsed.state.user:', parsed.state?.user);
         
         // isVerified와 user 데이터 모두 확인
         isVerified = parsed.state?.isVerified || false;
@@ -44,8 +51,10 @@ export const hasCookie = (name: string): boolean => {
         
         console.log('추출된 isVerified 값:', isVerified);
         console.log('유효한 사용자 데이터 존재:', hasValidUser);
+        console.log('사용자 ID:', parsed.state?.user?.id);
       } catch (error) {
         console.error('user-store 파싱 오류:', error);
+        console.error('파싱 실패한 데이터:', userStoreData);
         return false;
       }
     } else {
@@ -59,9 +68,11 @@ export const hasCookie = (name: string): boolean => {
     
     console.log('실제 쿠키 존재:', hasActualCookie);
     console.log('유효한 localStorage 상태:', hasValidLocalStorage);
+    console.log('쿠키가 비어있지 않은가?', actualCookie && actualCookie.trim() !== '');
     
     const isAuthenticated = hasActualCookie || hasValidLocalStorage;
     console.log('최종 인증 상태:', isAuthenticated);
+    console.log('인증 상태 결정 이유:', hasActualCookie ? '쿠키 존재' : (hasValidLocalStorage ? 'localStorage 유효' : '둘 다 없음'));
     
     return isAuthenticated;
   } catch (error) {

@@ -16,10 +16,8 @@ instance.interceptors.request.use(
 // 응답 인터셉터 추가
 instance.interceptors.response.use(
   (response) => {
-    // API 호출 성공 시 인증 상태를 true로 설정
-    const { setIsVerified } = useUserStore.getState();
-    setIsVerified(true);
-    
+    // API 호출 성공 시에는 인증 상태를 자동으로 변경하지 않음
+    // 인증 상태는 로그인 시에만 설정되고, checkAuthStatus에서 관리됨
     return response;
   },
   (error) => {

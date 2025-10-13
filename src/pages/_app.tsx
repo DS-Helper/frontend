@@ -9,11 +9,20 @@ import { useUserStore } from "@/lib/store/userStore";
 export default function App({ Component, pageProps }: AppProps) {
   const [queryClient] = useState(() => new QueryClient());
   const { checkAuthStatus } = useUserStore();
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    // 앱 시작 시 인증 상태 확인
-    checkAuthStatus();
-  }, [checkAuthStatus]);
+    // 클라이언트 사이드에서 하이드레이션 완료 후 인증 상태 확인
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    // 하이드레이션이 완료된 후에만 인증 상태 확인
+    if (isHydrated) {
+      console.log('=== _app.tsx에서 인증 상태 확인 시작 ===');
+      checkAuthStatus();
+    }
+  }, [isHydrated, checkAuthStatus]);
 
   return (
     <QueryClientProvider client={queryClient}>
