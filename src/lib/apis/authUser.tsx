@@ -19,3 +19,13 @@ export const getLogin = async (data: any) => {
     return null;
   }
 };
+
+export const getCheckAuth = async () => {
+  try {
+    const res = await instance.get("/auth/check-logged-in");
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
