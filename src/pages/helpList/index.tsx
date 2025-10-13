@@ -22,7 +22,7 @@ export default function HelpListPage() {
   const observerRef = useRef<HTMLDivElement>(null);
 
   // API에서 데이터를 가져오는 함수
-  const fetchReservations = async (status?: string) => {
+  const fetchReservations = useCallback(async (status?: string) => {
     setIsApiLoading(true);
     try {
       const params = {
@@ -64,14 +64,14 @@ export default function HelpListPage() {
     } finally {
       setIsApiLoading(false);
     }
-  };
+  }, [user?.id]);
 
   // 탭 변경 시 API 호출
   useEffect(() => {
     if (isVerified) {
       fetchReservations(activeTab);
     }
-  }, [activeTab, isVerified]);
+  }, [activeTab, isVerified, fetchReservations]);
 
   // 로그인 상태 변경 시 API 호출
   useEffect(() => {
@@ -80,7 +80,7 @@ export default function HelpListPage() {
     } else {
       setApiRequests([]);
     }
-  }, [isVerified]);
+  }, [isVerified, activeTab, fetchReservations]);
 
   // API 데이터를 사용하거나, 없으면 목업 데이터 사용
   const userRequests = apiRequests.length > 0 
