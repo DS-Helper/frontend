@@ -32,29 +32,17 @@ export const useUserStore = create(
         
         // localStorage에서 기존 인증 상태 확인
         const hasToken = hasCookie('token');
-        console.log('localStorage 기반 인증 상태:', hasToken);
+        console.log('hasCookie 기반 인증 상태:', hasToken);
         
         if (hasToken) {
-          // localStorage에 인증 상태가 있으면 실제 API 호출로 확인
-          console.log('localStorage에 인증 상태 있음 - API 호출로 확인');
-          
-          // 간단한 API 호출로 쿠키 존재 여부 확인
-          instance.get('/oauth/kakao/login-url') // 기존에 있는 간단한 엔드포인트
-            .then((response) => {
-              console.log('✅ 쿠키 확인 성공 - 인증 상태: true');
-              // API 호출 성공 시에만 인증 상태를 true로 설정
-              set({ isVerified: true });
-            })
-            .catch((error) => {
-              console.log('❌ 쿠키 확인 실패 - 인증 상태: false');
-              console.log('API 오류:', error);
-              // API 호출 실패 시 모든 인증 관련 데이터 초기화
-              set({ isVerified: false, user: null, accessToken: null });
-              // localStorage도 정리
-              localStorage.removeItem('user-store');
-            });
+          console.log('인증 상태 있음 - 상태 유지');
+          // hasCookie에서 이미 쿠키와 localStorage를 모두 확인했으므로
+          // 추가 API 호출 없이 상태를 유지
+          if (!currentState.isVerified) {
+            set({ isVerified: true });
+          }
         } else {
-          console.log('localStorage에 인증 상태 없음 - 인증 상태: false');
+          console.log('인증 상태 없음 - 모든 데이터 초기화');
           // 인증 상태가 없으면 모든 데이터 초기화
           set({ isVerified: false, user: null, accessToken: null });
         }

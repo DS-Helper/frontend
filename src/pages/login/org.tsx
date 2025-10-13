@@ -12,7 +12,7 @@ const cn = classNames.bind(styles);
 export default function OrgLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setIsVerified } = useUserStore();
+  const { setIsVerified, setUser } = useUserStore();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,8 +27,17 @@ export default function OrgLoginPage() {
     
 
     if (res && res.data) {
-      alert("로그인 성공!");
+      // 사용자 정보 저장 (기관 로그인 응답에 사용자 정보가 있다면)
+      if (res.data.user) {
+        setUser(res.data.user);
+      }
+      
+      // 인증 상태 업데이트
       setIsVerified(true);
+      
+      console.log('기관 로그인 성공 - 사용자 정보 저장 완료');
+      
+      alert("로그인 성공!");
       router.push("/");
     } else {
       alert("로그인 실패!");

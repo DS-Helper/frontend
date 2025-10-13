@@ -31,6 +31,9 @@ export default function KakaoLoginPage() {
           // 인증 상태 업데이트 (Zustand persist로 자동 저장됨)
           setIsVerified(true);
           
+          console.log('로그인 성공 - 쿠키 설정 완료, 사용자 정보 저장 완료');
+          console.log('설정된 쿠키:', document.cookie);
+          
           alert('카카오 로그인 성공!');
           router.push('/');
         } else {

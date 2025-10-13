@@ -9,7 +9,7 @@ export const getCookie = (name: string): string | null => {
   return value || null; 
 };
 
-// httpOnly 쿠키는 JavaScript로 읽을 수 없으므로, localStorage에 저장된 인증 상태 확인
+// 쿠키 존재 여부 확인 (실제 쿠키와 localStorage 모두 확인)
 export const hasCookie = (name: string): boolean => {
   console.log('=== hasCookie 함수 호출됨 ===');
   console.log('함수 파라미터 name:', name);
@@ -22,7 +22,11 @@ export const hasCookie = (name: string): boolean => {
   console.log('브라우저 환경에서 실행됨');
   
   try {
-    // localStorage에서 인증 상태 확인
+    // 1. 먼저 실제 쿠키 확인
+    const actualCookie = Cookies.get(name);
+    console.log('실제 쿠키 값:', actualCookie);
+    
+    // 2. localStorage에서 인증 상태 확인
     const userStoreData = localStorage.getItem('user-store');
     let isVerified = false;
     let hasValidUser = false;
@@ -40,23 +44,29 @@ export const hasCookie = (name: string): boolean => {
         
         console.log('추출된 isVerified 값:', isVerified);
         console.log('유효한 사용자 데이터 존재:', hasValidUser);
-        
-        // 둘 다 true여야만 인증된 상태로 간주
-        const isAuthenticated = isVerified && hasValidUser;
-        console.log('최종 인증 상태:', isAuthenticated);
-        
-        return isAuthenticated;
       } catch (error) {
         console.error('user-store 파싱 오류:', error);
         return false;
       }
     } else {
       console.log('user-store 데이터가 없음');
-      return false;
     }
+    
+    // 3. 인증 상태 판단 로직
+    // 실제 쿠키가 있거나, localStorage에 유효한 인증 상태가 있으면 true
+    const hasActualCookie = !!actualCookie;
+    const hasValidLocalStorage = isVerified && hasValidUser;
+    
+    console.log('실제 쿠키 존재:', hasActualCookie);
+    console.log('유효한 localStorage 상태:', hasValidLocalStorage);
+    
+    const isAuthenticated = hasActualCookie || hasValidLocalStorage;
+    console.log('최종 인증 상태:', isAuthenticated);
+    
+    return isAuthenticated;
   } catch (error) {
-    console.error('localStorage 접근 오류:', error);
-    console.log('localStorage 접근 실패 - 인증 상태: false 반환');
+    console.error('쿠키/localStorage 접근 오류:', error);
+    console.log('접근 실패 - 인증 상태: false 반환');
     return false;
   }
 };
