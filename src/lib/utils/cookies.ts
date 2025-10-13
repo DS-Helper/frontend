@@ -65,7 +65,7 @@ export const hasCookie = (name: string): boolean => {
     }
     
     // 1-3. 다양한 방법으로 token 쿠키 찾기
-    const tokenCookies = [];
+    const tokenCookies: string[] = [];
     if (document.cookie) {
       const cookies = document.cookie.split(';');
       cookies.forEach(cookie => {
