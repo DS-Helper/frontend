@@ -20,3 +20,21 @@ export const clearAuthState = (): void => {
     console.log('인증 상태가 초기화되었습니다.');
   }
 };
+
+// 쿠키 설정 테스트 함수 (디버깅용)
+export const testCookieSetting = (): void => {
+  console.log('=== 쿠키 설정 테스트 시작 ===');
+  const { setCookie } = require('./cookies');
+  const testValue = 'test-token-' + Date.now();
+  setCookie('token', testValue, 1);
+  
+  // 잠시 후 확인
+  setTimeout(() => {
+    console.log('=== 쿠키 설정 테스트 결과 ===');
+    const Cookies = require('js-cookie');
+    const retrievedValue = Cookies.get('token');
+    console.log('설정한 값:', testValue);
+    console.log('읽어온 값:', retrievedValue);
+    console.log('테스트 성공:', retrievedValue === testValue);
+  }, 100);
+};

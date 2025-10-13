@@ -22,11 +22,26 @@ export const hasCookie = (name: string): boolean => {
   console.log('브라우저 환경에서 실행됨');
   
   try {
+    // 0. 모든 쿠키 확인
+    console.log('현재 모든 쿠키:', document.cookie);
+    console.log('쿠키 개수:', document.cookie ? document.cookie.split(';').length : 0);
+    
     // 1. 먼저 실제 쿠키 확인
     const actualCookie = Cookies.get(name);
     console.log('실제 쿠키 값:', actualCookie);
     console.log('쿠키 값 타입:', typeof actualCookie);
     console.log('쿠키 값 길이:', actualCookie ? actualCookie.length : 0);
+    
+    // 1-1. 다른 방법으로도 쿠키 확인
+    const cookieFromDocument = document.cookie
+      .split('; ')
+      .find(row => row.startsWith(name + '='));
+    console.log('document.cookie에서 찾은 쿠키:', cookieFromDocument);
+    
+    if (cookieFromDocument) {
+      const cookieValue = cookieFromDocument.split('=')[1];
+      console.log('document.cookie에서 추출한 값:', cookieValue);
+    }
     
     // 2. localStorage에서 인증 상태 확인
     const userStoreData = localStorage.getItem('user-store');
@@ -83,10 +98,22 @@ export const hasCookie = (name: string): boolean => {
 };
 
 export const setCookie = (name: string, value: string, days: number = 7): void => {
-  if (typeof window === 'undefined') return;
+  console.log('=== setCookie 함수 호출됨 ===');
+  console.log('쿠키 이름:', name);
+  console.log('쿠키 값:', value);
+  console.log('유효 기간:', days, '일');
+  
+  if (typeof window === 'undefined') {
+    console.log('window가 undefined - SSR 환경에서 쿠키 설정 불가');
+    return;
+  }
   
   const isProduction = process.env.NODE_ENV === 'production';
   const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+  
+  console.log('현재 환경:', isProduction ? 'production' : 'development');
+  console.log('현재 프로토콜:', window.location.protocol);
+  console.log('HTTPS 여부:', isHttps);
   
   const options = {
     expires: days,
@@ -95,16 +122,36 @@ export const setCookie = (name: string, value: string, days: number = 7): void =
     secure: isProduction || isHttps, // HTTPS 환경에서는 항상 secure
   };
   
+  console.log('쿠키 설정 옵션:', options);
+  
   try {
+    // 쿠키 설정 전 현재 상태 확인
+    console.log('설정 전 쿠키 값:', Cookies.get(name));
+    console.log('설정 전 모든 쿠키:', document.cookie);
+    
     Cookies.set(name, value, options);
     
+    // 쿠키 설정 후 확인
+    const setCookieValue = Cookies.get(name);
+    console.log('설정 후 쿠키 값:', setCookieValue);
+    console.log('설정 후 모든 쿠키:', document.cookie);
+    
+    // 설정 성공 여부 확인
+    if (setCookieValue === value) {
+      console.log('✅ 쿠키 설정 성공');
+    } else {
+      console.log('❌ 쿠키 설정 실패 - 값이 다름');
+      console.log('예상 값:', value);
+      console.log('실제 값:', setCookieValue);
+    }
+    
     // 디버깅을 위한 로그
-    console.log('쿠키 설정:', name, '=', value, '옵션:', options);
-    console.log('현재 프로토콜:', window.location.protocol);
-    console.log('설정된 쿠키 확인:', Cookies.get(name));
+    console.log('쿠키 설정 완료:', name, '=', value, '옵션:', options);
   } catch (error) {
-    console.error('쿠키 설정 오류:', error);
+    console.error('❌ 쿠키 설정 오류:', error);
   }
+  
+  console.log('=== setCookie 함수 종료 ===');
 };
 
 export const removeCookie = (name: string): void => {
