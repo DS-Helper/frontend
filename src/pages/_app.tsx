@@ -19,7 +19,6 @@ export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     // 하이드레이션이 완료된 후에만 인증 상태 확인
     if (isHydrated) {
-      console.log('=== _app.tsx에서 인증 상태 확인 시작 ===');
       checkAuthStatus();
     }
   }, [isHydrated, checkAuthStatus]);

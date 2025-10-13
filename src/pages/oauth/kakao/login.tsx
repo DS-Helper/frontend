@@ -3,7 +3,6 @@
 import { useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import { useUserStore } from "@/lib/store/userStore";
-import { setCookie } from "@/lib/utils/cookies";
 import { getLogin } from "@/lib/apis/authUser";
 
 export default function KakaoLoginPage() {
@@ -19,9 +18,6 @@ export default function KakaoLoginPage() {
         const data = response.data;
         
         if (data.token) {
-          // 토큰을 쿠키에 저장
-          setCookie('token', data.token, 7);
-          
           // 사용자 정보 저장
           if (data.user) {
             const { setUser } = useUserStore.getState();
@@ -30,9 +26,6 @@ export default function KakaoLoginPage() {
           
           // 인증 상태 업데이트 (Zustand persist로 자동 저장됨)
           setIsVerified(true);
-          
-          console.log('로그인 성공 - 쿠키 설정 완료, 사용자 정보 저장 완료');
-          console.log('설정된 쿠키:', document.cookie);
           
           alert('카카오 로그인 성공!');
           router.push('/');
