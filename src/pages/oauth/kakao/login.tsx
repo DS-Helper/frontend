@@ -43,6 +43,7 @@ export default function KakaoLoginPage() {
         throw new Error('로그인 요청에 실패했습니다.');
       }
     } catch (error) {
+      console.error('로그인 처리 중 오류:', error);
       alert('로그인 처리 중 오류가 발생했습니다.');
       router.push('/login');
     }

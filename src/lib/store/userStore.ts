@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { User } from "@/types/userType";
 import { persist } from "zustand/middleware";
 import { hasCookie } from "../utils/cookies";
-import { instance } from "../apis/axios";
 
 interface UserState {
   user: User | null;

@@ -13,7 +13,6 @@ import people from "@/public/helpModify_people.svg"
 import house from "@/public/helpModify_house.svg"
 import male from "@/public/reservate_male.svg"
 import female from "@/public/reservate_female.svg"
-import both from "@/public/reservate_both.svg"
 
 export default function ModifyPage() {
   const router = useRouter();
