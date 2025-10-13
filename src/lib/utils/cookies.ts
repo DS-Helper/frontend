@@ -119,7 +119,7 @@ export const setCookie = (name: string, value: string, days: number = 7): void =
     expires: days,
     path: '/',
     sameSite: 'lax' as const,
-    secure: isProduction || isHttps, // HTTPS 환경에서는 항상 secure
+    secure: false, // 개발 환경에서는 secure를 false로 설정
   };
   
   console.log('쿠키 설정 옵션:', options);
@@ -129,7 +129,13 @@ export const setCookie = (name: string, value: string, days: number = 7): void =
     console.log('설정 전 쿠키 값:', Cookies.get(name));
     console.log('설정 전 모든 쿠키:', document.cookie);
     
+    // 방법 1: js-cookie 라이브러리 사용
     Cookies.set(name, value, options);
+    
+    // 방법 2: 직접 document.cookie 설정 (백업)
+    const cookieString = `${name}=${value}; path=/; max-age=${days * 24 * 60 * 60}`;
+    document.cookie = cookieString;
+    console.log('직접 설정한 쿠키 문자열:', cookieString);
     
     // 쿠키 설정 후 확인
     const setCookieValue = Cookies.get(name);
@@ -143,6 +149,12 @@ export const setCookie = (name: string, value: string, days: number = 7): void =
       console.log('❌ 쿠키 설정 실패 - 값이 다름');
       console.log('예상 값:', value);
       console.log('실제 값:', setCookieValue);
+      
+      // 직접 document.cookie에서 확인
+      const directCookie = document.cookie
+        .split('; ')
+        .find(row => row.startsWith(name + '='));
+      console.log('document.cookie에서 직접 확인:', directCookie);
     }
     
     // 디버깅을 위한 로그
