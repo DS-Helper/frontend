@@ -31,6 +31,52 @@ export default function ModifyPage() {
   const [endTime, setEndTime] = useState("");
   const [showErrors, setShowErrors] = useState(false);
 
+  // 휴대폰 번호 포맷팅 함수
+  const formatPhoneNumber = (value: string) => {
+    // 숫자만 추출
+    const numbers = value.replace(/\D/g, '');
+    
+    // 길이에 따라 포맷팅
+    if (numbers.length <= 3) {
+      return numbers;
+    } else if (numbers.length <= 6) {
+      // 010-000 형식
+      return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+    } else if (numbers.length <= 10) {
+      // 10자리: 010-000-0000 형식
+      return `${numbers.slice(0, 3)}-${numbers.slice(3, 6)}-${numbers.slice(6)}`;
+    } else {
+      // 11자리: 010-0000-0000 형식
+      return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+    }
+  };
+
+  // 휴대폰 번호 입력 핸들러
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedValue = formatPhoneNumber(e.target.value);
+    setPhoneNumber(formattedValue);
+  };
+
+  // 휴대폰 번호 검증 함수
+  const validatePhoneNumber = (phone: string): boolean => {
+    const numbers = phone.replace(/\D/g, '');
+    // 숫자만 있고 10자리 또는 11자리인지 확인
+    return /^\d{10,11}$/.test(numbers);
+  };
+
+  // 도움받는 사람 수 검증 함수
+  const validateRecipientNumber = (number: string): boolean => {
+    // 숫자만 있고 1 이상의 정수인지 확인
+    return /^\d+$/.test(number) && parseInt(number) > 0;
+  };
+
+  // 숫자만 입력 가능한 핸들러
+  const handleNumberOnlyChange = (value: string, setter: (value: string) => void) => {
+    // 숫자만 추출
+    const numbers = value.replace(/\D/g, '');
+    setter(numbers);
+  };
+
   // 달력 변경 시 validation 상태 초기화
   const handleDateTimeChange = (data: any) => {
     // 날짜는 ISO 문자열로 전송
@@ -46,12 +92,24 @@ export default function ModifyPage() {
     setStartTime(formatTime(data.startTime));
     setEndTime(formatTime(data.endTime));
     
-    // 달력 변경 시 에러 상태 초기화
-    setShowErrors(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 휴대폰 번호 형식 검증
+    if (!validatePhoneNumber(phoneNumber)) {
+      alert("휴대폰 번호를 올바르게 입력해주세요.\n예: 010-1234-5678 또는 010-123-4567");
+      return;
+    }
+
+    // 도움받는 사람 수 검증
+    if (!validateRecipientNumber(recipientNumber)) {
+      alert("도움받는 사람 수를 올바르게 입력해주세요.\n숫자만 입력 가능하며, 1 이상의 값을 입력해주세요.");
+      return;
+    }
+
+    // 검증 통과 후 에러 상태 표시
     setShowErrors(true);
 
     // 필수 필드 검증
@@ -93,9 +151,12 @@ export default function ModifyPage() {
   return (
     <div className={cn("container")}>
       <main className={cn("main")}>
-        <form onSubmit={handleSubmit} className={cn("form")}>
-          <h2 className={cn("title")}>정보 입력</h2>
+        <h2 className={cn("title")}>정보 입력</h2>
 
+        {/* 달력 자리 - form 밖으로 이동 */}
+        <DateTimeSelector onChange={handleDateTimeChange} />
+
+        <form onSubmit={handleSubmit} className={cn("form")}>
           {/* 개인/기관 선택 */}
           <div className={cn("toggleGroup")}>
             <button
@@ -123,24 +184,28 @@ export default function ModifyPage() {
           {/* 입력 필드 */}
           <div className={cn("inputGroup")}>
             <label>이름 <span className={cn("required")}>(필수)</span></label>
-            <input type="text" placeholder="홍길동" value={name} onChange={(e) => setName(e.target.value)} className={showErrors && !name ? cn("error") : undefined}  />
+            <input type="text" placeholder="이름을 입력해주세요." value={name} onChange={(e) => setName(e.target.value)} className={showErrors && !name ? cn("error") : undefined}  />
             {showErrors && !name && <p className={cn("errorMsg")}>이름을 입력해주세요.</p>}
           </div>
 
           <div className={cn("inputGroup")}>
             <label>전화번호 <span className={cn("required")}>(필수)</span></label>
-            <input type="text" placeholder="010-0000-0000" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className={showErrors && !phoneNumber ? cn("error") : undefined} />
+            <input 
+              type="text" 
+              placeholder="전화번호를 입력해주세요." 
+              value={phoneNumber} 
+              onChange={handlePhoneNumberChange}
+              maxLength={13}
+              className={showErrors && !phoneNumber ? cn("error") : undefined} 
+            />
             {showErrors && !phoneNumber && <p className={cn("errorMsg")}>전화번호를 입력해주세요.</p>}
           </div>
 
           <div className={cn("inputGroup")}>
             <label>방문 주소 <span className={cn("required")}>(필수)</span></label>
-            <input type="text" placeholder="주소를 입력해주세요" value={address} onChange={(e) => setAddress(e.target.value)} className={showErrors && !address ? cn("error") : undefined} />
+            <input type="text" placeholder="주소를 입력해주세요." value={address} onChange={(e) => setAddress(e.target.value)} className={showErrors && !address ? cn("error") : undefined} />
             {showErrors && !address && <p className={cn("errorMsg")}>주소를 입력해주세요.</p>}
           </div>
-
-          {/* 달력 자리 */}
-          <DateTimeSelector onChange={handleDateTimeChange} />
 
           {/* 도움 요청 내용 */}
           <div className={cn("inputGroup")}>
@@ -185,7 +250,7 @@ export default function ModifyPage() {
               type="text" 
               placeholder="1" 
               value={recipientNumber} 
-              onChange={(e) => setRecipientNumber(e.target.value)} 
+              onChange={(e) => handleNumberOnlyChange(e.target.value, setRecipientNumber)} 
               className={showErrors && !recipientNumber ? cn("error") : undefined} 
             />
             {showErrors && !recipientNumber && <p className={cn("errorMsg")}>도움 받는 사람 수를 입력해주세요.</p>}

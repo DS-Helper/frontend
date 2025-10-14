@@ -13,7 +13,7 @@ export const postPersonalReservation = async (data: any) => {
 
 export const getPersonalReservation = async (params: any) => {
   try {
-    const res = await instance.get("/personal-reservations", params);
+    const res = await instance.get("/personal-reservations/status", params);
     return res;
   } catch (e) {
     console.error(e);

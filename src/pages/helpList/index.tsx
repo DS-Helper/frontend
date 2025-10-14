@@ -27,9 +27,9 @@ export default function HelpListPage() {
     try {
       const params = {
         params: {
+          reservationStatus: status && status !== "전체" ? status : undefined,
           page: 0,
-          size: 10, // 충분한 데이터를 가져오기 위해 큰 사이즈 설정
-          ...(status && status !== "전체" && { reservationStatus: status })
+          size: 10,
         }
       };
       

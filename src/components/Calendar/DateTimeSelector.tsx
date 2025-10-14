@@ -33,7 +33,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
   const handleDateChange = (date: Date) => {
     setSelectedDate(date);
     setSelectedTimeBlocks([]);
-    onChange({ visitDate: date, startTime: new Date(), endTime: new Date() });
+    // 날짜만 선택했을 때는 onChange를 호출하지 않음
   };
 
   const handleTimeClick = (time: TimeSlot) => {
@@ -210,6 +210,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
                 return (
                   <button
                     key={time}
+                    type="button"
                     onClick={() => handleTimeClick(time)}
                     disabled={isReserved}
                     className={cn({
