@@ -43,16 +43,7 @@ export const useUserStore = create(
       },
     }),
     { 
-      name: "user-store",
-      // 하이드레이션 완료 후 콜백 추가
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          // 하이드레이션 완료 후 인증 상태 재확인
-          setTimeout(() => {
-            state.checkAuthStatus();
-          }, 100);
-        }
-      }
+      name: "user-store"
     }
   )
 );
