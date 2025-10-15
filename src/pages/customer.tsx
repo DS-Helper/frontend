@@ -1,7 +1,7 @@
 // 고객 문의 페이지
 import styles from '@/styles/Customer.module.scss';
 import classNames from 'classnames/bind';
-import React, { useState } from "react";
+import React, { useState ,ChangeEvent, FormEvent } from "react";
 
 const cn = classNames.bind(styles);
 
