@@ -5,7 +5,7 @@ import styles from "@/styles/HelpList.module.scss";
 import { HelpRequestStatus, HelpRequest } from "@/types/helpList"
 import { helpRequests } from "@/mocks/helpList";
 import { useUserStore } from "@/lib/store/userStore";
-import { getPersonalReservation } from "@/lib/apis/reservation";
+import { getPersonalReservation, patchPersonalReservation } from "@/lib/apis/reservation";
 
 const cn = classNames.bind(styles);
 
@@ -14,7 +14,7 @@ const ITEMS_PER_PAGE = 10;
 export default function HelpListPage() {
   const router = useRouter();
   const { user, isVerified } = useUserStore();
-  const [activeTab, setActiveTab] = useState<"전체" | "예정" | "완료" | "취소">("전체");
+  const [activeTab, setActiveTab] = useState<"전체" | "대기" | "완료" | "취소">("전체");
   const [visibleItems, setVisibleItems] = useState<number>(ITEMS_PER_PAGE);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [apiRequests, setApiRequests] = useState<HelpRequest[]>([]);
@@ -25,9 +25,12 @@ export default function HelpListPage() {
   const fetchReservations = useCallback(async (status?: string) => {
     setIsApiLoading(true);
     try {
+      // 탭 상태를 API 파라미터로 변환
+      let apiStatus = status;
+      
       const params = {
         params: {
-          reservationStatus: status && status !== "전체" ? status : undefined,
+          reservationStatus: apiStatus && apiStatus !== "전체" ? apiStatus : undefined,
           page: 0,
           size: 10,
         }
@@ -39,20 +42,42 @@ export default function HelpListPage() {
       if (response && response.data) {
         console.log('API 응답 데이터:', response.data);
         const rawData = response.data.content || response.data || [];
+        console.log('원본 rawData:', rawData);
+        console.log('rawData의 첫 번째 항목:', rawData[0]);
         
         // API 응답 데이터를 HelpRequest 형식으로 매핑
-        const mappedData = rawData.map((item: any) => ({
-          id: item.id || item.reservationId || Math.random().toString(),
-          userId: item.userId || user?.id || '',
-          date: item.visitDate ? new Date(item.visitDate).toLocaleDateString('ko-KR') : '',
-          dayOfWeek: item.visitDate ? new Date(item.visitDate).toLocaleDateString('ko-KR', { weekday: 'short' }) : '',
-          content: item.requirement || item.content || '',
-          startTime: item.startTime || '',
-          endTime: item.endTime || '',
-          status: item.reservationStatus || item.status || '예정'
-        }));
+        const mappedData = rawData.map((item: any) => {
+          // API 상태를 UI 상태로 변환
+          console.log('원본 item의 상태:', item.reservationStatus || item.status);
+          let uiStatus = item.reservationStatus || item.status;
+          
+          // API 상태를 UI 상태로 변환
+          if (uiStatus === 'REQUESTED') {
+            uiStatus = '대기';
+          } else if (uiStatus === 'CANCELED') {
+            uiStatus = '취소';
+          }
+          
+          // 시간 포맷에서 초 단위 제거 (12:30:00 -> 12:30)
+          const formatTime = (time: string) => {
+            if (!time) return '';
+            return time.split(':').slice(0, 2).join(':');
+          };
+
+          return {
+            id: item.id || item.reservationId || Math.random().toString(),
+            userId: item.userId || user?.id || '',
+            date: item.visitDate ? new Date(item.visitDate).toLocaleDateString('ko-KR') : '',
+            dayOfWeek: item.visitDate ? new Date(item.visitDate).toLocaleDateString('ko-KR', { weekday: 'short' }) : '',
+            content: item.requirement || item.content || '',
+            startTime: formatTime(item.startTime || ''),
+            endTime: formatTime(item.endTime || ''),
+            status: uiStatus
+          };
+        });
         
         console.log('매핑된 데이터:', mappedData);
+        console.log('매핑된 데이터의 상태들:', mappedData.map((item: any) => item.status));
         setApiRequests(mappedData);
       } else {
         console.log('API 응답이 없거나 빈 데이터');
@@ -90,6 +115,11 @@ export default function HelpListPage() {
   const filteredRequests = activeTab === "전체" 
     ? userRequests 
     : userRequests.filter((request: HelpRequest) => request.status === activeTab);
+  
+  console.log('현재 activeTab:', activeTab);
+  console.log('userRequests:', userRequests);
+  console.log('userRequests의 status들:', userRequests.map(item => item.status));
+  console.log('filteredRequests:', filteredRequests);
 
   const displayedRequests = filteredRequests.slice(0, visibleItems);
   const hasMoreItems = visibleItems < filteredRequests.length;
@@ -129,14 +159,14 @@ export default function HelpListPage() {
   }, [activeTab]);
 
   // 탭 변경 핸들러
-  const handleTabChange = (tab: "전체" | "예정" | "완료" | "취소") => {
+  const handleTabChange = (tab: "전체" | "대기" | "완료" | "취소") => {
     setActiveTab(tab);
     setVisibleItems(ITEMS_PER_PAGE);
   };
 
   const getStatusColor = (status: HelpRequestStatus) => {
     switch (status) {
-      case "예정":
+      case "대기":
         return "scheduled";
       case "완료":
         return "completed";
@@ -151,13 +181,20 @@ export default function HelpListPage() {
     router.push(`/helpList/${id}`);
   };
 
-  const handleCancelReservation = (id: string) => {
+  const handleCancelReservation = async (id: string) => {
     if(confirm("예약을 취소하시겠습니까?")) {
-      console.log(id)
-      // 예약 취소 루틴
-      alert("취소되었습니다.");
-    } else {
-      // 아무 동작 안함
+      try {
+        const response = await patchPersonalReservation(id);
+        
+        if (response) {
+          alert("예약이 취소되었습니다.");
+          fetchReservations(activeTab);
+        } else {
+          alert("예약 취소에 실패했습니다. 다시 시도해주세요.");
+        }
+      } catch (error) {
+        alert("예약 취소 중 오류가 발생했습니다. 다시 시도해주세요.");
+      }
     }
   };
 
@@ -177,7 +214,7 @@ export default function HelpListPage() {
       {/* 탭 메뉴 */}
       <nav className={cn("tabNavigation")}>
         <div className={cn("tabContainer")}>
-          {(["전체", "예정", "완료", "취소"] as const).map((tab) => (
+          {(["전체", "대기", "완료", "취소"] as const).map((tab) => (
             <button
               key={tab}
               className={cn("tabButton", { active: activeTab === tab })}
@@ -248,7 +285,7 @@ export default function HelpListPage() {
                 >
                   상세 보기
                 </button>
-                {request.status === "예정" && (
+                {request.status === "대기" && (
                   <button
                     className={cn("cancelButton")}
                     onClick={() => handleCancelReservation(request.id)}

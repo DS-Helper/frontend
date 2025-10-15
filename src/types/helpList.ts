@@ -1,4 +1,4 @@
-export type HelpRequestStatus = "예정" | "완료" | "취소";
+export type HelpRequestStatus = "대기" | "완료" | "취소";
 
 export interface HelpRequest {
   id: string;
