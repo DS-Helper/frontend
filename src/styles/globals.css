@@ -68,7 +68,7 @@ button {
   outline: none;
   cursor: pointer;
   border: none;
-  background-color: #fff;
+  background-color: transparent;
   color: #222;
 }
 

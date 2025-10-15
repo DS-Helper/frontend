@@ -1,13 +1,12 @@
 'use client';
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import classNames from "classnames/bind";
 import styles from "./HelpDetail.module.scss";
-import { helpRequests } from "@/mocks/helpList";
-import { getHelpDetailById } from "@/mocks/helpDetail";
+import { getPersonalReservation, patchPersonalReservation } from "@/lib/apis/reservation";
 import { useUserStore } from "@/lib/store/userStore";
-import { HelpRequest, HelpDetailData } from "@/types/helpList";
+import { HelpRequest, HelpDetailData, ApiReservationData } from "@/types/helpList";
 import { IoChevronDown } from "react-icons/io5";
 import Image from 'next/image';
 
@@ -18,74 +17,130 @@ const cn = classNames.bind(styles);
 
 export default function HelpDetailPage() {
   const router = useRouter();
-  const params = useParams();
-  const id = params?.id as string;
-  const { user } = useUserStore();
+  const { id } = router.query;
+  const { user, isVerified } = useUserStore();
   const [helpRequest, setHelpRequest] = useState<HelpRequest | null>(null);
   const [helpDetail, setHelpDetail] = useState<HelpDetailData | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (isClient && id && user) {
-      // 유저 본인의 도움 요청만 가져오기
-      const request = helpRequests.find((req: HelpRequest) => req.id === id && req.userId === user.id);
-      const detail = getHelpDetailById(id);
-      
-      if (request && detail && detail.userId === user.id) {
-        setHelpRequest(request);
-        setHelpDetail(detail);
-        setIsVisible(true);
-      } else {
-        // 권한이 없거나 데이터가 없는 경우
+    if (router.isReady && id && isVerified) {
+      // API에서 데이터 가져오기
+      const fetchReservationDetail = async () => {
+        try {
+          const response = await getPersonalReservation({
+            params: {
+              page: 0,
+              size: 100, // 모든 데이터 가져오기
+            }
+          });
+          
+          if (response && response.data) {
+            const rawData = response.data.content || response.data || [];
+            
+            // 해당 ID의 예약 찾기
+            const reservation = rawData.find((item: ApiReservationData) => item.id === id);
+            
+            if (reservation) {
+              // API 데이터를 HelpRequest 형식으로 매핑
+              const mappedRequest: HelpRequest = {
+                id: reservation.id,
+                userId: reservation.user.id,
+                date: reservation.visitDate ? new Date(reservation.visitDate).toLocaleDateString('ko-KR') : '',
+                dayOfWeek: reservation.visitDate ? new Date(reservation.visitDate).toLocaleDateString('ko-KR', { weekday: 'short' }) : '',
+                content: reservation.requirement || '',
+                startTime: reservation.startTime ? reservation.startTime.split(':').slice(0, 2).join(':') : '',
+                endTime: reservation.endTime ? reservation.endTime.split(':').slice(0, 2).join(':') : '',
+                status: reservation.reservationStatus === 'REQUESTED' ? '대기' : 
+                       reservation.reservationStatus === 'CANCELED' ? '취소' : 
+                       reservation.reservationStatus || '대기'
+              };
+              
+              setHelpRequest(mappedRequest);
+              
+              // 상세 정보를 API 데이터로 구성
+              const mappedDetail: HelpDetailData = {
+                id: reservation.id,
+                userId: reservation.user.id,
+                location: reservation.address || "위치 정보 없음",
+                applicantInfo: {
+                  name: reservation.name || "이름 없음",
+                  contact: reservation.phoneNumber || "연락처 없음",
+                  organizationName: "" // API에 기관명 필드가 없음
+                },
+                recipientInfo: {
+                  gender: reservation.recipientGender === 'FEMALE' ? '여자' : 
+                         reservation.recipientGender === 'MALE' ? '남자' : 
+                         reservation.recipientGender || "성별 없음",
+                  count: reservation.recipientNumber || 1
+                },
+                rejectionReason: "", // API에 거절사유 필드가 없음
+                specialNotes: "" // API에 특이사항 필드가 없음
+              };
+              
+              setHelpDetail(mappedDetail);
+            } else {
+              // 데이터가 없는 경우 목록으로 돌아가기
+              router.push('/helpList');
+            }
+          } else {
+            router.push('/helpList');
+          }
+      } catch {
+        console.error('예약 상세 조회 실패');
         router.push('/helpList');
       }
+      };
+      
+      fetchReservationDetail();
     }
-  }, [isClient, id, user, router]);
+  }, [router.isReady, id, isVerified, router]);
 
   const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(() => {
-      router.back();
-    }, 200);
+    router.back();
   };
 
-  const handleCancelReservation = () => {
+  const handleCancelReservation = async () => {
     if (confirm("예약을 취소하시겠습니까?")) {
-      console.log("예약 취소:", id);
-      // 예약 취소 로직
-      handleClose();
+      try {
+        const response = await patchPersonalReservation(id as string);
+        
+        if (response) {
+          alert("예약이 취소되었습니다.");
+          // 취소 후 목록 페이지로 이동
+          router.push('/helpList');
+        } else {
+          alert("예약 취소에 실패했습니다. 다시 시도해주세요.");
+        }
+      } catch (error) {
+        alert("예약 취소 중 오류가 발생했습니다. 다시 시도해주세요.");
+      }
     }
   };
 
-  // 클라이언트 사이드가 아닌 경우 로딩 표시
-  if (!isClient) {
+  // 라우터가 준비되지 않은 경우 로딩 표시
+  if (!router.isReady) {
     return <div>Loading...</div>;
   }
 
   // id가 없는 경우
   if (!id) {
-    router.push('/helpList');
+    router.back();
     return null;
   }
 
   // 유저가 로그인하지 않은 경우
-  if (!user) {
-    router.push('/helpList');
+  if (!isVerified) {
+    router.push('/login');
     return null;
   }
 
   if (!helpRequest) {
-    return null;
+    return <div>데이터를 불러오는 중...</div>;
   }
 
   return (
-    <div className={cn("modalOverlay", { visible: isVisible })} onClick={handleClose}>
-      <div className={cn("modalContent")} onClick={(e) => e.stopPropagation()}>
+    <div className={cn("helpDetailPage")}>
+      <div className={cn("pageContent")}>
         {/* 헤더 */}
         <div className={cn("header", getStatusClass(helpRequest.status))}>
           <div className={cn("statusContainer")}>
@@ -93,10 +148,8 @@ export default function HelpDetailPage() {
               {helpRequest.status}
             </span>
           </div>
-          <button className={cn("closeButton")} onClick={handleClose}>
-            <span className={cn("chevronIcon", getStatusClass(helpRequest.status))}>
-              <IoChevronDown />
-            </span>
+          <button className={cn("backButton")} onClick={handleClose}>
+            <IoChevronDown size={20} className={cn("status", getStatusClass(helpRequest.status))} />
           </button>
         </div>
 
@@ -126,17 +179,17 @@ export default function HelpDetailPage() {
           {/* 신청자 정보 */}
           <section className={cn("infoSection")}>
             <h3 className={cn("sectionTitle")}>신청자 정보</h3>
-            {user.type === "기업" && helpDetail?.applicantInfo?.organizationName && (
+            {user?.type === "기업" && helpDetail?.applicantInfo?.organizationName && (
               <div className={cn("infoRow")}>
                 <span className={cn("label")}>기관명 :</span>
                 <span className={cn("value")}>{helpDetail.applicantInfo.organizationName}</span>
               </div>
             )}
-            <div className={cn("infoRow")}>
+            <div className={cn("infoRow", "nameRow")}>
               <span className={cn("label")}>이름 :</span>
               <span className={cn("value")}>{helpDetail?.applicantInfo?.name || "이름 없음"}</span>
             </div>
-            <div className={cn("infoRow")}>
+            <div className={cn("infoRow", "contactRow")}>
               <span className={cn("label")}>연락처 :</span>
               <span className={cn("value")}>{helpDetail?.applicantInfo?.contact || "연락처 없음"}</span>
             </div>
@@ -145,28 +198,14 @@ export default function HelpDetailPage() {
           {/* 도움 요청 내용 */}
           <section className={cn("infoSection")}>
             <h3 className={cn("sectionTitle")}>도움 요청 내용</h3>
-            {user.type === "기업" ? (
-              <div className={cn("detailedContent")}>
-                <div className={cn("contentParagraph")}>
-                  할머니가 병원에 꼭 가셔야 하는데, 평소 허리가 많이 아프셔서 혼자서는 이동이 어려우세요. 집에서 병원까지는 도보로 약 10분 거리인데, 중간에 오르막이 있어서 부축이 필요합니다.
-                </div>
-                <div className={cn("contentParagraph")}>
-                  병원 도착 후에는 진료 접수와 휠체어 대여를 도와주실 수 있으면 좋겠습니다. 진료가 끝나면 약국에도 들러야 하는데, 약 수령까지 함께 동행해주셨으면 합니다.
-                </div>
-                <div className={cn("contentParagraph")}>
-                  혹시 병원 진료 시간이 오래 걸릴 수 있으니, 너무 촉박하지 않은 일정으로 부탁드립니다. 마지막에 다시 집까지 함께 돌아와주시면 정말 감사하겠습니다.
-                </div>
-              </div>
-            ) : (
-              <div className={cn("contentText")}>
-                {helpRequest.content}
-              </div>
-            )}
+            <div className={cn("contentText")}>
+              {helpRequest.content}
+            </div>
           </section>
 
           {/* 도움 받는 사람의 성별/수 */}
           <section className={cn("infoSection")}>
-            <h3 className={cn("sectionTitle")}>도움 받는 사람의 성별/수</h3>
+            <h3 className={cn("sectionTitle")}>도움 받는 사람의 성별 / 수</h3>
             <div className={cn("infoRow")}>
               <span className={cn("value")}>
                 {helpDetail?.recipientInfo?.gender || "성별 없음"} / {helpDetail?.recipientInfo?.count || 0}
@@ -178,7 +217,7 @@ export default function HelpDetailPage() {
           <section className={cn("infoSection")}>
             <h3 className={cn("sectionTitle")}>특이사항</h3>
             <div className={cn("contentText")}>
-              집에 큰 개가 있습니다. 사람을 잘 따르지만, 처음 방문하실 때는 짖을 수 있으니 놀라지 마세요. 개는 묶여 있으니 접촉은 없습니다.
+              {helpDetail?.specialNotes || "특이사항 없음"}
             </div>
           </section>
 
@@ -194,7 +233,7 @@ export default function HelpDetailPage() {
         </div>
 
         {/* 액션 버튼 */}
-        {helpRequest.status === "예정" && (
+        {helpRequest.status === "대기" && (
           <div className={cn("actionSection")}>
             <button 
               className={cn("cancelButton")} 
@@ -211,7 +250,7 @@ export default function HelpDetailPage() {
 
 function getStatusClass(status: string): string {
   switch (status) {
-    case "예정":
+    case "대기":
       return "scheduled";
     case "완료":
       return "completed";
