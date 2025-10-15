@@ -21,6 +21,18 @@ export const getPersonalReservation = async (params: any) => {
   }
 };
 
+export const patchPersonalReservation = async (personalReservationId: string) => {
+  try {
+    const res = await instance.patch(`/personal-reservations`, {
+      personalReservationId: personalReservationId
+    });
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
 // 조직 사용자 예약
 export const postOrganizationReservation = async (data: any) => {
   try {
