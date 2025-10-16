@@ -38,6 +38,7 @@ export default function HelpDetailPage() {
           console.log('상세 조회 API 응답:', response);
           console.log('사용자 타입:', currentUserType);
           console.log('예약 ID:', id);
+          console.log('응답 데이터 구조:', response?.data);
           
           if (response && response.data) {
             const reservation = response.data;
@@ -45,10 +46,15 @@ export default function HelpDetailPage() {
             // reservation 데이터 존재 여부 확인 (기관/개인 구분)
             const reservationId = currentUserType === 'organization' 
               ? reservation.organizationReservationId 
-              : reservation.id;
+              : (reservation.id || reservation.personalReservationId);
               
             if (!reservation || !reservationId) {
               console.error('예약 데이터가 없거나 형식이 올바르지 않음:', reservation);
+              console.error('예상된 ID 필드들:', {
+                id: reservation?.id,
+                personalReservationId: reservation?.personalReservationId,
+                organizationReservationId: reservation?.organizationReservationId
+              });
               router.push('/helpList');
               return;
             }
@@ -58,7 +64,7 @@ export default function HelpDetailPage() {
               id: reservationId,
               userId: currentUserType === 'organization' 
                 ? reservation.reservationHolderId 
-                : reservation.user?.id || '',
+                : (reservation.user?.id || reservation.userId || ''),
               date: reservation.visitDate ? new Date(reservation.visitDate).toLocaleDateString('ko-KR') : '',
               dayOfWeek: reservation.visitDate ? new Date(reservation.visitDate).toLocaleDateString('ko-KR', { weekday: 'short' }) : '',
               content: reservation.requirement || '',
@@ -76,15 +82,15 @@ export default function HelpDetailPage() {
               id: reservationId,
               userId: currentUserType === 'organization' 
                 ? reservation.reservationHolderId 
-                : reservation.user?.id || '',
+                : (reservation.user?.id || reservation.userId || ''),
               location: reservation.address || "위치 정보 없음",
               applicantInfo: {
                 name: currentUserType === 'organization' 
                   ? reservation.reservationHolder 
-                  : reservation.name || "이름 없음",
+                  : (reservation.name || reservation.userName || "이름 없음"),
                 contact: currentUserType === 'organization' 
                   ? reservation.reservationPhoneNumber 
-                  : reservation.phoneNumber || "연락처 없음",
+                  : (reservation.phoneNumber || reservation.phone || "연락처 없음"),
                 organizationName: currentUserType === 'organization' 
                   ? reservation.organizationName 
                   : ""

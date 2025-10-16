@@ -21,6 +21,12 @@ export default function HelpListPage() {
   const [isApiLoading, setIsApiLoading] = useState<boolean>(false);
   const [hasMorePages, setHasMorePages] = useState<boolean>(true);
   const observerRef = useRef<HTMLDivElement>(null);
+  const userTypeRef = useRef(userType);
+
+  // userType이 변경될 때 ref 업데이트
+  useEffect(() => {
+    userTypeRef.current = userType;
+  }, [userType]);
 
   // API에서 데이터를 가져오는 함수
   const fetchReservations = useCallback(async (status?: string, page: number = 0, append: boolean = false) => {
@@ -43,7 +49,7 @@ export default function HelpListPage() {
       };
       
       // userType이 null이거나 undefined인 경우 기본값 처리
-      const currentUserType = userType || 'individual';
+      const currentUserType = userTypeRef.current || 'individual';
       
       const response = currentUserType === 'organization' 
         ? await getOrganizationReservation(params)
@@ -114,7 +120,7 @@ export default function HelpListPage() {
         setIsApiLoading(false);
       }
     }
-  }, [userType]);
+  }, []);
 
   // 로그인 상태 및 탭 변경 시 API 호출 (첫 페이지만)
   useEffect(() => {

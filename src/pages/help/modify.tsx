@@ -22,6 +22,7 @@ export default function ModifyPage() {
   const [recipientGenderType, setRecipientGenderType] = useState<"남" | "여" | null>("남");
 
   const [name, setName] = useState("");
+  const [organizationName, setOrganizationName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
   const [requirement, setRequirement] = useState("");
@@ -123,25 +124,51 @@ export default function ModifyPage() {
     setShowErrors(true);
 
     // 필수 필드 검증
-    const hasErrors = !name || !phoneNumber || !address || !requirement || !recipientNumber || !specialNotes;
+    const hasErrors = !name || !phoneNumber || !address || !requirement || !recipientNumber || !specialNotes || (type === 'org' && !organizationName);
 
     if (!hasErrors) {
       try {
-        const payload = {
-          name,
-          phoneNumber,
-          visitDate,
-          startTime,
-          endTime,
-          address,
-          requirement,
-          recipientGenderType,
-          recipientNumber,
+        // visitDate를 YYYY-MM-DD 형식으로 변환
+        const formatVisitDate = (isoString: string): string => {
+          if (!isoString) return '';
+          const date = new Date(isoString);
+          const year = date.getFullYear();
+          const month = (date.getMonth() + 1).toString().padStart(2, '0');
+          const day = date.getDate().toString().padStart(2, '0');
+          return `${year}-${month}-${day}`;
         };
+
+        const formattedVisitDate = formatVisitDate(visitDate);
+
+        const payload = type === 'personal' 
+          ? {
+              name,
+              phoneNumber,
+              visitDate: formattedVisitDate,
+              startTime,
+              endTime,
+              address,
+              requirement,
+              recipientGenderType,
+              recipientNumber,
+            }
+          : {
+              name,
+              organizationName,
+              phoneNumber,
+              visitDate: formattedVisitDate,
+              startTime,
+              endTime,
+              address,
+              requirement,
+              recipientGenderType,
+              recipientNumber,
+            };
   
         // 사용자 타입에 따라 적절한 API 호출
         console.log('현재 사용자:', user);
         console.log('선택된 타입:', type);
+        console.log('전송할 payload:', payload);
         
         const res = type === 'personal' 
           ? await postPersonalReservation(payload)
@@ -200,6 +227,21 @@ export default function ModifyPage() {
             <input type="text" placeholder="이름을 입력해주세요." value={name} onChange={(e) => setName(e.target.value)} className={showErrors && !name ? cn("error") : undefined}  />
             {showErrors && !name && <p className={cn("errorMsg")}>이름을 입력해주세요.</p>}
           </div>
+
+          {/* 기관 이름 필드 (기관 사용자만 표시) */}
+          {type === 'org' && (
+            <div className={cn("inputGroup")}>
+              <label>기관 이름 <span className={cn("required")}>(필수)</span></label>
+              <input 
+                type="text" 
+                placeholder="기관 이름을 입력해주세요." 
+                value={organizationName} 
+                onChange={(e) => setOrganizationName(e.target.value)} 
+                className={showErrors && !organizationName ? cn("error") : undefined}  
+              />
+              {showErrors && !organizationName && <p className={cn("errorMsg")}>기관 이름을 입력해주세요.</p>}
+            </div>
+          )}
 
           <div className={cn("inputGroup")}>
             <label>전화번호 <span className={cn("required")}>(필수)</span></label>
