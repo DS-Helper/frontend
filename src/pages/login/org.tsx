@@ -12,7 +12,7 @@ const cn = classNames.bind(styles);
 export default function OrgLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setIsVerified, setUser } = useUserStore();
+  const { setIsVerified, setUser, setUserType } = useUserStore();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,24 +23,40 @@ export default function OrgLoginPage() {
       password,
     };
 
-    const res = await postLogin(payload);
-    
-
-    if (res && res.data) {
-      // 사용자 정보 저장 (기관 로그인 응답에 사용자 정보가 있다면)
-      if (res.data.user) {
-        setUser(res.data.user);
+    try {
+      const res = await postLogin(payload);
+      
+      // 로그인 성공 조건: 응답이 있고 상태가 200번대인 경우
+      const isSuccess = res && res.status >= 200 && res.status < 300;
+      
+      if (isSuccess) {
+        // 사용자 정보 저장 (기관 로그인 응답에 사용자 정보가 있다면)
+        if (res.data?.user) {
+          setUser(res.data.user);
+        }
+        
+        // 사용자 타입을 기관으로 설정
+        setUserType('organization');
+        
+        // 인증 상태 업데이트
+        setIsVerified(true);
+        router.push("/");
+      } else {
+        alert("로그인 실패!");
       }
+    } catch (error: any) {
       
-      // 인증 상태 업데이트
-      setIsVerified(true);
-      
-      console.log('기관 로그인 성공 - 사용자 정보 저장 완료');
-      
-      alert("로그인 성공!");
-      router.push("/");
-    } else {
-      alert("로그인 실패!");
+      // Axios 에러인 경우 더 자세한 정보 제공
+      if (error.response) {
+        // 서버에서 명시적으로 에러 메시지를 보낸 경우
+        if (error.response.data?.message) {
+          alert(`로그인 실패: ${error.response.data.message}`);
+        } else {
+          alert("로그인 처리 중 오류가 발생했습니다.");
+        }
+      } else {
+        alert("로그인 처리 중 오류가 발생했습니다.");
+      }
     }
   };
   

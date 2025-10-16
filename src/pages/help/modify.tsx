@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "@/styles/Modify.module.scss";
 import Image from "next/image"
 import classNames from "classnames/bind";
 import DateTimeSelector from "@/components/Calendar/DateTimeSelector";
-import { postReservation } from "@/lib/apis/reservation";
+import { postPersonalReservation } from "@/lib/apis/reservationUser";
+import { postOrganizationReservation } from "@/lib/apis/reservationOrg";
 import { useUserStore } from "@/lib/store/userStore"; 
 
 const cn = classNames.bind(styles);
@@ -16,7 +17,7 @@ import female from "@/public/reservate_female.svg"
 
 export default function ModifyPage() {
   const router = useRouter();
-  const { user } = useUserStore();
+  const { user, userType } = useUserStore();
   const [type, setType] = useState<"personal" | "org">("personal");
   const [recipientGenderType, setRecipientGenderType] = useState<"남" | "여" | null>("남");
 
@@ -30,6 +31,15 @@ export default function ModifyPage() {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [showErrors, setShowErrors] = useState(false);
+
+  // 사용자 타입에 따라 자동으로 개인/기관 선택
+  useEffect(() => {
+    if (userType === 'organization') {
+      setType('org');
+    } else {
+      setType('personal');
+    }
+  }, [userType]);
 
   // 휴대폰 번호 포맷팅 함수
   const formatPhoneNumber = (value: string) => {
@@ -130,11 +140,12 @@ export default function ModifyPage() {
         };
   
         // 사용자 타입에 따라 적절한 API 호출
-        const userType = user?.type || 'personal';
         console.log('현재 사용자:', user);
-        console.log('사용자 타입:', userType);
+        console.log('선택된 타입:', type);
         
-        const res = await postReservation(payload, userType);
+        const res = type === 'personal' 
+          ? await postPersonalReservation(payload)
+          : await postOrganizationReservation(payload);
         console.log(res);
         if (res) {
           router.push("/help/complete");
@@ -162,9 +173,10 @@ export default function ModifyPage() {
             <button
               type="button"
               onClick={() => setType("personal")}
+              disabled={userType === 'organization'}
               className={`${cn("toggleButton")} ${
                 type === "personal" ? cn("active") : ""
-              }`}
+              } ${userType === 'organization' ? cn("disabled") : ""}`}
             >
               <Image src={people} width={80} height={80} alt='개인 회원' className={cn("buttonImage")} />
               <p className={cn("toggleLabel")}>개인</p>
@@ -172,9 +184,10 @@ export default function ModifyPage() {
             <button
               type="button"
               onClick={() => setType("org")}
+              disabled={userType === 'individual'}
               className={`${cn("toggleButton")} ${
                 type === "org" ? cn("active") : ""
-              }`}
+              } ${userType === 'individual' ? cn("disabled") : ""}`}
             >
               <Image src={house} width={80} height={80} alt="기관 회원" />
               <p className={cn("toggleLabel")}>기관</p>

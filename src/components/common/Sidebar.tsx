@@ -33,6 +33,7 @@ export default function Sidebar({ onClose }: { onClose: () => void }) {
           <li><Link href="/help">도움 요청하기</Link></li>
           <li><Link href="/helpList">도움 요청 내역</Link></li>
           <li>고객 문의</li>
+          <li><Link href="/helpStory">도와드린 이야기</Link></li>
           <li onClick={handleLogoutClick} style={{ cursor: 'pointer' }}>로그아웃</li>
         </ul>
       </div>

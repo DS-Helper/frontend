@@ -1,12 +1,22 @@
-// 사용자가 로그인되어 있는지 확인 (API 기반)
+// 사용자가 로그인되어 있는지 확인 (쿠키 기반)
 export const isAuthenticated = async (): Promise<boolean> => {
   if (typeof window === 'undefined') {
     return false;
   }
   
   try {
-    const { getCheckAuth } = await import('../apis/authUser');
-    const response = await getCheckAuth();
+    // 사용자 타입에 따라 적절한 API 호출
+    const { useUserStore } = await import('../store/userStore');
+    const { userType } = useUserStore.getState();
+    
+    const { getCheckAuth: getUserCheckAuth } = await import('../apis/authUser');
+    const { getCheckAuth: getOrgCheckAuth } = await import('../apis/authOrganization');
+    
+    const checkAuthPromise = userType === 'organization' 
+      ? getOrgCheckAuth() 
+      : getUserCheckAuth();
+      
+    const response = await checkAuthPromise;
     // true = 로그인, false = 로그아웃
     return !!(response && response.data === true);
   } catch {
