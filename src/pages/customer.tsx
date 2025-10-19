@@ -288,9 +288,39 @@ export default function Customer(){
                             <div className={cn("formGroup")}>
                                 <label>관련 이미지</label>
                                 <div className={cn("imageUploadArea")}>
-                                    
+                                    {/* 이미지 업로드 슬롯 1 (index0) */}
+                                    {[0,1].map((index) => (
+                                        <div key={index} className={cn("imageSlot")}>
+                                            {images[index] ? (
+                                                // 이미지가 있을 경우 미리보기와 삭제 버튼 표시
+                                                <div className={cn("imagePreview")}>
+                                                    <img src={images[index]} alt={`문의 이미지 ${index+1}`} />
+                                                    <button type="button" className={cn("removeImageBtn")}>
+                                                        &times;
+                                                    </button>
+                                                </div>
+                                            ):(
+                                                // 이미지가 없을 경우 업로드 버튼(label)
+                                                <label htmlFor={`image-upload-${index}`} className={cn("uploadLabel")}>
+                                                    <span className={cn("plusIcon")}>+</span>
+                                                    <input id={`image-upload-${index}`}
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className={cn("hiddenFileInput")}
+                                                    onChange={(e) => handleImageUpload(e, index)}
+                                                    />
+                                                </label>
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
+                            {/* 등록 버튼 추가 */}
+                            <button 
+                            type="submit"
+                            className={cn("submitBtn", {disabled: !isFormValid})}
+                            disabled={!isFormValid}
+                            >등록하기</button>
                         </form>
                     )}
                 </div>

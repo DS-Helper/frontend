@@ -255,3 +255,90 @@
 .imageWrapper{
     margin-top: 8px;
 }
+
+.contentInput{
+    width:100%;
+    max-width: 570px;
+    min-height: 76px;
+    padding:16px;
+    font-size:17px;
+    line-height: 1px;
+    border: 1px solid #d1d1d1;
+    border-radius: 0 0 12px rgba(0,0,0,0.12);
+    color: #3C3B3B;
+
+    &:focus{
+        outline: none;
+        border-color:#999;
+    }
+    &::placeholder{
+        color: #999;
+    }
+}
+
+.imageUploadArea{
+    display: flex;
+    gap: 16px; // 이미지 슬롯 사이 간격
+    margin-top:16px; // 폼 그룹 내 간격
+}
+
+.imageSlot{
+    border-radius: 16px;
+    width: 163px;
+    height: 120px;
+    background-color: #f7f7f7;
+    overflow: hidden;
+    position:relative;
+    border:1px solid #e1e1e1;
+}
+.uploadLabel{
+    display:flex;
+    align-items:center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    
+    .plusIcon{
+        font-size: 3rem;
+        color: #aeaeae;    
+    }
+}
+.hiddenFileInput{
+    display: none; // 실제 파일 input 숨김
+}
+
+.imagePreview{
+    position: relative;
+    width: 100%;
+    height:100%;
+    
+    img{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.removeImageBtn{
+    position: absolute;
+}
+
+.submitBtn{
+    width: 100%;
+    padding:16px;
+    font-size: 17px;
+    font-weight: bold;
+    color: white;
+    background-color: #0dba53;
+    border-radius: 16px;
+
+    &:hover:not(.disabled){
+        background-color: #09a347;
+    }
+
+    &.disabled{
+        background-color: #e1e1e1;
+        color: #999;
+    }
+}
