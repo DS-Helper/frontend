@@ -1,0 +1,96 @@
+"use client";
+
+import styles from "@/styles/Login.module.scss";
+import classNames from "classnames/bind";
+import { useState } from "react";
+import { postLogin } from "../../lib/apis/authOrganization";
+import { useUserStore } from "../../lib/store/userStore";
+import { useRouter } from "next/router";
+
+const cn = classNames.bind(styles);
+
+export default function OrgLoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { setIsVerified, setUser } = useUserStore();
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const payload = {
+      email,
+      password,
+    };
+
+    const res = await postLogin(payload);
+    
+
+    if (res && res.data) {
+      // 사용자 정보 저장 (기관 로그인 응답에 사용자 정보가 있다면)
+      if (res.data.user) {
+        setUser(res.data.user);
+      }
+      
+      // 인증 상태 업데이트
+      setIsVerified(true);
+      
+      console.log('기관 로그인 성공 - 사용자 정보 저장 완료');
+      
+      alert("로그인 성공!");
+      router.push("/");
+    } else {
+      alert("로그인 실패!");
+    }
+  };
+  
+  return (
+    <div className={cn("orgContainer")}> 
+      <div className={cn("formWrapper")}>
+        <h2 className={cn("title")}>기관 로그인</h2>
+
+        <form className={cn("form")} onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="email" className={cn("label")}>이메일</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="이메일"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={cn("input")}
+              autoComplete="email"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className={cn("label")}>비밀번호</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="비밀번호"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={cn("input")}
+              autoComplete="current-password"
+            />
+          </div>
+
+          <button type="submit" className={cn("loginBtn")}>
+            로그인
+          </button>
+        </form>
+
+        <div className={cn("links")}>
+          <a href="#">이메일찾기</a>
+          <span>|</span>
+          <a href="#">비밀번호찾기</a>
+          <span>|</span>
+          <a href="#">회원가입</a>
+        </div>
+      </div>
+    </div>
+  );
+}

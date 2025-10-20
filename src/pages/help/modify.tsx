@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import styles from "@/styles/Modify.module.scss";
 import Image from "next/image"
 import classNames from "classnames/bind";
 import DateTimeSelector from "@/components/Calendar/DateTimeSelector";
+import { postReservation } from "@/lib/apis/reservation";
+import { useUserStore } from "@/lib/store/userStore"; 
 
 const cn = classNames.bind(styles);
 
@@ -11,77 +13,150 @@ import people from "@/public/helpModify_people.svg"
 import house from "@/public/helpModify_house.svg"
 import male from "@/public/reservate_male.svg"
 import female from "@/public/reservate_female.svg"
-import both from "@/public/reservate_both.svg"
 
 export default function ModifyPage() {
   const router = useRouter();
+  const { user } = useUserStore();
   const [type, setType] = useState<"personal" | "org">("personal");
-  const [gender, setGender] = useState<"male" | "female" | "both" | null>("male");
+  const [recipientGenderType, setRecipientGenderType] = useState<"남" | "여" | null>("남");
 
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
-  const [helpContent, setHelpContent] = useState("");
-  const [peopleCount, setPeopleCount] = useState("");
+  const [requirement, setRequirement] = useState("");
+  const [recipientNumber, setRecipientNumber] = useState("");
   const [specialNotes, setSpecialNotes] = useState("");
-  const [validation, setValidation] = useState<{ [key: string]: string }>({});
+  const [visitDate, setVisitDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [showErrors, setShowErrors] = useState(false);
 
-  
+  // 휴대폰 번호 포맷팅 함수
+  const formatPhoneNumber = (value: string) => {
+    // 숫자만 추출
+    const numbers = value.replace(/\D/g, '');
+    
+    // 길이에 따라 포맷팅
+    if (numbers.length <= 3) {
+      return numbers;
+    } else if (numbers.length <= 6) {
+      // 010-000 형식
+      return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+    } else if (numbers.length <= 10) {
+      // 10자리: 010-000-0000 형식
+      return `${numbers.slice(0, 3)}-${numbers.slice(3, 6)}-${numbers.slice(6)}`;
+    } else {
+      // 11자리: 010-0000-0000 형식
+      return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+    }
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // 휴대폰 번호 입력 핸들러
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedValue = formatPhoneNumber(e.target.value);
+    setPhoneNumber(formattedValue);
+  };
+
+  // 휴대폰 번호 검증 함수
+  const validatePhoneNumber = (phone: string): boolean => {
+    const numbers = phone.replace(/\D/g, '');
+    // 숫자만 있고 10자리 또는 11자리인지 확인
+    return /^\d{10,11}$/.test(numbers);
+  };
+
+  // 도움받는 사람 수 검증 함수
+  const validateRecipientNumber = (number: string): boolean => {
+    // 숫자만 있고 1 이상의 정수인지 확인
+    return /^\d+$/.test(number) && parseInt(number) > 0;
+  };
+
+  // 숫자만 입력 가능한 핸들러
+  const handleNumberOnlyChange = (value: string, setter: (value: string) => void) => {
+    // 숫자만 추출
+    const numbers = value.replace(/\D/g, '');
+    setter(numbers);
+  };
+
+  // 달력 변경 시 validation 상태 초기화
+  const handleDateTimeChange = (data: any) => {
+    // 날짜는 ISO 문자열로 전송
+    setVisitDate(data.visitDate.toISOString());
+    
+    // 시간은 HH:mm 형식으로 전송 (LocalTime 형식)
+    const formatTime = (date: Date) => {
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
+    };
+    
+    setStartTime(formatTime(data.startTime));
+    setEndTime(formatTime(data.endTime));
+    
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newValidation: { [key: string]: string } = {};
-
-    if (!name) {
-      newValidation.name = "error";
-    } else {
-      newValidation.name = "success";
+    // 휴대폰 번호 형식 검증
+    if (!validatePhoneNumber(phoneNumber)) {
+      alert("휴대폰 번호를 올바르게 입력해주세요.\n예: 010-1234-5678 또는 010-123-4567");
+      return;
     }
 
-    if (!phoneNumber) {
-      newValidation.phoneNumber = "error";
-    } else {
-      newValidation.phoneNumber = "success";
+    // 도움받는 사람 수 검증
+    if (!validateRecipientNumber(recipientNumber)) {
+      alert("도움받는 사람 수를 올바르게 입력해주세요.\n숫자만 입력 가능하며, 1 이상의 값을 입력해주세요.");
+      return;
     }
 
-    if (!address) {
-      newValidation.address = "error";
-    } else {
-      newValidation.address = "success";
-    }
+    // 검증 통과 후 에러 상태 표시
+    setShowErrors(true);
 
-    if (!helpContent) {
-      newValidation.helpContent = "error";
-    } else {
-      newValidation.helpContent = "success";
-    }
+    // 필수 필드 검증
+    const hasErrors = !name || !phoneNumber || !address || !requirement || !recipientNumber || !specialNotes;
 
-    if (!peopleCount) {
-      newValidation.peopleCount = "error";
-    } else {
-      newValidation.peopleCount = "success";
-    }
-
-    if (!specialNotes) {
-      newValidation.specialNotes = "error";
-    } else {
-      newValidation.specialNotes = "success";
-    }
-
-    setValidation(newValidation);
-
-    if (Object.values(newValidation).every((v) => v === "success")) {
-      router.push("/help/complete");
+    if (!hasErrors) {
+      try {
+        const payload = {
+          name,
+          phoneNumber,
+          visitDate,
+          startTime,
+          endTime,
+          address,
+          requirement,
+          recipientGenderType,
+          recipientNumber,
+        };
+  
+        // 사용자 타입에 따라 적절한 API 호출
+        const userType = user?.type || 'personal';
+        console.log('현재 사용자:', user);
+        console.log('사용자 타입:', userType);
+        
+        const res = await postReservation(payload, userType);
+        console.log(res);
+        if (res) {
+          router.push("/help/complete");
+        } else {
+          alert("예약에 실패했습니다. 다시 시도해주세요.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("서버 에러가 발생했습니다.");
+      }
     }
   };
 
   return (
     <div className={cn("container")}>
       <main className={cn("main")}>
-        <form onSubmit={handleSubmit} className={cn("form")}>
-          <h2 className={cn("title")}>정보 입력</h2>
+        <h2 className={cn("title")}>정보 입력</h2>
 
+        {/* 달력 자리 - form 밖으로 이동 */}
+        <DateTimeSelector onChange={handleDateTimeChange} />
+
+        <form onSubmit={handleSubmit} className={cn("form")}>
           {/* 개인/기관 선택 */}
           <div className={cn("toggleGroup")}>
             <button
@@ -109,24 +184,28 @@ export default function ModifyPage() {
           {/* 입력 필드 */}
           <div className={cn("inputGroup")}>
             <label>이름 <span className={cn("required")}>(필수)</span></label>
-            <input type="text" placeholder="홍길동" value={name} onChange={(e) => setName(e.target.value)} className={cn(validation.name)}  />
-            {validation.name === "error" && <p className={cn("errorMsg")}>이름을 입력해주세요.</p>}
+            <input type="text" placeholder="이름을 입력해주세요." value={name} onChange={(e) => setName(e.target.value)} className={showErrors && !name ? cn("error") : undefined}  />
+            {showErrors && !name && <p className={cn("errorMsg")}>이름을 입력해주세요.</p>}
           </div>
 
           <div className={cn("inputGroup")}>
             <label>전화번호 <span className={cn("required")}>(필수)</span></label>
-            <input type="text" placeholder="010-0000-0000" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className={cn(validation.phoneNumber)} />
-            {validation.phoneNumber === "error" && <p className={cn("errorMsg")}>전화번호를 입력해주세요.</p>}
+            <input 
+              type="text" 
+              placeholder="전화번호를 입력해주세요." 
+              value={phoneNumber} 
+              onChange={handlePhoneNumberChange}
+              maxLength={13}
+              className={showErrors && !phoneNumber ? cn("error") : undefined} 
+            />
+            {showErrors && !phoneNumber && <p className={cn("errorMsg")}>전화번호를 입력해주세요.</p>}
           </div>
 
           <div className={cn("inputGroup")}>
             <label>방문 주소 <span className={cn("required")}>(필수)</span></label>
-            <input type="text" placeholder="주소를 입력해주세요" value={address} onChange={(e) => setAddress(e.target.value)} className={cn(validation.address)} />
-            {validation.address === "error" && <p className={cn("errorMsg")}>주소를 입력해주세요.</p>}
+            <input type="text" placeholder="주소를 입력해주세요." value={address} onChange={(e) => setAddress(e.target.value)} className={showErrors && !address ? cn("error") : undefined} />
+            {showErrors && !address && <p className={cn("errorMsg")}>주소를 입력해주세요.</p>}
           </div>
-
-          {/* 달력 자리 */}
-          <DateTimeSelector />
 
           {/* 도움 요청 내용 */}
           <div className={cn("inputGroup")}>
@@ -134,11 +213,11 @@ export default function ModifyPage() {
             <input 
               type="text" 
               placeholder="도움 요청 내용을 입력해주세요" 
-              value={helpContent} 
-              onChange={(e) => setHelpContent(e.target.value)} 
-              className={cn(validation.helpContent)} 
+              value={requirement} 
+              onChange={(e) => setRequirement(e.target.value)} 
+              className={showErrors && !requirement ? cn("error") : undefined} 
             />
-            {validation.helpContent === "error" && <p className={cn("errorMsg")}>도움 요청 내용을 입력해주세요.</p>}
+            {showErrors && !requirement && <p className={cn("errorMsg")}>도움 요청 내용을 입력해주세요.</p>}
           </div>
 
           {/* 성별 선택 */}
@@ -146,16 +225,15 @@ export default function ModifyPage() {
             <label>도움 받는 사람의 성별</label>
             <div className={cn("toggleGroup")}>
               {([
-                { value: "male", label: "남자", src: male },
-                { value: "female", label: "여자", src: female },
-                { value: "both", label: "둘 다 있음", src: both },
+                { value: "남", label: "남자", src: male },
+                { value: "여", label: "여자", src: female },
               ] as const).map((g) => (
                 <button
                   key={g.value}
                   type="button"
-                  onClick={() => setGender(g.value)}
+                  onClick={() => setRecipientGenderType(g.value)}
                   className={`${cn("toggleButton")} ${
-                    gender === g.value ? cn("active") : ""
+                    recipientGenderType === g.value ? cn("active") : ""
                   }`}
                 >
                   <Image src={g.src} width={80} height={80} alt="성별 선택" />
@@ -170,12 +248,12 @@ export default function ModifyPage() {
             <label>도움 받는 사람 수 <span className={cn("required")}>(필수)</span></label>
             <input 
               type="text" 
-              placeholder="1명" 
-              value={peopleCount} 
-              onChange={(e) => setPeopleCount(e.target.value)} 
-              className={cn(validation.peopleCount)} 
+              placeholder="1" 
+              value={recipientNumber} 
+              onChange={(e) => handleNumberOnlyChange(e.target.value, setRecipientNumber)} 
+              className={showErrors && !recipientNumber ? cn("error") : undefined} 
             />
-            {validation.peopleCount === "error" && <p className={cn("errorMsg")}>도움 받는 사람 수를 입력해주세요.</p>}
+            {showErrors && !recipientNumber && <p className={cn("errorMsg")}>도움 받는 사람 수를 입력해주세요.</p>}
           </div>
 
           {/* 특이사항 */}
@@ -186,9 +264,9 @@ export default function ModifyPage() {
               placeholder="특이사항을 입력해주세요" 
               value={specialNotes} 
               onChange={(e) => setSpecialNotes(e.target.value)} 
-              className={cn(validation.specialNotes)} 
+              className={showErrors && !specialNotes ? cn("error") : undefined} 
             />
-            {validation.specialNotes === "error" && <p className={cn("errorMsg")}>특이사항을 입력해주세요.</p>}
+            {showErrors && !specialNotes && <p className={cn("errorMsg")}>특이사항을 입력해주세요.</p>}
           </div>
 
           <button type="submit" className={cn("submitBtn")}>

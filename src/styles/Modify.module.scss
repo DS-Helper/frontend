@@ -1,13 +1,16 @@
 .main {
   flex: 1;
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
   padding: 4rem 0;
+  gap: 4rem;
 }
 
 .form {
   width: 100%;
-  max-width: 64rem;
+  max-width: 57rem;
   display: flex;
   flex-direction: column;
   gap: 2.4rem;
@@ -140,6 +143,8 @@
 }
 
 .dateTimeSelector {
+  width: 100%;
+  max-width: 57rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;

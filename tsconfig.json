@@ -25,7 +25,7 @@
     "emitDecoratorMetadata": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@/store/*": ["./src/store/*"],
+      "@/store/*": ["./src/lib/store/*"],
       "@/components/*": ["./src/components/*"],
       "@/types/*": ["./src/types/*"],
       "@/styles/*": ["./src/styles/*"],

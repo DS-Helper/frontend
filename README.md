@@ -1,5 +1,14 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
 
+### 카카오 개발자 콘솔 설정
+
+1. [카카오 개발자 콘솔](https://developers.kakao.com/) 접속
+2. 애플리케이션 생성 후 Client ID 확인
+3. 플랫폼 설정에서 Web 플랫폼 추가
+4. Redirect URI 설정:
+   - 개발: `http://localhost:8080/oauth/kakao/login`
+   - 프로덕션: `https://www.dshelper.kro.kr/oauth/kakao/login`
+
 ## Getting Started
 
 First, run the development server:

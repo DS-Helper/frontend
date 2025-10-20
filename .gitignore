@@ -40,4 +40,18 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# IDE backup files
+.history/
+*.history
+*_backup*
+*_bak*
+*~
+.#*
+#*#
+
+# VS Code
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+
 .env

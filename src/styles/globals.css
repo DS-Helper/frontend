@@ -17,7 +17,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #fff;
     --foreground: #ededed;
   }
 }
@@ -37,6 +37,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   padding-top: 6rem;
+  color: #222;
 }
 
 * {
@@ -59,6 +60,8 @@ a {
 .container {
   width: 100%;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 button {
@@ -66,10 +69,16 @@ button {
   cursor: pointer;
   border: none;
   background-color: transparent;
+  color: #222;
 }
 
 ul {
   list-style: none;
+}
+
+input {
+  background-color: #fff;
+  color: #222;
 }
 
 /* React Calendar 요일 스타일 오버라이드 - CSS Grid로 통일 */

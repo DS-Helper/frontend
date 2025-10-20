@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 import Image from 'next/image';
 import banner from '@/public/help_request_banner.svg'
 import {useState} from "react"
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 const cn = classNames.bind(styles);
 

@@ -117,13 +117,14 @@
   max-width: 57rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
   margin: 0 auto;
   padding: 2.4rem;
 }
 
 .infoSection {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 0.1rem solid var(--grey-300);
 
   &:last-of-type {
     margin-bottom: 0;
@@ -132,7 +133,6 @@
 
 .infoDate {
   padding: 2.4rem;
-  margin-bottom: 0;
 }
 
 .sectionTitle {
@@ -146,9 +146,12 @@
   display: flex;
   align-items: center;
   gap: 1.2rem;
+}
+
+.nameRow {
   margin-bottom: 1.2rem;
 
-  &:last-child {
+  &.contactRow {
     margin-bottom: 0;
   }
 }

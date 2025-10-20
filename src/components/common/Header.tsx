@@ -2,7 +2,7 @@ import { useState } from "react";
 import styles from "@/styles/Header.module.scss";
 import classNames from "classnames/bind";
 import Image from "next/image";
-import { useUserStore } from "@/store/userStore";
+import { useUserStore } from "@/lib/store/userStore";
 import { BiSolidBell } from "react-icons/bi";
 import { FiMenu } from "react-icons/fi";
 import Sidebar from "./Sidebar";
@@ -38,7 +38,7 @@ export default function Header() {
               </div>
             </button>
           ) : (
-            <button className={cn("login")}>로그인</button>
+            <button className={cn("login")} onClick={() => router.push("/login")}>로그인</button>
           )}
         </div>
       </div>

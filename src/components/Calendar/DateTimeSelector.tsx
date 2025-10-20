@@ -6,7 +6,11 @@ import styles from "@/styles/Modify.module.scss";
 const cn = classNames.bind(styles);
 type TimeSlot = string;
 
-export default function DateTimeSelector() {
+type DateTimeSelectorProps = {
+  onChange: (data: { visitDate: Date; startTime: Date; endTime: Date }) => void;
+};
+
+export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTimeBlocks, setSelectedTimeBlocks] = useState<TimeSlot[]>([]);
 
@@ -29,6 +33,7 @@ export default function DateTimeSelector() {
   const handleDateChange = (date: Date) => {
     setSelectedDate(date);
     setSelectedTimeBlocks([]);
+    // 날짜만 선택했을 때는 onChange를 호출하지 않음
   };
 
   const handleTimeClick = (time: TimeSlot) => {
@@ -98,6 +103,20 @@ export default function DateTimeSelector() {
     
     // 선택된 시간 블록 업데이트
     setSelectedTimeBlocks(newTimeBlocks);
+    const [startHour, startMin] = newTimeBlocks[0].split(":").map(Number);
+    const [endHour, endMin] = newTimeBlocks[newTimeBlocks.length - 1].split(":").map(Number);
+
+    const startDateTime = new Date(selectedDate);
+    startDateTime.setHours(startHour, startMin, 0, 0);
+
+    const endDateTime = new Date(selectedDate);
+    endDateTime.setHours(endHour, endMin, 0, 0);
+
+    onChange({
+      visitDate: selectedDate,
+      startTime: startDateTime,
+      endTime: endDateTime,
+    });
   };
 
   const isWeekend = (date: Date) => {
@@ -191,6 +210,7 @@ export default function DateTimeSelector() {
                 return (
                   <button
                     key={time}
+                    type="button"
                     onClick={() => handleTimeClick(time)}
                     disabled={isReserved}
                     className={cn({
