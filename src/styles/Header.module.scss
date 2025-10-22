@@ -22,11 +22,15 @@
 
 .headerLogo {
   width: 10rem;
-  height: 2.2rem;
   margin-right: 17rem;
 
   img {
     cursor: pointer;
+  }
+
+  .headerLogoImage {
+    width: 10rem;
+    height: 2.2rem;
   }
 }
 
@@ -47,8 +51,15 @@
   gap: 1.6rem;
   color: var(--grey-400);
 }
+
 .userMenuIcon {
   cursor: pointer;
+}
+
+.userMenuIconBell, 
+.userMenuIconMenu {
+  width: 3rem;
+  height: 3rem;
 }
 
 .login {

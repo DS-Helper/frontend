@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from 'next/router';
 import classNames from "classnames/bind";
 import styles from "./HelpDetail.module.scss";
-import { getPersonalReservation, patchPersonalReservation } from "@/lib/apis/reservation";
+import { getPersonalReservation, patchPersonalReservation, getPersonalReservationDetail } from "@/lib/apis/reservationUser";
+import { getOrganizationReservation, patchOrganizationReservation, getOrganizationReservationDetail } from "@/lib/apis/reservationOrg";
 import { useUserStore } from "@/lib/store/userStore";
 import { HelpRequest, HelpDetailData, ApiReservationData } from "@/types/helpList";
 import { IoChevronDown } from "react-icons/io5";
@@ -18,7 +19,7 @@ const cn = classNames.bind(styles);
 export default function HelpDetailPage() {
   const router = useRouter();
   const { id } = router.query;
-  const { user, isVerified } = useUserStore();
+  const { user, isVerified, userType } = useUserStore();
   const [helpRequest, setHelpRequest] = useState<HelpRequest | null>(null);
   const [helpDetail, setHelpDetail] = useState<HelpDetailData | null>(null);
 
@@ -27,73 +28,97 @@ export default function HelpDetailPage() {
       // API에서 데이터 가져오기
       const fetchReservationDetail = async () => {
         try {
-          const response = await getPersonalReservation({
-            params: {
-              page: 0,
-              size: 100, // 모든 데이터 가져오기
-            }
-          });
+          const currentUserType = userType || 'individual';
+          
+          // 개별 예약 상세 조회 API 사용
+          const response = currentUserType === 'organization' 
+            ? await getOrganizationReservationDetail(id as string)
+            : await getPersonalReservationDetail(id as string);
+          
+          console.log('상세 조회 API 응답:', response);
+          console.log('사용자 타입:', currentUserType);
+          console.log('예약 ID:', id);
+          console.log('응답 데이터 구조:', response?.data);
           
           if (response && response.data) {
-            const rawData = response.data.content || response.data || [];
+            const reservation = response.data;
             
-            // 해당 ID의 예약 찾기
-            const reservation = rawData.find((item: ApiReservationData) => item.id === id);
-            
-            if (reservation) {
-              // API 데이터를 HelpRequest 형식으로 매핑
-              const mappedRequest: HelpRequest = {
-                id: reservation.id,
-                userId: reservation.user.id,
-                date: reservation.visitDate ? new Date(reservation.visitDate).toLocaleDateString('ko-KR') : '',
-                dayOfWeek: reservation.visitDate ? new Date(reservation.visitDate).toLocaleDateString('ko-KR', { weekday: 'short' }) : '',
-                content: reservation.requirement || '',
-                startTime: reservation.startTime ? reservation.startTime.split(':').slice(0, 2).join(':') : '',
-                endTime: reservation.endTime ? reservation.endTime.split(':').slice(0, 2).join(':') : '',
-                status: reservation.reservationStatus === 'REQUESTED' ? '대기' : 
-                       reservation.reservationStatus === 'CANCELED' ? '취소' : 
-                       reservation.reservationStatus || '대기'
-              };
+            // reservation 데이터 존재 여부 확인 (기관/개인 구분)
+            const reservationId = currentUserType === 'organization' 
+              ? reservation.organizationReservationId 
+              : (reservation.id || reservation.personalReservationId);
               
-              setHelpRequest(mappedRequest);
-              
-              // 상세 정보를 API 데이터로 구성
-              const mappedDetail: HelpDetailData = {
-                id: reservation.id,
-                userId: reservation.user.id,
-                location: reservation.address || "위치 정보 없음",
-                applicantInfo: {
-                  name: reservation.name || "이름 없음",
-                  contact: reservation.phoneNumber || "연락처 없음",
-                  organizationName: "" // API에 기관명 필드가 없음
-                },
-                recipientInfo: {
-                  gender: reservation.recipientGender === 'FEMALE' ? '여자' : 
-                         reservation.recipientGender === 'MALE' ? '남자' : 
-                         reservation.recipientGender || "성별 없음",
-                  count: reservation.recipientNumber || 1
-                },
-                rejectionReason: "", // API에 거절사유 필드가 없음
-                specialNotes: "" // API에 특이사항 필드가 없음
-              };
-              
-              setHelpDetail(mappedDetail);
-            } else {
-              // 데이터가 없는 경우 목록으로 돌아가기
+            if (!reservation || !reservationId) {
+              console.error('예약 데이터가 없거나 형식이 올바르지 않음:', reservation);
+              console.error('예상된 ID 필드들:', {
+                id: reservation?.id,
+                personalReservationId: reservation?.personalReservationId,
+                organizationReservationId: reservation?.organizationReservationId
+              });
               router.push('/helpList');
+              return;
             }
+            
+            // API 데이터를 HelpRequest 형식으로 매핑
+            const mappedRequest: HelpRequest = {
+              id: reservationId,
+              userId: currentUserType === 'organization' 
+                ? reservation.reservationHolderId 
+                : (reservation.user?.id || reservation.userId || ''),
+              date: reservation.visitDate ? new Date(reservation.visitDate).toLocaleDateString('ko-KR') : '',
+              dayOfWeek: reservation.visitDate ? new Date(reservation.visitDate).toLocaleDateString('ko-KR', { weekday: 'short' }) : '',
+              content: reservation.requirement || '',
+              startTime: reservation.startTime ? reservation.startTime.split(':').slice(0, 2).join(':') : '',
+              endTime: reservation.endTime ? reservation.endTime.split(':').slice(0, 2).join(':') : '',
+              status: reservation.reservationStatus === 'REQUESTED' ? '대기' : 
+                     reservation.reservationStatus === 'CANCELED' ? '취소' : 
+                     reservation.reservationStatus || '대기'
+            };
+            
+            setHelpRequest(mappedRequest);
+            
+            // 상세 정보를 API 데이터로 구성
+            const mappedDetail: HelpDetailData = {
+              id: reservationId,
+              userId: currentUserType === 'organization' 
+                ? reservation.reservationHolderId 
+                : (reservation.user?.id || reservation.userId || ''),
+              location: reservation.address || "위치 정보 없음",
+              applicantInfo: {
+                name: currentUserType === 'organization' 
+                  ? reservation.reservationHolder 
+                  : (reservation.name || reservation.userName || "이름 없음"),
+                contact: currentUserType === 'organization' 
+                  ? reservation.reservationPhoneNumber 
+                  : (reservation.phoneNumber || reservation.phone || "연락처 없음"),
+                organizationName: currentUserType === 'organization' 
+                  ? reservation.organizationName 
+                  : ""
+              },
+              recipientInfo: {
+                gender: reservation.recipientGender === 'FEMALE' ? '여자' : 
+                       reservation.recipientGender === 'MALE' ? '남자' : 
+                       reservation.recipientGender || "성별 없음",
+                count: reservation.recipientNumber || 1
+              },
+              rejectionReason: "", // API에 거절사유 필드가 없음
+              specialNotes: "" // API에 특이사항 필드가 없음
+            };
+            
+            setHelpDetail(mappedDetail);
           } else {
+            console.error('API 응답이 없거나 데이터가 없음:', response);
             router.push('/helpList');
           }
-      } catch {
-        console.error('예약 상세 조회 실패');
-        router.push('/helpList');
-      }
+        } catch (error) {
+          console.error('예약 상세 조회 실패:', error);
+          router.push('/helpList');
+        }
       };
       
       fetchReservationDetail();
     }
-  }, [router.isReady, id, isVerified, router]);
+  }, [router.isReady, id, isVerified, userType, router]);
 
   const handleClose = () => {
     router.back();
@@ -102,7 +127,11 @@ export default function HelpDetailPage() {
   const handleCancelReservation = async () => {
     if (confirm("예약을 취소하시겠습니까?")) {
       try {
-        const response = await patchPersonalReservation(id as string);
+        const currentUserType = userType || 'individual';
+        
+        const response = currentUserType === 'organization' 
+          ? await patchOrganizationReservation(id as string)
+          : await patchPersonalReservation(id as string);
         
         if (response) {
           alert("예약이 취소되었습니다.");

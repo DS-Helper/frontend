@@ -18,7 +18,7 @@ export default function NotificationModal({ onRequest, onLater }: NotificationMo
         {/* 모달 내용 */}
         <div className={cn("modalContent")}>
           {/* 아이콘 영역 */}
-          <Image src={notification} alt="알림 요청" width={150} height={150} />
+          <Image src={notification} alt="알림 요청" width={150} height={150} className={cn("notificationImage")} />
           <div className={cn("modalText")}>
             <h2 className={cn("modalTitle")}>요청 처리 결과를 알려드릴게요!</h2>
             <p className={cn("modalDescription")}>

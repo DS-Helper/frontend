@@ -20,8 +20,9 @@ export default function KakaoLoginPage() {
         if (data.token) {
           // 사용자 정보 저장
           if (data.user) {
-            const { setUser } = useUserStore.getState();
+            const { setUser, setUserType } = useUserStore.getState();
             setUser(data.user);
+            setUserType('individual');
           }
           
           // 인증 상태 업데이트 (Zustand persist로 자동 저장됨)

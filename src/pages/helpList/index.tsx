@@ -4,14 +4,16 @@ import classNames from "classnames/bind";
 import styles from "@/styles/HelpList.module.scss";
 import { HelpRequestStatus, HelpRequest, ApiReservationData } from "@/types/helpList"
 import { useUserStore } from "@/lib/store/userStore";
-import { getPersonalReservation, patchPersonalReservation } from "@/lib/apis/reservation";
+import { getPersonalReservation, patchPersonalReservation } from "@/lib/apis/reservationUser";
+import { getOrganizationReservation, patchOrganizationReservation } from "@/lib/apis/reservationOrg";
 
 const cn = classNames.bind(styles);
 
 const ITEMS_PER_PAGE = 10;
 
 export default function HelpListPage() {
-  const { user, isVerified } = useUserStore();
+  const { user, isVerified, userType } = useUserStore();
+  
   const [activeTab, setActiveTab] = useState<"전체" | "대기" | "완료" | "취소">("전체");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -19,6 +21,12 @@ export default function HelpListPage() {
   const [isApiLoading, setIsApiLoading] = useState<boolean>(false);
   const [hasMorePages, setHasMorePages] = useState<boolean>(true);
   const observerRef = useRef<HTMLDivElement>(null);
+  const userTypeRef = useRef(userType);
+
+  // userType이 변경될 때 ref 업데이트
+  useEffect(() => {
+    userTypeRef.current = userType;
+  }, [userType]);
 
   // API에서 데이터를 가져오는 함수
   const fetchReservations = useCallback(async (status?: string, page: number = 0, append: boolean = false) => {
@@ -40,11 +48,17 @@ export default function HelpListPage() {
         }
       };
       
-      const response = await getPersonalReservation(params);
+      // userType이 null이거나 undefined인 경우 기본값 처리
+      const currentUserType = userTypeRef.current || 'individual';
+      
+      const response = currentUserType === 'organization' 
+        ? await getOrganizationReservation(params)
+        : await getPersonalReservation(params);
       
       if (response && response.data) {
         const rawData = response.data.content || response.data || [];
         const totalPages = response.data.totalPages || 0;
+        const totalElements = response.data.totalElements || 0;
         
         // API 응답 데이터를 HelpRequest 형식으로 매핑
         const mappedData = rawData.map((item: ApiReservationData) => {
@@ -84,8 +98,9 @@ export default function HelpListPage() {
           setApiRequests(mappedData);
         }
         
-        // 더 이상 페이지가 있는지 확인
-        setHasMorePages(page < totalPages - 1 && mappedData.length > 0);
+        // 더 이상 페이지가 있는지 확인 - 더 간단한 조건
+        const hasMoreData = mappedData.length > 0 && mappedData.length >= ITEMS_PER_PAGE;
+        setHasMorePages(hasMoreData);
       } else {
         if (!append) {
           setApiRequests([]);
@@ -111,22 +126,15 @@ export default function HelpListPage() {
   useEffect(() => {
     if (isVerified) {
       setCurrentPage(0);
-      setHasMorePages(true);
+      setHasMorePages(true); // 초기에는 true로 설정
       // 첫 페이지만 로드하여 빠른 초기 렌더링
       fetchReservations(activeTab, 0, false);
     } else {
       setApiRequests([]);
       setCurrentPage(0);
-      setHasMorePages(true);
+      setHasMorePages(false); // 로그인하지 않은 경우 false
     }
   }, [activeTab, isVerified, fetchReservations]);
-
-  // 컴포넌트 언마운트 시 정리
-  useEffect(() => {
-    return () => {
-      console.log('helpList 컴포넌트 언마운트');
-    };
-  }, []);
 
   // API 데이터를 사용하거나, 없으면 목업 데이터 사용
   const userRequests = apiRequests.length > 0 
@@ -138,7 +146,10 @@ export default function HelpListPage() {
     : userRequests.filter((request: HelpRequest) => request.status === activeTab);
 
   const loadMoreItems = useCallback(() => {
-    if (isLoading || !hasMorePages) return;
+    
+    if (isLoading || !hasMorePages) {
+      return;
+    }
     
     const nextPage = currentPage + 1;
     setCurrentPage(nextPage);
@@ -149,13 +160,14 @@ export default function HelpListPage() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
+        
         if (entries[0].isIntersecting && hasMorePages && !isLoading && !isApiLoading) {
           loadMoreItems();
         }
       },
       { 
         threshold: 0.1,
-        rootMargin: '100px' // 미리 100px 전에 로딩 시작
+        rootMargin: '200px' // 더 일찍 트리거되도록 증가
       }
     );
 
@@ -163,8 +175,10 @@ export default function HelpListPage() {
       observer.observe(observerRef.current);
     }
 
-    return () => observer.disconnect();
-  }, [loadMoreItems, hasMorePages, isLoading, isApiLoading]);
+    return () => {
+      observer.disconnect();
+    };
+  }, [loadMoreItems, hasMorePages, isLoading, isApiLoading, currentPage]);
 
   // 탭 변경 핸들러
   const handleTabChange = (tab: "전체" | "대기" | "완료" | "취소") => {
@@ -191,7 +205,11 @@ export default function HelpListPage() {
   const handleCancelReservation = async (id: string) => {
     if(confirm("예약을 취소하시겠습니까?")) {
       try {
-        const response = await patchPersonalReservation(id);
+        const currentUserType = userType || 'individual';
+        
+        const response = currentUserType === 'organization' 
+          ? await patchOrganizationReservation(id)
+          : await patchPersonalReservation(id);
         
         if (response) {
           alert("예약이 취소되었습니다.");
@@ -316,8 +334,22 @@ export default function HelpListPage() {
           )}
           
           {/* 무한 스크롤 감지 요소 */}
-          {hasMorePages && (
-            <div ref={observerRef} className={cn("scrollObserver")} />
+          {hasMorePages && !isApiLoading && (
+            <div 
+              ref={observerRef} 
+              className={cn("scrollObserver")} 
+              style={{ 
+                height: '50px', 
+                background: 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#666',
+                fontSize: '14px'
+              }}
+            >
+              스크롤 감지 영역 (더 많은 데이터 로딩 중...)
+            </div>
           )}
           
           {/* 더 이상 로드할 항목이 없을 때 */}

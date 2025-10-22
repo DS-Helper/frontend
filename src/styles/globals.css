@@ -40,6 +40,25 @@ body {
   color: #222;
 }
 
+/* 모바일 반응형 스타일 (611px 이하) */
+@media (max-width: 611px) {
+  html,
+  body {
+    font-size: 38.5%; /* 9px 기준으로 조정 */
+  }
+
+  body {
+    padding-top: 6rem; /* 모바일에서 헤더 높이 줄임 */
+  }
+}
+
+@media (max-width: 425px) {
+  html,
+  body {
+    font-size: 20%;
+  }
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -62,6 +81,13 @@ a {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
+}
+
+/* 모바일 반응형 스타일 (611px 이하) */
+@media (max-width: 611px) {
+  .container {
+    padding: 0 1rem; /* 모바일에서 좌우 패딩 추가 */
+  }
 }
 
 button {
@@ -268,4 +294,30 @@ input {
   color: #ccc !important;
   opacity: 0.5 !important;
   cursor: not-allowed !important;
+}
+
+/* 모바일 반응형 스타일 (611px 이하) */
+@media (max-width: 611px) {
+  /* 모바일에서 달력 크기 조정 */
+  .react-calendar__tile {
+    min-height: 3rem !important;
+    height: 3rem !important;
+    font-size: 1.2rem !important;
+  }
+
+  /* 모바일에서 요일 헤더 크기 조정 */
+  .react-calendar__month-view__weekdays__weekday abbr {
+    font-size: 1.2rem !important;
+  }
+
+  /* 모바일에서 달력 그리드 간격 조정 */
+  .react-calendar__month-view__weekdays,
+  .react-calendar__month-view__days {
+    gap: 0.1rem !important;
+  }
+
+  /* 모바일에서 각 주의 높이 조정 */
+  .react-calendar__month-view__days > * {
+    min-height: 3rem !important;
+  }
 }

@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "@/styles/Modify.module.scss";
 import Image from "next/image"
 import classNames from "classnames/bind";
 import DateTimeSelector from "@/components/Calendar/DateTimeSelector";
-import { postReservation } from "@/lib/apis/reservation";
+import { postPersonalReservation } from "@/lib/apis/reservationUser";
+import { postOrganizationReservation } from "@/lib/apis/reservationOrg";
 import { useUserStore } from "@/lib/store/userStore"; 
 
 const cn = classNames.bind(styles);
@@ -13,14 +14,16 @@ import people from "@/public/helpModify_people.svg"
 import house from "@/public/helpModify_house.svg"
 import male from "@/public/reservate_male.svg"
 import female from "@/public/reservate_female.svg"
+import both from "@/public/reservate_both.svg"
 
 export default function ModifyPage() {
   const router = useRouter();
-  const { user } = useUserStore();
+  const { user, userType } = useUserStore();
   const [type, setType] = useState<"personal" | "org">("personal");
-  const [recipientGenderType, setRecipientGenderType] = useState<"남" | "여" | null>("남");
+  const [recipientGenderType, setRecipientGenderType] = useState<"남" | "여" | "둘 다" | null>("남");
 
   const [name, setName] = useState("");
+  const [organizationName, setOrganizationName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
   const [requirement, setRequirement] = useState("");
@@ -30,6 +33,15 @@ export default function ModifyPage() {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [showErrors, setShowErrors] = useState(false);
+
+  // 사용자 타입에 따라 자동으로 개인/기관 선택
+  useEffect(() => {
+    if (userType === 'organization') {
+      setType('org');
+    } else {
+      setType('personal');
+    }
+  }, [userType]);
 
   // 휴대폰 번호 포맷팅 함수
   const formatPhoneNumber = (value: string) => {
@@ -113,28 +125,55 @@ export default function ModifyPage() {
     setShowErrors(true);
 
     // 필수 필드 검증
-    const hasErrors = !name || !phoneNumber || !address || !requirement || !recipientNumber || !specialNotes;
+    const hasErrors = !name || !phoneNumber || !address || !requirement || !recipientNumber || !specialNotes || (type === 'org' && !organizationName);
 
     if (!hasErrors) {
       try {
-        const payload = {
-          name,
-          phoneNumber,
-          visitDate,
-          startTime,
-          endTime,
-          address,
-          requirement,
-          recipientGenderType,
-          recipientNumber,
+        // visitDate를 YYYY-MM-DD 형식으로 변환
+        const formatVisitDate = (isoString: string): string => {
+          if (!isoString) return '';
+          const date = new Date(isoString);
+          const year = date.getFullYear();
+          const month = (date.getMonth() + 1).toString().padStart(2, '0');
+          const day = date.getDate().toString().padStart(2, '0');
+          return `${year}-${month}-${day}`;
         };
+
+        const formattedVisitDate = formatVisitDate(visitDate);
+
+        const payload = type === 'personal' 
+          ? {
+              name,
+              phoneNumber,
+              visitDate: formattedVisitDate,
+              startTime,
+              endTime,
+              address,
+              requirement,
+              recipientGenderType,
+              recipientNumber,
+            }
+          : {
+              name,
+              organizationName,
+              phoneNumber,
+              visitDate: formattedVisitDate,
+              startTime,
+              endTime,
+              address,
+              requirement,
+              recipientGenderType,
+              recipientNumber,
+            };
   
         // 사용자 타입에 따라 적절한 API 호출
-        const userType = user?.type || 'personal';
         console.log('현재 사용자:', user);
-        console.log('사용자 타입:', userType);
+        console.log('선택된 타입:', type);
+        console.log('전송할 payload:', payload);
         
-        const res = await postReservation(payload, userType);
+        const res = type === 'personal' 
+          ? await postPersonalReservation(payload)
+          : await postOrganizationReservation(payload);
         console.log(res);
         if (res) {
           router.push("/help/complete");
@@ -162,9 +201,10 @@ export default function ModifyPage() {
             <button
               type="button"
               onClick={() => setType("personal")}
+              disabled={userType === 'organization'}
               className={`${cn("toggleButton")} ${
-                type === "personal" ? cn("active") : ""
-              }`}
+                type === "personal" ? cn("active") : ""} 
+                ${userType === 'organization' ? cn("disabled") : ""}`}
             >
               <Image src={people} width={80} height={80} alt='개인 회원' className={cn("buttonImage")} />
               <p className={cn("toggleLabel")}>개인</p>
@@ -172,11 +212,12 @@ export default function ModifyPage() {
             <button
               type="button"
               onClick={() => setType("org")}
+              disabled={userType === 'individual'}
               className={`${cn("toggleButton")} ${
-                type === "org" ? cn("active") : ""
-              }`}
+                type === "org" ? cn("active") : ""} 
+                ${userType === 'individual' ? cn("disabled") : ""}`}
             >
-              <Image src={house} width={80} height={80} alt="기관 회원" />
+              <Image src={house} width={80} height={80} alt="기관 회원" className={cn("buttonImage")} />
               <p className={cn("toggleLabel")}>기관</p>
             </button>
           </div>
@@ -187,6 +228,21 @@ export default function ModifyPage() {
             <input type="text" placeholder="이름을 입력해주세요." value={name} onChange={(e) => setName(e.target.value)} className={showErrors && !name ? cn("error") : undefined}  />
             {showErrors && !name && <p className={cn("errorMsg")}>이름을 입력해주세요.</p>}
           </div>
+
+          {/* 기관 이름 필드 (기관 사용자만 표시) */}
+          {type === 'org' && (
+            <div className={cn("inputGroup")}>
+              <label>기관 이름 <span className={cn("required")}>(필수)</span></label>
+              <input 
+                type="text" 
+                placeholder="기관 이름을 입력해주세요." 
+                value={organizationName} 
+                onChange={(e) => setOrganizationName(e.target.value)} 
+                className={showErrors && !organizationName ? cn("error") : undefined}  
+              />
+              {showErrors && !organizationName && <p className={cn("errorMsg")}>기관 이름을 입력해주세요.</p>}
+            </div>
+          )}
 
           <div className={cn("inputGroup")}>
             <label>전화번호 <span className={cn("required")}>(필수)</span></label>
@@ -227,6 +283,7 @@ export default function ModifyPage() {
               {([
                 { value: "남", label: "남자", src: male },
                 { value: "여", label: "여자", src: female },
+                { value: "둘 다", label: "둘 다 있음", src: both },
               ] as const).map((g) => (
                 <button
                   key={g.value}
@@ -236,7 +293,7 @@ export default function ModifyPage() {
                     recipientGenderType === g.value ? cn("active") : ""
                   }`}
                 >
-                  <Image src={g.src} width={80} height={80} alt="성별 선택" />
+                  <Image src={g.src} width={80} height={80} alt="성별 선택" className={cn("buttonImage")} />
                   <p className={cn("genderTitle")}>{g.label}</p>
                 </button>
               ))}

@@ -2,6 +2,10 @@
   width: 100%;
   background-color: var(--grey-100);
   padding: 5rem 27rem 10rem;
+
+  @media (max-width: 610px) {
+    padding: 5rem 2rem 10rem;
+  }
 }
 
 .footerContainer {

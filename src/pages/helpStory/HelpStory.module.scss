@@ -1,0 +1,140 @@
+.container {
+  max-width: 91.2rem;
+  margin: 0 auto;
+  padding: 9rem 0;
+  background-color: #ffffff;
+}
+
+.main {
+  width: 100%;
+}
+
+.title {
+  text-align: center;
+  font-size: 4.8rem;
+  font-weight: 700;
+  margin-bottom: 10rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 6rem 0;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.storyList {
+  gap: 3.2rem;
+  margin-bottom: 9rem;
+}
+
+.storyItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 3.2rem;
+  padding: 3.2rem;
+  border-radius: 1.2rem;
+  background-color: #fff;
+}
+
+.storyContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.storyTitle {
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: var(--grey-800);
+}
+
+.storyDescription {
+  font-size: 1.7rem;
+  color: var(--grey-600);
+}
+
+.storyImage {
+  flex-shrink: 0;
+  width: 24rem;
+  height: 18rem;
+  background-color: var(--grey-200);
+  border-radius: 1.2rem;
+}
+
+.storyDate {
+  font-size: 0.9rem;
+  color: #999;
+}
+
+.storyWriter {
+  font-size: 0.9rem;
+  color: #999;
+  margin-top: auto;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 1.2rem;
+}
+
+.placeholderImage {
+  width: 100%;
+  height: 100%;
+  background-color: var(--grey-200);
+  border-radius: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--grey-500);
+  font-size: 1.5rem;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 8rem 0;
+  color: var(--grey-600);
+  font-size: 1.7rem;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.2rem;
+  margin-top: 4rem;
+}
+
+.pageButton {
+  padding: 1.2rem 1.8rem;
+  border: 1px solid var(--grey-300);
+  background-color: var(--background);
+  color: var(--grey-800);
+  border-radius: 1.2rem;
+  cursor: pointer;
+  font-size: 1.5rem;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: var(--grey-200);
+    border-color: var(--grey-300);
+  }
+
+  &.active {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.navButton {
+    font-weight: bold;
+  }
+}

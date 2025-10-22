@@ -7,20 +7,20 @@ export const handleLogout = async () => {
     const response = await instance.post("/logout");
     
     // 스토어에서 사용자 상태 초기화 (Zustand persist로 자동 저장됨)
-    const { setIsVerified, setUser, setAccessToken } = useUserStore.getState();
+    const { setIsVerified, setUser, setUserType } = useUserStore.getState();
     setIsVerified(false);
     setUser(null);
-    setAccessToken(null);
+    setUserType(null);
     
     return response;
   } catch (error) {
     console.error('로그아웃 중 오류:', error);
     
     // 에러가 발생해도 로컬 상태는 초기화
-    const { setIsVerified, setUser, setAccessToken } = useUserStore.getState();
+    const { setIsVerified, setUser, setUserType } = useUserStore.getState();
     setIsVerified(false);
     setUser(null);
-    setAccessToken(null);
+    setUserType(null);
     
     throw error;
   }

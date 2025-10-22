@@ -43,7 +43,7 @@ export default function CompletePage() {
             확정되면 알림을 보내드릴 예정이에요.
           </p>
           <div className={cn("imageBox")}>
-            <Image src={image} alt="도움 요청 접수 완료" />
+            <Image src={image} alt="도움 요청 접수 완료" className={cn("completeImage")} />
           </div>
         </div>
 
