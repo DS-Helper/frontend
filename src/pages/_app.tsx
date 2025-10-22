@@ -8,7 +8,7 @@ import { useUserStore } from "@/lib/store/userStore";
 
 export default function App({ Component, pageProps }: AppProps) {
   const [queryClient] = useState(() => new QueryClient());
-  const { checkAuthStatus, isVerified, userType } = useUserStore();
+  const { checkAuthStatus } = useUserStore();
   const [isHydrated, setIsHydrated] = useState(false);
   const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
 

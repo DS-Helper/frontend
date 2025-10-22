@@ -24,10 +24,10 @@ instance.interceptors.response.use(
     // 401 에러 (인증 실패) 시 자동 로그아웃
     if (error.response?.status === 401) {
       // 스토어에서 사용자 상태 초기화 (Zustand persist로 자동 저장됨)
-      const { setIsVerified, setUser, setAccessToken } = useUserStore.getState();
+      const { setIsVerified, setUser, setUserType } = useUserStore.getState();
       setIsVerified(false);
       setUser(null);
-      setAccessToken(null);
+      setUserType(null);
       
       // 로그인 페이지로 리다이렉트
       if (typeof window !== 'undefined') {

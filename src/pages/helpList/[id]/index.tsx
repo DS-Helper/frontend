@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from 'next/router';
 import classNames from "classnames/bind";
 import styles from "./HelpDetail.module.scss";
-import { getPersonalReservation, patchPersonalReservation, getPersonalReservationDetail } from "@/lib/apis/reservationUser";
-import { getOrganizationReservation, patchOrganizationReservation, getOrganizationReservationDetail } from "@/lib/apis/reservationOrg";
+import { getPersonalReservationDetail, patchPersonalReservation } from "@/lib/apis/reservationUser";
+import { getOrganizationReservationDetail, patchOrganizationReservation } from "@/lib/apis/reservationOrg";
 import { useUserStore } from "@/lib/store/userStore";
-import { HelpRequest, HelpDetailData, ApiReservationData } from "@/types/helpList";
+import { HelpRequest, HelpDetailData } from "@/types/helpList";
 import { IoChevronDown } from "react-icons/io5";
 import Image from 'next/image';
 
@@ -110,8 +110,8 @@ export default function HelpDetailPage() {
             console.error('API 응답이 없거나 데이터가 없음:', response);
             router.push('/helpList');
           }
-        } catch (error) {
-          console.error('예약 상세 조회 실패:', error);
+        } catch {
+          console.error('예약 상세 조회 실패');
           router.push('/helpList');
         }
       };
@@ -140,7 +140,7 @@ export default function HelpDetailPage() {
         } else {
           alert("예약 취소에 실패했습니다. 다시 시도해주세요.");
         }
-      } catch (error) {
+      } catch {
         alert("예약 취소 중 오류가 발생했습니다. 다시 시도해주세요.");
       }
     }
