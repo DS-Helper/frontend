@@ -1,9 +1,10 @@
 // 고객 문의 페이지
 import styles from '@/styles/Customer.module.scss';
 import classNames from 'classnames/bind';
-import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import { getInquiries, postInquiry } from '@/lib/apis/customer';
 import { Inquiry, InquiryFormData } from '@/types/customer';
+import Image from 'next/image';
 
 const cn = classNames.bind(styles);
 
@@ -226,9 +227,11 @@ export default function Customer(){
                                         {/* 이미지 표시*/}
                                         {item.image && (
                                             <div className={cn("imageWrapper")}>
-                                                <img 
+                                                <Image 
                                                 src={item.image}
                                                 alt="문의 이미지"
+                                                width={200}
+                                                height={150}
                                                 className={cn("inquiryImage")}/>
                                             </div>
 
@@ -308,7 +311,7 @@ export default function Customer(){
                                             {images[index] ? (
                                                 // 이미지가 있을 경우 미리보기와 삭제 버튼 표시
                                                 <div className={cn("imagePreview")}>
-                                                    <img src={images[index]} alt={`문의 이미지 ${index+1}`} />
+                                                    <Image src={images[index]} alt={`문의 이미지 ${index+1}`} width={100} height={100} />
                                                     <button 
                                                         type="button" 
                                                         className={cn("removeImageBtn")}

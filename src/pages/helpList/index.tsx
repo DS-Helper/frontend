@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useRouter } from "next/router";
 import classNames from "classnames/bind";
 import styles from "@/styles/HelpList.module.scss";
 import { HelpRequestStatus, HelpRequest, ApiReservationData } from "@/types/helpList"
@@ -57,8 +56,8 @@ export default function HelpListPage() {
       
       if (response && response.data) {
         const rawData = response.data.content || response.data || [];
-        const totalPages = response.data.totalPages || 0;
-        const totalElements = response.data.totalElements || 0;
+        // const totalPages = response.data.totalPages || 0;
+        // const totalElements = response.data.totalElements || 0;
         
         // API 응답 데이터를 HelpRequest 형식으로 매핑
         const mappedData = rawData.map((item: ApiReservationData) => {
