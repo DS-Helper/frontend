@@ -6,6 +6,11 @@
   align-items: center;
   padding: 4rem 0;
   gap: 4rem;
+
+  @media (max-width: 611px) {
+    padding: 3.2rem 2rem;
+    align-items: flex-start;
+  }
 }
 
 .form {
@@ -14,6 +19,10 @@
   display: flex;
   flex-direction: column;
   gap: 2.4rem;
+
+  @media (max-width: 611px) {
+    max-width: 100%;
+  }
 }
 
 .title {
@@ -40,6 +49,11 @@
   cursor: pointer;
   transition: all 0.2s ease;
   filter: grayscale(100%);
+}
+
+.buttonImage {
+  width: 8rem;
+  height: 8rem;
 }
 
 .toggleButton.active {
@@ -151,8 +165,10 @@
   background: #fff;
   padding: 2.4rem;
   border-radius: 1.2rem;
-  border: 1px solid #e5e5e5;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 611px) {
+    max-width: 100%;
+  }
 
   .dateTimeLabel {
     font-weight: 600;
@@ -526,6 +542,11 @@
   margin-top: 6rem;
 }
 
+.completeImage {
+  width: 35.4rem;
+  height: 23.6rem;
+}
+
 // 완료 페이지 스타일
 .completeContent {
   max-width: 48rem;
@@ -578,6 +599,11 @@
   display: flex;
   flex-direction: column;
   gap: 3rem;
+}
+
+.notificationImage {
+  width: 15rem;
+  height: 15rem;
 }
 
 // 모달 제목

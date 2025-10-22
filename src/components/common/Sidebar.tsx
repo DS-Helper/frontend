@@ -29,7 +29,7 @@ export default function Sidebar({ onClose }: { onClose: () => void }) {
       <div className={cn("sidebar")}>
         <div className={cn("sidebarHeader")}>
           <div className={cn("sidebarHeaderClose")} onClick={onClose}>
-            <FaAngleRight size={16} />
+            <FaAngleRight size={16} className={cn("sidebarHeaderCloseIcon")} />
           </div>
         </div>
         <ul className={cn("sidebarMenuList")}>

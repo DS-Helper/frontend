@@ -118,6 +118,10 @@
   flex-direction: column;
   margin: 0 auto;
   padding: 2.4rem;
+
+  @media (max-width: 611px) {
+    max-width: 100%;
+  }
 }
 
 .infoSection {
@@ -229,41 +233,4 @@
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease;
-}
-
-// 반응형 디자인
-@media (max-width: 768px) {
-  .modalContent {
-    margin: 5rem 0 0 0;
-    border-radius: 2rem 2rem 0 0;
-    width: 100%;
-  }
-
-  .header {
-    padding: 1.6rem 2rem;
-  }
-
-  .mainContent {
-    padding: 2rem;
-  }
-
-  .actionSection {
-    padding: 2rem;
-  }
-
-  .sectionTitle {
-    font-size: 1.7rem;
-  }
-
-  .infoText,
-  .label,
-  .value,
-  .contentText {
-    font-size: 1.5rem;
-  }
-
-  .icon {
-    font-size: 1.6rem;
-    min-width: 2rem;
-  }
 }

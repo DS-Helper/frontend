@@ -12,16 +12,24 @@
   align-items: center;
   justify-content: center;
 
+  @media (max-width: 611px) {
+    height: auto;
+  }
+
   .homePage1Content {
     display: flex;
+    align-items: center;
     gap: 7.3rem;
   }
 
   .homePage1Title {
     font-size: 7.8rem;
     font-weight: 700;
-    color: #222222;
-    line-height: 1.4;
+  }
+
+  .homePage1Image {
+    width: 25rem;
+    height: 32.9rem;
   }
 
   .homePage1Button {
@@ -47,6 +55,14 @@
   padding: 10rem 20rem;
   text-align: center;
 
+  @media (max-width: 611px) {
+    min-height: auto;
+  }
+
+  @media (max-width: 611px) {
+    padding: 10rem 2rem;
+  }
+
   .homePageWrapper {
     display: flex;
     flex-direction: column;
@@ -57,10 +73,21 @@
     display: flex;
     gap: 8rem;
 
+    @media (max-width: 611px) {
+      flex-direction: column;
+      gap: 5rem;
+    }
+
     .homePageButton {
       display: flex;
       flex-direction: column;
       gap: 3.4rem;
+
+      @media (max-width: 611px) {
+        flex-direction: row;
+        gap: 0.8rem;
+        justify-content: center;
+      }
 
       button {
         width: 100%;
@@ -87,11 +114,22 @@
       }
     }
 
+    .homePageListImage {
+      width: 18rem;
+      height: 18rem;
+    }
+
     .homePageList {
       width: 100%;
       display: flex;
       gap: 1.6rem;
       flex-wrap: wrap;
+
+      @media (max-width: 611px) {
+        padding: 0 5rem;
+        gap: 10rem;
+        justify-content: center;
+      }
 
       li {
         width: 30%;
@@ -207,6 +245,14 @@
   min-height: 100vh;
   padding: 16rem 26rem;
   text-align: center;
+  
+  @media (max-width: 611px) {
+    min-height: auto;
+  }
+
+  @media (max-width: 611px) {
+    padding: 10rem 2rem;
+  }
 
   .homePageWrapper {
     display: flex;
@@ -224,6 +270,12 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 5rem;
+
+      .storyImage {
+        width: 24rem;
+        height: 18rem;
+        object-fit: cover;
+      }
 
       div {
         display: flex;

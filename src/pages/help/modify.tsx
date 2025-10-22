@@ -14,12 +14,13 @@ import people from "@/public/helpModify_people.svg"
 import house from "@/public/helpModify_house.svg"
 import male from "@/public/reservate_male.svg"
 import female from "@/public/reservate_female.svg"
+import both from "@/public/reservate_both.svg"
 
 export default function ModifyPage() {
   const router = useRouter();
   const { user, userType } = useUserStore();
   const [type, setType] = useState<"personal" | "org">("personal");
-  const [recipientGenderType, setRecipientGenderType] = useState<"남" | "여" | null>("남");
+  const [recipientGenderType, setRecipientGenderType] = useState<"남" | "여" | "둘 다" | null>("남");
 
   const [name, setName] = useState("");
   const [organizationName, setOrganizationName] = useState("");
@@ -202,8 +203,8 @@ export default function ModifyPage() {
               onClick={() => setType("personal")}
               disabled={userType === 'organization'}
               className={`${cn("toggleButton")} ${
-                type === "personal" ? cn("active") : ""
-              } ${userType === 'organization' ? cn("disabled") : ""}`}
+                type === "personal" ? cn("active") : ""} 
+                ${userType === 'organization' ? cn("disabled") : ""}`}
             >
               <Image src={people} width={80} height={80} alt='개인 회원' className={cn("buttonImage")} />
               <p className={cn("toggleLabel")}>개인</p>
@@ -213,10 +214,10 @@ export default function ModifyPage() {
               onClick={() => setType("org")}
               disabled={userType === 'individual'}
               className={`${cn("toggleButton")} ${
-                type === "org" ? cn("active") : ""
-              } ${userType === 'individual' ? cn("disabled") : ""}`}
+                type === "org" ? cn("active") : ""} 
+                ${userType === 'individual' ? cn("disabled") : ""}`}
             >
-              <Image src={house} width={80} height={80} alt="기관 회원" />
+              <Image src={house} width={80} height={80} alt="기관 회원" className={cn("buttonImage")} />
               <p className={cn("toggleLabel")}>기관</p>
             </button>
           </div>
@@ -282,6 +283,7 @@ export default function ModifyPage() {
               {([
                 { value: "남", label: "남자", src: male },
                 { value: "여", label: "여자", src: female },
+                { value: "둘 다", label: "둘 다 있음", src: both },
               ] as const).map((g) => (
                 <button
                   key={g.value}
@@ -291,7 +293,7 @@ export default function ModifyPage() {
                     recipientGenderType === g.value ? cn("active") : ""
                   }`}
                 >
-                  <Image src={g.src} width={80} height={80} alt="성별 선택" />
+                  <Image src={g.src} width={80} height={80} alt="성별 선택" className={cn("buttonImage")} />
                   <p className={cn("genderTitle")}>{g.label}</p>
                 </button>
               ))}

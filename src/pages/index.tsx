@@ -91,7 +91,7 @@ export default function Home() {
           <ul className={cn("homePageList")}>
             {helpList.map((item, i) => (
               <li key={i}>
-                <Image src={item.img} alt={item.title} width={180} height={180} />
+                <Image src={item.img} className={cn("homePageListImage")} alt={item.title} width={180} height={180} />
                 <p>{item.title}</p>
                 <span>{item.desc}</span>
               </li>
@@ -146,7 +146,7 @@ export default function Home() {
             <p className={cn("homePage1Title")}>
               달성군 이웃을 위한 <br /> 무료 방문 서비스
             </p>
-            <Image src={mainImage} alt="메인 이미지" width={250} height={329} />
+            <Image src={mainImage} className={cn("homePage1Image")} alt="메인 이미지" width={250} height={329} />
           </div>
           <button className={cn("homePage1Button")} onClick={handleHelp}>
             도움 요청하기
@@ -186,7 +186,7 @@ export default function Home() {
                     <span className={cn("storyContent")}>{s.content}</span>
                     <span className={cn("storyDate")}>{s.date}</span>
                   </div>
-                  <Image src={s.img} alt="도와드린 이야기" width={240} height={180} />
+                  <Image src={s.img} className={cn("storyImage")} alt="도와드린 이야기" width={240} height={180} />
                 </li>
               ))}
             </ul>

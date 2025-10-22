@@ -21,20 +21,20 @@ export default function Header() {
     <header className={cn("header")}>
       <div className={cn("headerContainer")}>
         <div className={cn("headerLogo")} onClick={() => router.push("/")}>
-          <Image src={logo} alt="logo" width={100} height={22} />
+          <Image src={logo} alt="logo" className={cn("headerLogoImage")} width={100} height={22} />
         </div>
 
         <div className={cn("headerLogin")}>
           {isVerified ? (
             <button className={cn("userMenu")}>
               <div className={cn("userMenuIcon")}>
-                <BiSolidBell size={20} />
+                <BiSolidBell size={20} className={cn("userMenuIconBell")} />
               </div>
               <div
                 className={cn("userMenuIcon")}
                 onClick={() => setIsOpen(!isOpen)}
               >
-                <FiMenu size={20} />
+                <FiMenu size={20} className={cn("userMenuIconMenu")} />
               </div>
             </button>
           ) : (

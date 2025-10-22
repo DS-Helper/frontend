@@ -15,6 +15,10 @@
   top: 0;
   right: 0;
   z-index: 1100;
+
+  @media (max-width: 611px) {
+    width: 70%;
+  }
 }
 
 .sidebarHeader {
@@ -26,11 +30,27 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+
+  @media (max-width: 611px) {
+    padding: 2rem;
+  }
 }
 
 .sidebarHeaderClose {
+  display: flex;
+  align-items: center;
   cursor: pointer;
   color: var(--grey-600);
+}
+
+.sidebarHeaderCloseIcon {
+  width: 1.6rem;
+  height: 1.6rem;
+
+  @media (max-width: 611px) {
+    width: 3rem;
+    height: 3rem;
+  }
 }
 
 .sidebarMenuList {

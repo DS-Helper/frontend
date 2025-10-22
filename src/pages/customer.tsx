@@ -1,7 +1,9 @@
 // 고객 문의 페이지
 import styles from '@/styles/Customer.module.scss';
 import classNames from 'classnames/bind';
-import React, { useState ,ChangeEvent, FormEvent } from "react";
+import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { getInquiries, postInquiry } from '@/lib/apis/customer';
+import { Inquiry, InquiryFormData } from '@/types/customer';
 
 const cn = classNames.bind(styles);
 
@@ -10,73 +12,37 @@ export default function Customer(){
     const [inquiryType, setInquiryType] = useState(""); //문의 타입
     const [content, setContent] = useState("");
     const [images, setImages] = useState<string[]>([]); // 미리보기 URL 배열
+    const [imageFiles, setImageFiles] = useState<File[]>([]); // 실제 파일 객체 배열
     
-    //임의 문의 데이터
-    const [inquiries, setInquiries] = useState([
-        {
-            id: 1,
-            status: "답변 보기",
-            content:"신청 당시에 부모님이 병원에 가시는 일정이 있어서 동행 요청을 드렸는데, 갑자기 병원이 날짜를 변경해서 다음주 금요일로 바뀌었습니다. 현재 요청한 일자를 바꾸고 싶은데 취소 후 재신청 외에는 방법이 없을까요 ? 이전 내용이 사라질까봐 걱정돼서 문의 드립니다.",
-            date:"2025.07.15",
-            time:"17:38",
-            image:"/public/hospital.jpg" ,
-            answer:"안녕하세요. 불편을 드려 정말 죄송합니다. \n\n확인 결과, 해당 시간대에 배차 배경이 누락된 것으로 확인되었습니다. \n\n빠르게 연락을 드리지 못한 점 사과드리며, 다음 일정은 저희가 우선 배정해드릴 수 있도록 처리하겠습니다.\n\n다시 한 번 사과드리며, 곧 별도 연락드리겠습니다."
-        },
-        {
-            id: 2,
-            status: "답변 대기",
-            content:"신청 당시에 부모님이 병원에 가시는 일정이 있어서 동행 요청을 드렸는데, 갑자기 병원이 날짜를 변경해서 다음주 금요일로 바뀌었습니다. 현재 요청한 일자를 바꾸고 싶은데 취소 후 재신청 외에는 방법이 없을까요 ? 이전 내용이 사라질까봐 걱정돼서 문의 드립니다.",
-            date:"2025.08.21",
-            time:"12:48",
-            image: undefined,
-            answer: null
-        },
-        {
-            id: 3,
-            status: "답변 보기",
-            content:"신청 당시에 부모님이 병원에 가시는 일정이 있어서 동행 요청을 드렸는데, 갑자기 병원이 날짜를 변경해서 다음주 금요일로 바뀌었습니다. 현재 요청한 일자를 바꾸고 싶은데 취소 후 재신청 외에는 방법이 없을까요 ? 이전 내용이 사라질까봐 걱정돼서 문의 드립니다.",
-            date:"2025.07.15",
-            time:"17:38",
-            image: undefined,
-            answer:"안녕하세요. 불편을 드려 정말 죄송합니다. \n\n확인 결과, 해당 시간대에 배차 배경이 누락된 것으로 확인되었습니다. \n\n빠르게 연락을 드리지 못한 점 사과드리며, 다음 일정은 저희가 우선 배정해드릴 수 있도록 처리하겠습니다.\n\n다시 한 번 사과드리며, 곧 별도 연락드리겠습니다."
-        },
-        {
-            id: 4,
-            status: "답변 대기",
-            content:"신청 당시에 부모님이 병원에 가시는 일정이 있어서 동행 요청을 드렸는데, 갑자기 병원이 날짜를 변경해서 다음주 금요일로 바뀌었습니다. 현재 요청한 일자를 바꾸고 싶은데 취소 후 재신청 외에는 방법이 없을까요 ? 이전 내용이 사라질까봐 걱정돼서 문의 드립니다.",
-            date:"2025.08.21",
-            time:"12:48",
-            image: undefined,
-            answer: null
-        },
-        {
-            id: 5,
-            status: "답변 보기",
-            content:"신청 당시에 부모님이 병원에 가시는 일정이 있어서 동행 요청을 드렸는데, 갑자기 병원이 날짜를 변경해서 다음주 금요일로 바뀌었습니다. 현재 요청한 일자를 바꾸고 싶은데 취소 후 재신청 외에는 방법이 없을까요 ? 이전 내용이 사라질까봐 걱정돼서 문의 드립니다.",
-            date:"2025.07.15",
-            time:"17:38",
-            image: undefined,
-            answer:"안녕하세요. 불편을 드려 정말 죄송합니다. \n\n확인 결과, 해당 시간대에 배차 배경이 누락된 것으로 확인되었습니다. \n\n빠르게 연락을 드리지 못한 점 사과드리며, 다음 일정은 저희가 우선 배정해드릴 수 있도록 처리하겠습니다.\n\n다시 한 번 사과드리며, 곧 별도 연락드리겠습니다."
-        },
-        {
-            id: 6,
-            status: "답변 대기",
-            content:"신청 당시에 부모님이 병원에 가시는 일정이 있어서 동행 요청을 드렸는데, 갑자기 병원이 날짜를 변경해서 다음주 금요일로 바뀌었습니다. 현재 요청한 일자를 바꾸고 싶은데 취소 후 재신청 외에는 방법이 없을까요 ? 이전 내용이 사라질까봐 걱정돼서 문의 드립니다.",
-            date:"2025.08.21",
-            time:"12:48",
-            image: undefined,
-            answer: null
-        },
-        {
-            id: 7,
-            status: "답변 대기",
-            content:"신청 당시에 부모님이 병원에 가시는 일정이 있어서 동행 요청을 드렸는데, 갑자기 병원이 날짜를 변경해서 다음주 금요일로 바뀌었습니다. 현재 요청한 일자를 바꾸고 싶은데 취소 후 재신청 외에는 방법이 없을까요 ? 이전 내용이 사라질까봐 걱정돼서 문의 드립니다.",
-            date:"2025.08.21",
-            time:"12:48",
-            image: undefined,
-            answer: null
+    // API에서 가져온 문의 데이터
+    const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    // 문의 내역 불러오기
+    const fetchInquiries = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await getInquiries();
+            if (response && response.data) {
+                setInquiries(response.data);
+            } else {
+                setError('문의 내역을 불러오는데 실패했습니다.');
+            }
+        } catch (err) {
+            setError('문의 내역을 불러오는 중 오류가 발생했습니다.');
+            console.error('문의 내역 불러오기 오류:', err);
+        } finally {
+            setLoading(false);
         }
-    ]);
+    };
+
+    // 컴포넌트 마운트 시 문의 내역 불러오기
+    useEffect(() => {
+        if (activeTab === 'history') {
+            fetchInquiries();
+        }
+    }, [activeTab]);
 
     // 답변 내용 모달
     const [isModalOpen, setModalOpen] = useState(false);
@@ -93,10 +59,38 @@ export default function Customer(){
         setModalOpen(false);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // API 요청이나 처리 로직 추가하기
-        console.log({ inquiryType, content });
+        setLoading(true);
+        setError(null);
+        
+        try {
+            const formData: InquiryFormData = {
+                inquiryType,
+                content,
+                images: imageFiles
+            };
+            
+            const response = await postInquiry(formData);
+            if (response && response.data) {
+                alert('문의가 성공적으로 등록되었습니다.');
+                // 폼 초기화
+                setInquiryType('');
+                setContent('');
+                setImages([]);
+                setImageFiles([]);
+                // 문의 내역 탭으로 이동하고 데이터 새로고침
+                setActiveTab('history');
+                await fetchInquiries();
+            } else {
+                setError('문의 등록에 실패했습니다.');
+            }
+        } catch (err) {
+            setError('문의 등록 중 오류가 발생했습니다.');
+            console.error('문의 등록 오류:', err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     /*
@@ -128,20 +122,31 @@ export default function Customer(){
         const file = e.target.files[0];
         const url = URL.createObjectURL(file);
 
-        setImages((prev) =>{
+        setImages((prev) => {
             const copy = [...prev];
-            // 해당 인덱스에 이미지 URL 저장
             copy[index] = url;
             return copy;
-        })
+        });
+        
+        setImageFiles((prev) => {
+            const copy = [...prev];
+            copy[index] = file;
+            return copy;
+        });
     }
     /* 이미지 삭제 처리 */
     const handleImageRemove = (index: number) => {
         setImages((prev) => {
             const copy = [...prev];
-            copy.splice(index, 1); // 해당 인덱스 항목 삭제
+            copy.splice(index, 1);
             return copy;
-        })
+        });
+        
+        setImageFiles((prev) => {
+            const copy = [...prev];
+            copy.splice(index, 1);
+            return copy;
+        });
     }
 
     /* 문의 내용 변경 처리 */
@@ -178,11 +183,20 @@ export default function Customer(){
                 
                 <div className={cn("tabContent")}>
                     {activeTab === "history" && (
-                        inquiries.length === 0 ? (
+                        loading ? (
+                            <div className={cn("loadingBox")}>
+                                <p className={cn("loadingMessage")}>문의 내역을 불러오는 중...</p>
+                            </div>
+                        ) : error ? (
+                            <div className={cn("errorBox")}>
+                                <p className={cn("errorMessage")}>{error}</p>
+                                <button onClick={fetchInquiries} className={cn("retryBtn")}>다시 시도</button>
+                            </div>
+                        ) : inquiries.length === 0 ? (
                             <div className={cn("emptyBox")}>
-                            <p className={cn("emptyMessage")}>문의하신 내역이 없어요.</p> </div>
-                        ) 
-                        :(
+                                <p className={cn("emptyMessage")}>문의하신 내역이 없어요.</p>
+                            </div>
+                        ) : (
                         <>
                             <ul className={cn("inquiryList")}>
                                 {currentInquiries.map((item) => {
@@ -196,7 +210,7 @@ export default function Customer(){
                                         <span className={cn("status", 
                                             {waiting: item.status==="답변 대기", 
                                             done: item.status==="답변 보기"})}
-                                            onClick={() => openModal(item.answer)}
+                                            onClick={() => openModal(item.answer || null)}
                                         > 
                                             {item.status}
                                         </span>
@@ -295,7 +309,11 @@ export default function Customer(){
                                                 // 이미지가 있을 경우 미리보기와 삭제 버튼 표시
                                                 <div className={cn("imagePreview")}>
                                                     <img src={images[index]} alt={`문의 이미지 ${index+1}`} />
-                                                    <button type="button" className={cn("removeImageBtn")}>
+                                                    <button 
+                                                        type="button" 
+                                                        className={cn("removeImageBtn")}
+                                                        onClick={() => handleImageRemove(index)}
+                                                    >
                                                         &times;
                                                     </button>
                                                 </div>
@@ -318,9 +336,14 @@ export default function Customer(){
                             {/* 등록 버튼 추가 */}
                             <button 
                             type="submit"
-                            className={cn("submitBtn", {disabled: !isFormValid})}
-                            disabled={!isFormValid}
-                            >등록하기</button>
+                            className={cn("submitBtn", {disabled: !isFormValid || loading})}
+                            disabled={!isFormValid || loading}
+                            >{loading ? '등록 중...' : '등록하기'}</button>
+                            {error && (
+                                <div className={cn("errorMessage")}>
+                                    {error}
+                                </div>
+                            )}
                         </form>
                     )}
                 </div>
