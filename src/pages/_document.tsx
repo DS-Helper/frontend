@@ -4,7 +4,7 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
-        <meta name="google-site-verification" content="eoPfzkPLZSthrx3DHXwYrKawOdwP3iHOnMNUGwQAjb4" />
+        <meta name="google-site-verification" content="b7oOKTY7k-qg3A4gkXUCFsBVTQXE8zyUidmQSmvLiMI" />
       </Head>
       <body>
         <Main />
