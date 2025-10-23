@@ -10,17 +10,17 @@ export default function Terms() {
       <div className={cn("termsContent")}>
         <h2 className={cn("termsSectionTitle")}>1. 목적</h2>
         <p className={cn("termsText")}>
-          본 약관은 DS Helper(이하 "서비스")의 이용 조건과 절차, 운영자와 이용자의 권리·의무 및 책임 사항을 규정함을 목적으로 합니다.
+          본 약관은 DS Helper(이하 &quot;서비스&quot;)의 이용 조건과 절차, 운영자와 이용자의 권리·의무 및 책임 사항을 규정함을 목적으로 합니다.
         </p>
       </div>
 
       <div className={cn("termsContent")}>
         <h2 className={cn("termsSectionTitle")}>2. 정의</h2>
         <ol className={cn("termsList")}>
-          <li className={cn("termsListItem")}>"서비스": 무상 방문/동행/생활 지원 등 정서·생활적 도움을 제공하는 비영리 서비스</li>
-          <li className={cn("termsListItem")}>"이용자": SNS 로그인으로 서비스에 가입하여 이용하는 개인 또는 기관</li>
-          <li className={cn("termsListItem")}>"헬퍼(크루)": 운영자가 선발하여 활동하는 봉사 성격의 인원(고용관계 아님)</li>
-          <li className={cn("termsListItem")}>"운영자": 서비스 기획·운영 주체</li>
+          <li className={cn("termsListItem")}>&quot;서비스&quot;: 무상 방문/동행/생활 지원 등 정서·생활적 도움을 제공하는 비영리 서비스</li>
+          <li className={cn("termsListItem")}>&quot;이용자&quot;: SNS 로그인으로 서비스에 가입하여 이용하는 개인 또는 기관</li>
+          <li className={cn("termsListItem")}>&quot;헬퍼(크루)&quot;: 운영자가 선발하여 활동하는 봉사 성격의 인원(고용관계 아님)</li>
+          <li className={cn("termsListItem")}>&quot;운영자&quot;: 서비스 기획·운영 주체</li>
         </ol>
       </div>
 

@@ -11,7 +11,7 @@ export default function Privacy() {
       <div className={cn("termsContent")}>
         <h2 className={cn("termsSectionTitle")}>1. 총칙</h2>
         <p className={cn("termsText")}>
-          DS Helper(이하 '서비스')는 개인정보 보호법 등 관계 법령을 준수하며 이용자의 개인정보를 안전하게 처리합니다.
+          DS Helper(이하 &apos;서비스&apos;)는 개인정보 보호법 등 관계 법령을 준수하며 이용자의 개인정보를 안전하게 처리합니다.
         </p>
       </div>
 
@@ -95,7 +95,7 @@ export default function Privacy() {
       <div className={cn("termsContent")}>
         <h2 className={cn("termsSectionTitle")}>7. 국외 이전</h2>
         <p className={cn("termsText")}>
-          현재 국외 이전이 필요한 경우가 없다면 "없음"으로 고지합니다.
+          현재 국외 이전이 필요한 경우가 없다면 &quot;없음&quot;으로 고지합니다.
         </p>
         <p className={cn("termsText")}>
           국외 이전이 발생하는 경우 이전 국가·일시·방법·보관기간·수탁자 정보를 사전 고지하고 필요한 동의를 받습니다.
