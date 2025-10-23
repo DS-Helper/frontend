@@ -1,5 +1,6 @@
 import styles from "@/styles/Footer.module.scss";
 import classNames from "classnames/bind";
+import Link from "next/link";
 
 const cn = classNames.bind(styles);
 
@@ -17,7 +18,10 @@ export default function Footer() {
           <li>전화번호 : 010-5250-9548</li>
           <li>이메일 : dlsgh3760@gmail.com</li>
         </ul>
-        <p className={cn("footerTitle")}>개인정보처리방침</p>
+        <div className={cn("footerLinkContainer")}>
+          <Link href="/terms" className={cn("footerLink")}>이용약관</Link>
+          <Link href="/privacy" className={cn("footerLink")}>개인정보처리방침</Link>
+        </div>
         <span className={cn("footerCopyright")}>
           © 2025 DS Helper. All rights reserved.
         </span>

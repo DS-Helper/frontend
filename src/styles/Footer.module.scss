@@ -20,6 +20,23 @@
   font-size: 1.5rem;
 }
 
+.footerLinkContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-bottom: 5rem;
+}
+
+.footerLink {
+  font-weight: 700;
+  color: var(--grey-700);
+  font-size: 1.5rem;
+}
+
+.footerLink:hover {
+  color: var(--primary-color);
+}
+
 .footerInfo {
   display: flex;
   gap: 1rem;
