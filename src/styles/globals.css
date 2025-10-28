@@ -40,15 +40,35 @@ body {
   color: #222;
 }
 
-/* 모바일 반응형 스타일 (611px 이하) */
+@media (max-width: 1000px) {
+  html,
+  body {
+    font-size: 55%;
+  }
+}
+
+@media (max-width: 840px) {
+  html,
+  body {
+    font-size: 45%;
+  }
+}
+
+@media (max-width: 700px) {
+  html,
+  body {
+    font-size: 40%;
+  }
+}
+
 @media (max-width: 611px) {
   html,
   body {
-    font-size: 38.5%; /* 9px 기준으로 조정 */
+    font-size: 38.5%;
   }
 
   body {
-    padding-top: 6rem; /* 모바일에서 헤더 높이 줄임 */
+    padding-top: 6rem;
   }
 }
 
