@@ -20,6 +20,26 @@ export const getLogin = async (data: any) => {
   }
 };
 
+export const naverLoginUrl = async () => {
+  try {
+    const res = await instance.get("/oauth/naver/login-url");
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+export const naverLogin = async (data: any) => {
+  try {
+    const res = await instance.get("/oauth/naver/login", { params: data });
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
 export const getCheckAuth = async () => {
   try {
     const res = await instance.get("/auth/check-logged-in");
