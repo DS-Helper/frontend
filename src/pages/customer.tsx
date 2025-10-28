@@ -26,11 +26,25 @@ export default function Customer(){
         try {
             const response = await getInquiries();
             if (response && response.data) {
-                setInquiries(response.data);
+                // 배열인지 확인하고 안전하게 설정
+                const data = response.data;
+                if (Array.isArray(data)) {
+                    setInquiries(data);
+                } else if (Array.isArray(data.inquiries)) {
+                    setInquiries(data.inquiries);
+                } else if (Array.isArray(data.items)) {
+                    setInquiries(data.items);
+                } else {
+                    console.error('예상하지 못한 응답 구조:', data);
+                    setInquiries([]);
+                    setError('문의 내역 데이터 형식이 올바르지 않습니다.');
+                }
             } else {
+                setInquiries([]);
                 setError('문의 내역을 불러오는데 실패했습니다.');
             }
         } catch (err) {
+            setInquiries([]);
             setError('문의 내역을 불러오는 중 오류가 발생했습니다.');
             console.error('문의 내역 불러오기 오류:', err);
         } finally {
@@ -66,14 +80,31 @@ export default function Customer(){
         setError(null);
         
         try {
-            const formData: InquiryFormData = {
-                inquiryType,
-                content,
-                images: imageFiles
+            // FormData 생성
+            const formData = new FormData();
+            
+            // dto 객체 생성 및 JSON 문자열로 변환
+            const dto = {
+                type: inquiryType === "help" ? "도움 요청" :
+                      inquiryType === "uncomfortable" ? "서비스 이용 불편" :
+                      inquiryType === "proposal" ? "서비스 개선 제안" :
+                      inquiryType === "etc" ? "기타" : inquiryType,
+                content: content
             };
             
+            // dto를 JSON 문자열로 추가
+            formData.append('dto', JSON.stringify(dto));
+            
+            // 이미지 파일 추가
+            imageFiles.forEach((file) => {
+                formData.append('images', file);
+            });
+            
             const response = await postInquiry(formData);
-            if (response && response.data) {
+            console.log('문의 등록 응답:', response);
+            
+            // 응답이 있고 상태 코드가 200번대면 성공으로 간주
+            if (response && (response.status === 200 || response.status === 201)) {
                 alert('문의가 성공적으로 등록되었습니다.');
                 // 폼 초기화
                 setInquiryType('');
@@ -200,14 +231,14 @@ export default function Customer(){
                         ) : (
                         <>
                             <ul className={cn("inquiryList")}>
-                                {currentInquiries.map((item) => {
+                                {currentInquiries.map((item, index) => {
                                     const isExpanded = expandedItems.includes(item.id);
                                     const isLong = item.content.length > 41; // 글자 수 42가 최대
                                     const displayContent = isExpanded || !isLong 
                                     ? item.content 
                                     : item.content.slice(0,41) +"...";
                                 return(
-                                    <li key={item.id} className={cn("inquiryItem")}>
+                                    <li key={item.id || `inquiry-${index}`} className={cn("inquiryItem")}>
                                         <span className={cn("status", 
                                             {waiting: item.status==="답변 대기", 
                                             done: item.status==="답변 보기"})}
@@ -255,7 +286,7 @@ export default function Customer(){
                                     </button>
                                     {Array.from({length: totalPages }, (_,i) => (
                                         <button
-                                            key={i+1}
+                                            key={i}
                                             className={cn({activate: currentPage === i+1})}
                                             onClick={() => setCurrentPage(i+1)}
                                         >
