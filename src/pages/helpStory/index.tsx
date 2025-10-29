@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getPosts } from "@/lib/apis/helpStory";
 import classNames from "classnames/bind";
-import styles from "./HelpStory.module.scss";
+import styles from "@/styles/HelpStory.module.scss";
 import Image from "next/image";
 
 const cn = classNames.bind(styles);
