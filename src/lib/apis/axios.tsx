@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from "axios";
 import { useUserStore } from "../store/userStore";
 
 export const instance: AxiosInstance = axios.create({
-  baseURL: "https://www.dshelper.kro.kr",
+  baseURL: "https://server.dshelper.kr/",
   withCredentials: true,
 });
 

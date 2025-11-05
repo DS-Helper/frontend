@@ -119,9 +119,10 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
     });
   };
 
-  const isWeekend = (date: Date) => {
+  // 수요일(3)과 금요일(5)만 선택 가능
+  const isAvailableDay = (date: Date) => {
     const day = date.getDay();
-    return day === 0 || day === 6;
+    return day === 3 || day === 5; // 수요일 또는 금요일
   };
 
   const isPastDate = (date: Date) => {
@@ -130,12 +131,12 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
     return date < today;
   };
 
-  const isSunday = (date: Date) => {
-    return date.getDay() === 0;
+  const isWednesday = (date: Date) => {
+    return date.getDay() === 3;
   };
 
-  const isSaturday = (date: Date) => {
-    return date.getDay() === 6;
+  const isFriday = (date: Date) => {
+    return date.getDay() === 5;
   };
 
   return (
@@ -150,25 +151,25 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
           calendarType="gregory"
           onChange={(value) => handleDateChange(value as Date)}
           value={selectedDate}
-          tileDisabled={({ date }) => isPastDate(date)}
+          tileDisabled={({ date }) => isPastDate(date) || !isAvailableDay(date)}
           className={cn("customCalendar")}
           tileClassName={({ date, view }) => {
             if (view === 'month') {
               const dateKey = date.toISOString().split("T")[0];
               const isSelected = selectedDate && dateKey === selectedDate.toISOString().split("T")[0];
               const isPast = isPastDate(date);
-              const isWeekendDay = isWeekend(date);
-              const isSundayDay = isSunday(date);
-              const isSaturdayDay = isSaturday(date);
+              const isAvailable = isAvailableDay(date);
+              const isWednesdayDay = isWednesday(date);
+              const isFridayDay = isFriday(date);
               
               return cn({
                 'calendarTile': true,
                 'selectedTile': isSelected,
                 'pastTile': isPast,
-                'sundayTile': isSundayDay,
-                'saturdayTile': isSaturdayDay,
-                'weekendTile': isWeekendDay,
-                'disabledTile': isPast
+                'wednesdayTile': isWednesdayDay,
+                'fridayTile': isFridayDay,
+                'availableTile': isAvailable,
+                'disabledTile': isPast || !isAvailable
               });
             }
             return '';
