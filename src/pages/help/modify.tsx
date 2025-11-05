@@ -141,13 +141,26 @@ export default function ModifyPage() {
 
         const formattedVisitDate = formatVisitDate(visitDate);
 
+        // endTime에 +1시간 추가
+        const addOneHour = (timeString: string): string => {
+          const [hours, minutes] = timeString.split(':').map(Number);
+          const date = new Date();
+          date.setHours(hours, minutes, 0, 0);
+          date.setHours(date.getHours() + 1);
+          const newHours = date.getHours().toString().padStart(2, '0');
+          const newMinutes = date.getMinutes().toString().padStart(2, '0');
+          return `${newHours}:${newMinutes}`;
+        };
+
+        const adjustedEndTime = addOneHour(endTime);
+
         const payload = type === 'personal' 
           ? {
               name,
               phoneNumber,
               visitDate: formattedVisitDate,
               startTime,
-              endTime,
+              endTime: adjustedEndTime,
               address,
               requirement,
               recipientGenderType,
@@ -159,7 +172,7 @@ export default function ModifyPage() {
               phoneNumber,
               visitDate: formattedVisitDate,
               startTime,
-              endTime,
+              endTime: adjustedEndTime,
               address,
               requirement,
               recipientGenderType,
