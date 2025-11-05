@@ -11,7 +11,7 @@ export default function Help(){
   const router = useRouter();
 
   const checklist = [
-    "방문시간은 주말 오전 10시 ~ 오후 5시 사이만 가능해요.",
+    "방문시간은 수요일, 금요일 오전 10시 ~ 오후 5시 사이만 가능해요.",
     "최소 30분, 최대 3시간까지 예약 할 수 있어요.",
     "예약 완료 전에는 추가 예약이 불가해요.",
     "도움 요청 내용은 자세히 작성 해주시면 보다 정확하고 따뜻한 동행이 가능해요.",
@@ -31,7 +31,6 @@ export default function Help(){
 
   const handleNext = () => {
     if (allChecked) {
-      alert("다음 단계로 이동합니다!"); 
       router.push('help/modify')
     } else {
       alert("모든 항목에 체크해야 진행할 수 있어요.");

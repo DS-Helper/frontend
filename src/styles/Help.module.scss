@@ -77,9 +77,39 @@
     gap: 1rem;
     margin-bottom: 2.4rem;
 
-    input {
+    input[type="checkbox"] {
       width: 2rem;
       height: 2rem;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      border: 2px solid var(--grey-300);
+      border-radius: 0.4rem;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+      background-color: #fff;
+
+      &:hover {
+        border-color: var(--primary-color);
+      }
+
+      &:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+
+        &::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 0.6rem;
+          height: 1rem;
+          border: solid #fff;
+          border-width: 0 0.2rem 0.2rem 0;
+          transform: translate(-50%, -60%) rotate(45deg);
+        }
+      }
     }
 
     p {

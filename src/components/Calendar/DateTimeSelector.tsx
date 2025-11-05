@@ -45,6 +45,26 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
 
     let newTimeBlocks = [...selectedTimeBlocks];
     
+    // 중간 타일인지 확인
+    if (newTimeBlocks.length > 1) {
+      const allTimes = getTimes();
+      const currentIndex = allTimes.indexOf(time);
+      const firstIndex = allTimes.indexOf(newTimeBlocks[0]);
+      const lastIndex = allTimes.indexOf(newTimeBlocks[newTimeBlocks.length - 1]);
+      
+      // 시작 시간을 다시 클릭한 경우 - 모든 선택 해제
+      if (time === newTimeBlocks[0]) {
+        newTimeBlocks = [];
+        setSelectedTimeBlocks(newTimeBlocks);
+        return;
+      }
+      
+      // 중간 타일을 클릭한 경우 - 아무 기능도 하지 않음
+      if (currentIndex > firstIndex && currentIndex < lastIndex) {
+        return;
+      }
+    }
+    
     if (newTimeBlocks.includes(time)) {
       // 이미 선택된 시간이면 제거
       newTimeBlocks = newTimeBlocks.filter((t) => t !== time);
@@ -85,9 +105,6 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
               newTimeBlocks.push(timeSlot);
             }
           }
-        } else {
-          // 기존 범위 내부에 선택 - 아무것도 하지 않음
-          return;
         }
         
         // 최대 6개 블록 제한 확인
@@ -103,20 +120,24 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
     
     // 선택된 시간 블록 업데이트
     setSelectedTimeBlocks(newTimeBlocks);
-    const [startHour, startMin] = newTimeBlocks[0].split(":").map(Number);
-    const [endHour, endMin] = newTimeBlocks[newTimeBlocks.length - 1].split(":").map(Number);
+    
+    // 선택된 시간이 있을 때만 onChange 호출
+    if (newTimeBlocks.length > 0) {
+      const [startHour, startMin] = newTimeBlocks[0].split(":").map(Number);
+      const [endHour, endMin] = newTimeBlocks[newTimeBlocks.length - 1].split(":").map(Number);
 
-    const startDateTime = new Date(selectedDate);
-    startDateTime.setHours(startHour, startMin, 0, 0);
+      const startDateTime = new Date(selectedDate);
+      startDateTime.setHours(startHour, startMin, 0, 0);
 
-    const endDateTime = new Date(selectedDate);
-    endDateTime.setHours(endHour, endMin, 0, 0);
+      const endDateTime = new Date(selectedDate);
+      endDateTime.setHours(endHour, endMin, 0, 0);
 
-    onChange({
-      visitDate: selectedDate,
-      startTime: startDateTime,
-      endTime: endDateTime,
-    });
+      onChange({
+        visitDate: selectedDate,
+        startTime: startDateTime,
+        endTime: endDateTime,
+      });
+    }
   };
 
   // 수요일(3)과 금요일(5)만 선택 가능
@@ -139,6 +160,20 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
     return date.getDay() === 5;
   };
 
+  // 분을 시간과 분으로 변환하는 함수
+  const formatDuration = (minutes: number): string => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    
+    if (hours === 0) {
+      return `${mins}분`;
+    } else if (mins === 0) {
+      return `${hours}시간`;
+    } else {
+      return `${hours}시간 ${mins}분`;
+    }
+  };
+
   return (
     <div className={cn("dateTimeSelector")}>
       <label className={cn("dateTimeLabel")}>
@@ -153,6 +188,9 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
           value={selectedDate}
           tileDisabled={({ date }) => isPastDate(date) || !isAvailableDay(date)}
           className={cn("customCalendar")}
+          formatDay={(locale, date) => {
+            return date.getDate().toString();
+          }}
           tileClassName={({ date, view }) => {
             if (view === 'month') {
               const dateKey = date.toISOString().split("T")[0];
@@ -204,9 +242,10 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
                 const isSelected = selectedTimeBlocks.includes(time);
                 
                 // 연속된 시간 블록에서의 위치 확인
-                const isStartTime = isSelected && selectedTimeBlocks.length > 0 && time === selectedTimeBlocks[0];
-                const isEndTime = isSelected && selectedTimeBlocks.length > 0 && time === selectedTimeBlocks[selectedTimeBlocks.length - 1];
-                const isMiddleTime = isSelected && !isStartTime && !isEndTime;
+                const isSingleTime = selectedTimeBlocks.length === 1 && isSelected;
+                const isStartTime = isSelected && selectedTimeBlocks.length > 1 && time === selectedTimeBlocks[0];
+                const isEndTime = isSelected && selectedTimeBlocks.length > 1 && time === selectedTimeBlocks[selectedTimeBlocks.length - 1];
+                const isMiddleTime = isSelected && !isStartTime && !isEndTime && !isSingleTime;
 
                 return (
                   <button
@@ -218,6 +257,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
                       'timeButton': true,
                       'reservedTime': isReserved,
                       'selectedTime': isSelected,
+                      'singleTime': isSingleTime,
                       'startTime': isStartTime,
                       'endTime': isEndTime,
                       'middleTime': isMiddleTime
@@ -234,7 +274,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
             {selectedTimeBlocks.length > 0 && (
               <div className={cn("selectedTimesInfo")}>
                 <p>선택된 시간: {selectedDate?.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })} {selectedTimeBlocks.length > 1 ? `${selectedTimeBlocks[0]} ~ ${selectedTimeBlocks[selectedTimeBlocks.length - 1]}` : selectedTimeBlocks[0]}</p>
-                <p>총 예약 시간: {selectedTimeBlocks.length * 30}분</p>
+                <p>총 예약 시간: {formatDuration(selectedTimeBlocks.length * 30)}</p>
                 <p className={cn("timeLimitInfo")}>최대 예약 가능: 3시간</p>
               </div>
             )}

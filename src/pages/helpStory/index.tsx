@@ -62,6 +62,20 @@ export default function HelpStoryPage() {
     }).replace(/\./g, '.').replace(/\s/g, '');
   };
 
+  // 이미지 URL 유효성 검증
+  const isValidImageUrl = (url: string | null | undefined): boolean => {
+    if (!url) return false;
+    // 'null'이 포함된 URL은 유효하지 않음
+    if (url.includes('null')) return false;
+    // 기본 URL 형식 검증
+    try {
+      const parsedUrl = new URL(url);
+      return parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:';
+    } catch {
+      return false;
+    }
+  };
+
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
@@ -137,7 +151,7 @@ export default function HelpStoryPage() {
                   <span className={cn("storyDate")}>{formatDate(post.createdAt)}</span>
                 </div>
                 <div className={cn("storyImage")}>
-                  {post.imageUrls && post.imageUrls.length > 0 ? (
+                  {post.imageUrls && post.imageUrls.length > 0 && isValidImageUrl(post.imageUrls[0]) ? (
                     <Image
                       src={post.imageUrls[0]}
                       alt={post.title}

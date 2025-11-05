@@ -88,25 +88,30 @@ export default function Home() {
     switch (activeButton) {
       case 0:
         return (
-          <ul className={cn("homePageList")}>
-            {helpList.map((item, i) => (
-              <li key={i}>
-                <Image src={item.img} className={cn("homePageListImage")} alt={item.title} width={180} height={180} />
-                <p>{item.title}</p>
-                <span>{item.desc}</span>
-              </li>
-            ))}
-          </ul>
+          <div className={cn("homePageListWrapper")}>
+            <ul className={cn("homePageList")}>
+              {helpList.map((item, i) => (
+                <li key={i}>
+                  <Image src={item.img} className={cn("homePageListImage")} alt={item.title} width={180} height={180} />
+                  <p>{item.title}</p>
+                  <span>{item.desc}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         );
       case 1:
         return (
-          <ul className={cn("homePageList2")}>
-            {whoList.map((text, i) => <li key={i}>{text}</li>)}
-          </ul>
+          <div className={cn("homePageListWrapper")}>
+            <ul className={cn("homePageList2")}>
+              {whoList.map((text, i) => <li key={i}>{text}</li>)}
+            </ul>
+          </div>
         );
       case 2:
         return (
-          <ul className={cn("homePageList3")}>
+          <div className={cn("homePageListWrapper")}>
+            <ul className={cn("homePageList3")}>
             {howStartList.map((item, i) => (
               <li key={i}>
                 <Image src={item.img} alt={item.title} width={308} height={530} />
@@ -116,11 +121,13 @@ export default function Home() {
                 </div>
               </li>
             ))}
-          </ul>
+            </ul>
+          </div>
         );
       case 3:
         return (
-          <ul className={cn("homePageList4")}>
+          <div className={cn("homePageListWrapper")}>
+            <ul className={cn("homePageList4")}>
             {whenList.map((item, i) => (
               <li key={i}>
                 <Image src={item.img} alt={item.title} width={204} height={170} />
@@ -130,7 +137,8 @@ export default function Home() {
                 </div>
               </li>
             ))}
-          </ul>
+            </ul>
+          </div>
         );
       default:
         return null;
