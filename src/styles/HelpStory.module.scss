@@ -61,6 +61,11 @@
   height: 18rem;
   background-color: var(--grey-200);
   border-radius: 1.2rem;
+  
+  @media (max-width: 611px) {
+    width: 13rem;
+    height: 10rem;
+  }
 }
 
 .storyDate {

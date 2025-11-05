@@ -221,6 +221,7 @@ export default function ModifyPage() {
             >
               <Image src={people} width={80} height={80} alt='개인 회원' className={cn("buttonImage")} />
               <p className={cn("toggleLabel")}>개인</p>
+              <span className={cn("toggleDescription")}>당사자가 아닌, 보호자도 신청 가능!</span>
             </button>
             <button
               type="button"
@@ -238,7 +239,7 @@ export default function ModifyPage() {
           {/* 입력 필드 */}
           <div className={cn("inputGroup")}>
             <label>이름 <span className={cn("required")}>(필수)</span></label>
-            <input type="text" placeholder="이름을 입력해주세요." value={name} onChange={(e) => setName(e.target.value)} className={showErrors && !name ? cn("error") : undefined}  />
+            <input type="text" value={name} onChange={(e) => setName(e.target.value)} className={showErrors && !name ? cn("error") : undefined}  />
             {showErrors && !name && <p className={cn("errorMsg")}>이름을 입력해주세요.</p>}
           </div>
 
@@ -247,8 +248,7 @@ export default function ModifyPage() {
             <div className={cn("inputGroup")}>
               <label>기관 이름 <span className={cn("required")}>(필수)</span></label>
               <input 
-                type="text" 
-                placeholder="기관 이름을 입력해주세요." 
+                type="text"
                 value={organizationName} 
                 onChange={(e) => setOrganizationName(e.target.value)} 
                 className={showErrors && !organizationName ? cn("error") : undefined}  
@@ -261,7 +261,6 @@ export default function ModifyPage() {
             <label>전화번호 <span className={cn("required")}>(필수)</span></label>
             <input 
               type="text" 
-              placeholder="전화번호를 입력해주세요." 
               value={phoneNumber} 
               onChange={handlePhoneNumberChange}
               maxLength={13}
@@ -272,7 +271,7 @@ export default function ModifyPage() {
 
           <div className={cn("inputGroup")}>
             <label>방문 주소 <span className={cn("required")}>(필수)</span></label>
-            <input type="text" placeholder="주소를 입력해주세요." value={address} onChange={(e) => setAddress(e.target.value)} className={showErrors && !address ? cn("error") : undefined} />
+            <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} className={showErrors && !address ? cn("error") : undefined} />
             {showErrors && !address && <p className={cn("errorMsg")}>주소를 입력해주세요.</p>}
           </div>
 
@@ -281,7 +280,6 @@ export default function ModifyPage() {
             <label>도움 요청 내용 <span className={cn("required")}>(필수)</span></label>
             <input 
               type="text" 
-              placeholder="도움 요청 내용을 입력해주세요" 
               value={requirement} 
               onChange={(e) => setRequirement(e.target.value)} 
               className={showErrors && !requirement ? cn("error") : undefined} 
@@ -318,7 +316,6 @@ export default function ModifyPage() {
             <label>도움 받는 사람 수 <span className={cn("required")}>(필수)</span></label>
             <input 
               type="text" 
-              placeholder="1" 
               value={recipientNumber} 
               onChange={(e) => handleNumberOnlyChange(e.target.value, setRecipientNumber)} 
               className={showErrors && !recipientNumber ? cn("error") : undefined} 
@@ -331,7 +328,6 @@ export default function ModifyPage() {
             <label>특이사항 <span className={cn("required")}>(필수)</span></label>
             <input 
               type="text" 
-              placeholder="특이사항을 입력해주세요" 
               value={specialNotes} 
               onChange={(e) => setSpecialNotes(e.target.value)} 
               className={showErrors && !specialNotes ? cn("error") : undefined} 
