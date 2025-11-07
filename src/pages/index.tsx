@@ -1,8 +1,10 @@
 import styles from "@/styles/Home.module.scss";
 import classNames from "classnames/bind";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { getPosts } from "@/lib/apis/helpStory";
+import { IoIosArrowForward } from "react-icons/io";
 
 // 이미지들
 import mainImage from "@/public/Hero-image.svg";
@@ -21,11 +23,28 @@ import story from "@/public/story.svg";
 
 const cn = classNames.bind(styles);
 
+interface StoryPost {
+  postId: string;
+  title: string;
+  content: string;
+  writerName: string;
+  imageUrls: string[];
+  createdAt: string;
+}
+
 export default function Home() {
   const [activeButton, setActiveButton] = useState(0);
+  const [storyList, setStoryList] = useState<Array<{
+    title: string;
+    content: string;
+    date: string;
+    img: string | typeof story;
+  }>>([]);
+  const [storyLoading, setStoryLoading] = useState(true);
   const router = useRouter();
 
   const handleHelp = () => router.push("/help");
+  const handleMoreStories = () => router.push("/helpStory");
 
   // 버튼 목록
   const guideButtons = [
@@ -55,33 +74,74 @@ export default function Home() {
 
   // 안내 2번
   const howStartList = [
-    { img: howStart1, title: "먼저 로그인 해주세요!", desc: "카카오, 네이버, 구글 로그인 필요..." },
-    { img: howStart2, title: "도움을 신청해요", desc: "≡ 메뉴에서 도움 요청하기 선택" },
-    { img: howStart3, title: "정보를 입력해주세요", desc: "신청자 유형, 정보, 일시, 요청 내용 입력" },
-    { img: howStart4, title: "요청 접수 완료!", desc: "헬퍼가 확인 후 확정 알림 예정" },
+    { img: howStart1, title: "먼저 로그인 해주세요!", desc: "도움을 요청하려면 로그인이 필요해요. 카카오, 네이버, 구글 중 편한 방법을 선택해 주세요. SNS 로그인이 어려우신 분은 로그인 하단에 있는 번호로 연락해 주세요." },
+    { img: howStart2, title: "도움을 신청해요", desc: "오른쪽 위 아이콘(≡) 을 누른 뒤, 도움 요청하기 메뉴를 선택해 주세요." },
+    { img: howStart3, title: "정보를 입력해주세요", desc: "신청자 유형을 선택하고, 도움을 받을 분의 정보와 일시, 그리고 요청 내용을 입력해 주세요." },
+    { img: howStart4, title: "요청 접수 완료!", desc: "신청자 유형을 선택하고, 도움을 받을 분의 정보와 일시, 그리고 요청 내용을 입력해 주세요." },
   ];
 
   // 안내 3번
   const whenList = [
-    { img: calendar, title: "주말 방문", desc: "현재는 토요일과 일요일만 가능" },
+    { img: calendar, title: "주말 방문", desc: "현재는 수요일과 금요일만 가능" },
     { img: clock, title: "요청 가능 시간", desc: "오전 10시 ~ 오후 5시" },
   ];
 
-  // 스토리
-  const storyList = [
-    {
-      title: "수술 후 거동이 어려운 이웃과 함께 병원에 방문",
-      content: "무릎 수술 후 한 달 간 외출이 힘들었던 분과 동행하여 병원과 약국에 방문했어요.",
-      date: "2025.06.10",
-      img: story,
-    },
-    {
-      title: "수술 후 거동이 어려운 이웃과 함께 병원에 방문",
-      content: "무릎 수술 후 한 달 간 외출이 힘들었던 분과 동행하여 병원과 약국에 방문했어요.",
-      date: "2025.06.10",
-      img: story,
-    },
-  ];
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).replace(/\./g, '.').replace(/\s/g, '');
+  };
+
+  // 이미지 URL 유효성 검증
+  const isValidImageUrl = (url: string | null | undefined): boolean => {
+    if (!url) return false;
+    if (url.includes('null')) return false;
+    try {
+      const parsedUrl = new URL(url);
+      return parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:';
+    } catch {
+      return false;
+    }
+  };
+
+  // 스토리 데이터 가져오기
+  useEffect(() => {
+    const fetchStories = async () => {
+      try {
+        setStoryLoading(true);
+        const response = await getPosts();
+        
+        if (response && response.data) {
+          const postsData: StoryPost[] = response.data.posts || [];
+          
+          // 최신 몇 개만 홈페이지에 표시 (최대 4개)
+          const latestPosts = postsData.slice(0, 4).map((post) => ({
+            title: post.title,
+            content: post.content,
+            date: formatDate(post.createdAt),
+            img: post.imageUrls && post.imageUrls.length > 0 && isValidImageUrl(post.imageUrls[0])
+              ? post.imageUrls[0]
+              : story,
+          }));
+          
+          setStoryList(latestPosts);
+        } else {
+          setStoryList([]);
+        }
+      } catch (error) {
+        console.error('도와드린 이야기 조회 실패:', error);
+        setStoryList([]);
+      } finally {
+        setStoryLoading(false);
+      }
+    };
+
+    fetchStories();
+  }, []);
 
   // 버튼별 렌더링
   const renderContent = () => {
@@ -114,7 +174,7 @@ export default function Home() {
             <ul className={cn("homePageList3")}>
             {howStartList.map((item, i) => (
               <li key={i}>
-                <Image src={item.img} alt={item.title} width={308} height={530} />
+                <Image src={item.img} alt={item.title} width={308} height={530} className={cn("homePageList3Image")} />
                 <div>
                   <p>{item.title}</p>
                   <span>{item.desc}</span>
@@ -130,7 +190,7 @@ export default function Home() {
             <ul className={cn("homePageList4")}>
             {whenList.map((item, i) => (
               <li key={i}>
-                <Image src={item.img} alt={item.title} width={204} height={170} />
+                <Image src={item.img} alt={item.title} width={204} height={170} className={cn("homePageList4Image")} />
                 <div>
                   <p>{item.title}</p>
                   <span>{item.desc}</span>
@@ -186,18 +246,34 @@ export default function Home() {
         <div className={cn("homePage3")}>
           <div className={cn("homePageWrapper")}>
             <p className={cn("title")}>도와드린 이야기</p>
-            <ul className={cn("storyList")}>
-              {storyList.map((s, i) => (
-                <li key={i}>
-                  <div>
-                    <p className={cn("storyTitle")}>{s.title}</p>
-                    <span className={cn("storyContent")}>{s.content}</span>
-                    <span className={cn("storyDate")}>{s.date}</span>
-                  </div>
-                  <Image src={s.img} className={cn("storyImage")} alt="도와드린 이야기" width={240} height={180} />
-                </li>
-              ))}
-            </ul>
+            {storyLoading ? (
+              <div className={cn("storyLoading")}>
+                <p>도와드린 이야기를 불러오는 중...</p>
+              </div>
+            ) : storyList.length > 0 ? (
+              <>
+                <ul className={cn("storyList")}>
+                  {storyList.map((s, i) => (
+                    <li key={i}>
+                      <div>
+                        <p className={cn("storyTitle")}>{s.title}</p>
+                        <span className={cn("storyContent")}>{s.content}</span>
+                        <span className={cn("storyDate")}>{s.date}</span>
+                      </div>
+                      <Image src={s.img} className={cn("storyImage")} alt="도와드린 이야기" width={240} height={180} />
+                    </li>
+                  ))}
+                </ul>
+                <button className={cn("moreStoriesButton")} onClick={handleMoreStories}>
+                  더보기 <IoIosArrowForward className={cn("moreStoriesArrow")} />
+                </button>
+                
+              </>
+            ) : (
+              <div className={cn("storyEmpty")}>
+                <p>아직 도와드린 이야기가 없습니다.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

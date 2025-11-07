@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import { getPosts } from "@/lib/apis/helpStory";
 import classNames from "classnames/bind";
 import styles from "@/styles/HelpStory.module.scss";
@@ -16,6 +17,7 @@ interface Post {
 }
 
 export default function HelpStoryPage() {
+  const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -82,6 +84,10 @@ export default function HelpStoryPage() {
     }
   };
 
+  const handleStoryClick = (postId: string) => {
+    router.push(`/helpStory/${postId}`);
+  };
+
   const renderPagination = () => {
     const pages = [];
     const maxVisiblePages = 5;
@@ -144,7 +150,11 @@ export default function HelpStoryPage() {
         <div className={cn("storyList")}>
           {posts.length > 0 ? (
             posts.map((post) => (
-              <div key={post.postId} className={cn("storyItem")}>
+              <div 
+                key={post.postId} 
+                className={cn("storyItem")}
+                onClick={() => handleStoryClick(post.postId)}
+              >
                 <div className={cn("storyContent")}>
                   <h3 className={cn("storyTitle")}>{post.title}</h3>
                   <p className={cn("storyDescription")}>{post.content}</p>

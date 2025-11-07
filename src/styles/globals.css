@@ -89,13 +89,6 @@ a {
   flex-direction: column;
 }
 
-/* 모바일 반응형 스타일 (611px 이하) */
-@media (max-width: 611px) {
-  .container {
-    padding: 0 1rem; /* 모바일에서 좌우 패딩 추가 */
-  }
-}
-
 button {
   outline: none;
   cursor: pointer;

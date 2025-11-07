@@ -238,7 +238,7 @@ export default function ModifyPage() {
 
           {/* 입력 필드 */}
           <div className={cn("inputGroup")}>
-            <label>이름 <span className={cn("required")}>(필수)</span></label>
+            <label>이름 <span className={cn("required")}>*</span></label>
             <input type="text" value={name} onChange={(e) => setName(e.target.value)} className={showErrors && !name ? cn("error") : undefined}  />
             {showErrors && !name && <p className={cn("errorMsg")}>이름을 입력해주세요.</p>}
           </div>
@@ -246,7 +246,7 @@ export default function ModifyPage() {
           {/* 기관 이름 필드 (기관 사용자만 표시) */}
           {type === 'org' && (
             <div className={cn("inputGroup")}>
-              <label>기관 이름 <span className={cn("required")}>(필수)</span></label>
+              <label>기관 이름 <span className={cn("required")}>^</span></label>
               <input 
                 type="text"
                 value={organizationName} 
@@ -258,7 +258,7 @@ export default function ModifyPage() {
           )}
 
           <div className={cn("inputGroup")}>
-            <label>전화번호 <span className={cn("required")}>(필수)</span></label>
+            <label>전화번호 <span className={cn("required")}>*</span></label>
             <input 
               type="text" 
               value={phoneNumber} 
@@ -270,14 +270,14 @@ export default function ModifyPage() {
           </div>
 
           <div className={cn("inputGroup")}>
-            <label>방문 주소 <span className={cn("required")}>(필수)</span></label>
+            <label>방문 주소 <span className={cn("required")}>*</span></label>
             <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} className={showErrors && !address ? cn("error") : undefined} />
             {showErrors && !address && <p className={cn("errorMsg")}>주소를 입력해주세요.</p>}
           </div>
 
           {/* 도움 요청 내용 */}
           <div className={cn("inputGroup")}>
-            <label>도움 요청 내용 <span className={cn("required")}>(필수)</span></label>
+            <label>도움 요청 내용 <span className={cn("required")}>*</span></label>
             <input 
               type="text" 
               value={requirement} 
@@ -313,7 +313,7 @@ export default function ModifyPage() {
 
           {/* 사람 수 */}
           <div className={cn("inputGroup")}>
-            <label>도움 받는 사람 수 <span className={cn("required")}>(필수)</span></label>
+            <label>도움 받는 사람 수 <span className={cn("required")}>*</span></label>
             <input 
               type="text" 
               value={recipientNumber} 
@@ -325,7 +325,7 @@ export default function ModifyPage() {
 
           {/* 특이사항 */}
           <div className={cn("inputGroup")}>
-            <label>특이사항 <span className={cn("required")}>(필수)</span></label>
+            <label>특이사항 <span className={cn("required")}>*</span></label>
             <input 
               type="text" 
               value={specialNotes} 
