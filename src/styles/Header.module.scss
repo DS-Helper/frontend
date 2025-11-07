@@ -11,6 +11,10 @@
   top: 0;
   left: 0;
   z-index: 100;
+
+  @media (max-width: 611px) {
+    padding: 1.8rem 2rem;
+  }
 }
 
 .headerContainer {

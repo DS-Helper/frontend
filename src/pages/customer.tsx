@@ -1,10 +1,12 @@
 // 고객 문의 페이지
 import styles from '@/styles/Customer.module.scss';
 import classNames from 'classnames/bind';
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, { useState, useEffect, ChangeEvent, useRef } from "react";
 import { getInquiries, postInquiry } from '@/lib/apis/customer';
 import { Inquiry, InquiryFormData } from '@/types/customer';
+import { IoIosArrowDown } from "react-icons/io";
 import Image from 'next/image';
+import AnswerModal from '@/components/Modal/AnswerModal';
 
 const cn = classNames.bind(styles);
 
@@ -192,6 +194,65 @@ export default function Customer(){
     */
     const isFormValid = inquiryType !== "" && content.trim() !== "";
     
+    // 문의 항목 컴포넌트
+    const InquiryItem = ({ item, isExpanded, onToggle, onOpenModal }: {
+        item: Inquiry;
+        isExpanded: boolean;
+        onToggle: (id: number) => void;
+        onOpenModal: (answer: string | null) => void;
+    }) => {
+        const contentRef = useRef<HTMLParagraphElement>(null);
+        const [isLong, setIsLong] = useState(false);
+
+        useEffect(() => {
+            if (contentRef.current) {
+                // 텍스트가 한 줄을 넘어가는지 체크
+                const lineHeight = parseFloat(getComputedStyle(contentRef.current).lineHeight);
+                const isOverflowing = contentRef.current.scrollHeight > lineHeight * 1.5; // 약간의 여유를 둠
+                setIsLong(isOverflowing);
+            }
+        }, [item.content]);
+
+        return (
+            <li className={cn("inquiryItem")}>
+                <span className={cn("status", 
+                    {waiting: item.status==="답변 대기", 
+                    done: item.status==="답변 보기"})}
+                    onClick={() => onOpenModal(item.answer || null)}
+                > 
+                    {item.status}
+                </span>
+                <p 
+                    ref={contentRef}
+                    className={cn("content", { truncated: isLong && !isExpanded })}
+                >
+                    <span className={cn("contentText")}>{item.content}</span>
+                    {isLong && (
+                        <a onClick={() => onToggle(item.id)} className={cn("moreLink")}>
+                            {isExpanded ? " 접기" : " 더보기"}
+                        </a>
+                    )}
+                </p>
+
+                {/* 이미지 표시*/}
+                {item.image && (
+                    <div className={cn("imageWrapper")}>
+                        <Image 
+                        src={item.image}
+                        alt="문의 이미지"
+                        width={200}
+                        height={150}
+                        className={cn("inquiryImage")}/>
+                    </div>
+                )}
+
+                <div className={cn("dateTime")}>
+                    <span className={cn("date")}>{item.date}</span>
+                    <span className={cn("time")}>{item.time}</span>
+                </div>
+            </li>
+        );
+    };
     
     return (
         <div className={cn("background")}>
@@ -232,49 +293,16 @@ export default function Customer(){
                         <>
                             <ul className={cn("inquiryList")}>
                                 {currentInquiries.map((item, index) => {
-                                    const isExpanded = expandedItems.includes(item.id);
-                                    const isLong = item.content.length > 41; // 글자 수 42가 최대
-                                    const displayContent = isExpanded || !isLong 
-                                    ? item.content 
-                                    : item.content.slice(0,41) +"...";
-                                return(
-                                    <li key={item.id || `inquiry-${index}`} className={cn("inquiryItem")}>
-                                        <span className={cn("status", 
-                                            {waiting: item.status==="답변 대기", 
-                                            done: item.status==="답변 보기"})}
-                                            onClick={() => openModal(item.answer || null)}
-                                        > 
-                                            {item.status}
-                                        </span>
-                                        <p className={cn("content")}>
-                                            {displayContent}
-                                            {isLong && (
-                                                <a onClick={() => itemToggle(item.id)}
-                                                > {isExpanded ? " 접기":" 더보기"}
-                                                </a>
-                                            )}
-                                        </p>
-
-                                        {/* 이미지 표시*/}
-                                        {item.image && (
-                                            <div className={cn("imageWrapper")}>
-                                                <Image 
-                                                src={item.image}
-                                                alt="문의 이미지"
-                                                width={200}
-                                                height={150}
-                                                className={cn("inquiryImage")}/>
-                                            </div>
-
-                                        )}
-
-                                        <div className={cn("dateTime")}>
-                                            <span className={cn("date")}>{item.date}</span>
-                                            <span className={cn("time")}>{item.time}</span>
-                                        </div>
-                                    </li>
-                                );
-                            })}
+                                    return (
+                                        <InquiryItem
+                                            key={item.id || `inquiry-${index}`}
+                                            item={item}
+                                            isExpanded={expandedItems.includes(item.id)}
+                                            onToggle={itemToggle}
+                                            onOpenModal={openModal}
+                                        />
+                                    );
+                                })}
                             </ul>
                             {/*Pagenation*/}
                             {totalPages > 1 && (
@@ -310,16 +338,17 @@ export default function Customer(){
                             <div className={cn("formGroup")}>
                                 <label>문의 유형</label>
                                 <div className={cn("customSelectWrapper")}>
-                                <select 
-                                    className={cn("customSelect")}
-                                    value={inquiryType}
-                                    onChange={(e) => setInquiryType(e.target.value)}>
+                                    <select 
+                                        className={cn("customSelect")}
+                                        value={inquiryType}
+                                        onChange={(e) => setInquiryType(e.target.value)}>
                                         <option value="" disabled>문의 유형을 선택하세요</option>
                                         <option value="help">도움 요청</option>
                                         <option value="uncomfortable">서비스 이용 불편</option>
                                         <option value="proposal">서비스 개선 제안</option>
                                         <option value="etc">기타</option>
                                     </select>
+                                    <IoIosArrowDown className={cn("selectIcon")} />
                                 </div>
                             </div>
                             <div className={cn("formGroup")}>
@@ -384,14 +413,11 @@ export default function Customer(){
             </div>
 
             {/* 답변 내용 모달 */}
-            {isModalOpen && (
-                <div className={cn("modalOverlay")} onClick={closeModal}>
-                    <div className={cn("modalContent")} onClick={(e) => e.stopPropagation()}>
-                        <h2>답변 내용</h2>
-                        <button className={cn("closeBtn")} onClick={closeModal}>x</button>
-                        <pre className={cn("answerText")}>{selectedAnswer}</pre>
-                    </div>
-                </div>
+            {isModalOpen && selectedAnswer && (
+                <AnswerModal 
+                    answer={selectedAnswer} 
+                    onClose={closeModal}
+                />
             )}
         </div>
     );

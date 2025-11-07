@@ -55,9 +55,9 @@ export default function Help(){
           ))}
         </ul>
         <button className={cn("nextButton")} onClick={handleNext}>확인</button>
-        <div className={cn("bannerWrapper")}>
-          <Image src={banner} alt="배너" fill className={cn("bannerImage")} />
-        </div>
+      </div>
+      <div className={cn("bannerWrapper")}>
+        <Image src={banner} alt="배너" fill className={cn("bannerImage")} />
       </div>
     </div>
   );
