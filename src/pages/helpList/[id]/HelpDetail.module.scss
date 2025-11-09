@@ -6,12 +6,12 @@
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: center;
   z-index: 1000;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.2s ease;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 
   &.visible {
     opacity: 1;
@@ -20,15 +20,15 @@
 }
 
 .modalContent {
-  background-color: #f8f9fa;
+  background-color: #fff;
   width: 100%;
-  margin: 5rem auto 0;
+  max-width: 100%;
   border-radius: 2rem 2rem 0 0;
-  max-height: calc(100vh - 5rem);
+  max-height: 100vh;
   position: relative;
   overflow-y: auto;
   transform: translateY(100%);
-  transition: transform 0.2s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   // 스크롤바 숨기기 (Webkit 브라우저)
   &::-webkit-scrollbar {
@@ -40,10 +40,10 @@
 
   // IE/Edge 스크롤바 숨기기
   -ms-overflow-style: none;
+}
 
-  .modalOverlay.visible & {
-    transform: translateY(0);
-  }
+.modalOverlay.visible .modalContent {
+  transform: translateY(0);
 }
 
 // 헤더
