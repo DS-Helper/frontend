@@ -35,11 +35,6 @@ export default function HelpDetailPage() {
             ? await getOrganizationReservationDetail(id as string)
             : await getPersonalReservationDetail(id as string);
           
-          console.log('상세 조회 API 응답:', response);
-          console.log('사용자 타입:', currentUserType);
-          console.log('예약 ID:', id);
-          console.log('응답 데이터 구조:', response?.data);
-          
           if (response && response.data) {
             const reservation = response.data;
             
@@ -59,50 +54,88 @@ export default function HelpDetailPage() {
               return;
             }
             
+            // 시간 포맷 함수 (오전/오후 형식)
+            const formatTime = (time: string) => {
+              if (!time) return '';
+              const [hours, minutes] = time.split(':').map(Number);
+              const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+              const period = hours < 12 ? '오전' : '오후';
+              return `${period} ${hour12}:${String(minutes).padStart(2, '0')}`;
+            };
+
+            // 날짜 포맷 함수 (MM.DD 형식)
+            const formatDate = (dateString: string) => {
+              if (!dateString) return '';
+              const date = new Date(dateString);
+              const month = String(date.getMonth() + 1).padStart(2, '0');
+              const day = String(date.getDate()).padStart(2, '0');
+              return `${month}.${day}`;
+            };
+
+            // 상태 변환 함수
+            const convertStatus = (status: string) => {
+              if (status === 'REQUESTED' || status === '대기') return '대기';
+              if (status === 'CANCELED' || status === '취소') return '취소';
+              if (status === 'COMPLETED' || status === '완료') return '완료';
+              return status || '대기';
+            };
+
             // API 데이터를 HelpRequest 형식으로 매핑
             const mappedRequest: HelpRequest = {
               id: reservationId,
               userId: currentUserType === 'organization' 
                 ? reservation.reservationHolderId 
-                : (reservation.user?.id || reservation.userId || ''),
-              date: reservation.visitDate ? new Date(reservation.visitDate).toLocaleDateString('ko-KR') : '',
+                : (reservation.user?.id || reservation.userId || reservation.reservationHolderId || ''),
+              date: reservation.visitDate ? formatDate(reservation.visitDate) : '',
               dayOfWeek: reservation.visitDate ? new Date(reservation.visitDate).toLocaleDateString('ko-KR', { weekday: 'short' }) : '',
               content: reservation.requirement || '',
-              startTime: reservation.startTime ? reservation.startTime.split(':').slice(0, 2).join(':') : '',
-              endTime: reservation.endTime ? reservation.endTime.split(':').slice(0, 2).join(':') : '',
-              status: reservation.reservationStatus === 'REQUESTED' ? '대기' : 
-                     reservation.reservationStatus === 'CANCELED' ? '취소' : 
-                     reservation.reservationStatus || '대기'
+              startTime: formatTime(reservation.startTime || ''),
+              endTime: formatTime(reservation.endTime || ''),
+              status: convertStatus(reservation.reservationStatus || '')
             };
             
             setHelpRequest(mappedRequest);
             
+            // 성별 변환 함수
+            const convertGender = (gender: string) => {
+              if (gender === 'FEMALE' || gender === '여' || gender === '여자') return '여자';
+              if (gender === 'MALE' || gender === '남' || gender === '남자') return '남자';
+              return gender || "성별 없음";
+            };
+
             // 상세 정보를 API 데이터로 구성
             const mappedDetail: HelpDetailData = {
               id: reservationId,
               userId: currentUserType === 'organization' 
                 ? reservation.reservationHolderId 
-                : (reservation.user?.id || reservation.userId || ''),
+                : (reservation.user?.id || reservation.userId || reservation.reservationHolderId || ''),
               location: reservation.address || "위치 정보 없음",
               applicantInfo: {
-                name: currentUserType === 'organization' 
-                  ? reservation.reservationHolder 
-                  : (reservation.name || reservation.userName || "이름 없음"),
-                contact: currentUserType === 'organization' 
-                  ? reservation.reservationPhoneNumber 
-                  : (reservation.phoneNumber || reservation.phone || "연락처 없음"),
+                // 개인 예약과 기관 예약 모두 reservationHolder를 우선 사용
+                name: reservation.reservationHolder 
+                  || reservation.name 
+                  || reservation.userName 
+                  || reservation.user?.name
+                  || "이름 없음",
+                // 개인 예약과 기관 예약 모두 reservationPhoneNumber를 우선 사용
+                contact: reservation.reservationPhoneNumber 
+                  || reservation.phoneNumber 
+                  || reservation.phone
+                  || "연락처 없음",
                 organizationName: currentUserType === 'organization' 
                   ? reservation.organizationName 
                   : ""
               },
               recipientInfo: {
-                gender: reservation.recipientGender === 'FEMALE' ? '여자' : 
-                       reservation.recipientGender === 'MALE' ? '남자' : 
-                       reservation.recipientGender || "성별 없음",
+                gender: convertGender(reservation.recipientGender || ''),
                 count: reservation.recipientNumber || 1
               },
-              rejectionReason: "", // API에 거절사유 필드가 없음
-              specialNotes: "" // API에 특이사항 필드가 없음
+              rejectionReason: reservation.rejectionReason || "", 
+              specialNotes: reservation.specialNotes 
+                || reservation.specialNote 
+                || reservation.note
+                || reservation.notes
+                || ""
             };
             
             setHelpDetail(mappedDetail);
@@ -163,7 +196,7 @@ export default function HelpDetailPage() {
     return null;
   }
 
-  if (!helpRequest) {
+  if (!helpRequest || !helpDetail) {
     return <div>데이터를 불러오는 중...</div>;
   }
 
@@ -216,11 +249,19 @@ export default function HelpDetailPage() {
             )}
             <div className={cn("infoRow", "nameRow")}>
               <span className={cn("label")}>이름 :</span>
-              <span className={cn("value")}>{helpDetail?.applicantInfo?.name || "이름 없음"}</span>
+              <span className={cn("value")}>
+                {helpDetail?.applicantInfo?.name && helpDetail.applicantInfo.name.trim() 
+                  ? helpDetail.applicantInfo.name 
+                  : "이름 없음"}
+              </span>
             </div>
             <div className={cn("infoRow", "contactRow")}>
               <span className={cn("label")}>연락처 :</span>
-              <span className={cn("value")}>{helpDetail?.applicantInfo?.contact || "연락처 없음"}</span>
+              <span className={cn("value")}>
+                {helpDetail?.applicantInfo?.contact && helpDetail.applicantInfo.contact.trim() 
+                  ? helpDetail.applicantInfo.contact 
+                  : "연락처 없음"}
+              </span>
             </div>
           </section>
 
@@ -246,7 +287,9 @@ export default function HelpDetailPage() {
           <section className={cn("infoSection")}>
             <h3 className={cn("sectionTitle")}>특이사항</h3>
             <div className={cn("contentText")}>
-              {helpDetail?.specialNotes || "특이사항 없음"}
+              {helpDetail?.specialNotes && helpDetail.specialNotes.trim() 
+                ? helpDetail.specialNotes 
+                : "특이사항 없음"}
             </div>
           </section>
 

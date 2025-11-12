@@ -41,3 +41,13 @@ export const patchPersonalReservation = async (personalReservationId: string) =>
     return null;
   }
 };
+
+export const getReservationReserved = async (date: string) => {
+  try {
+    const res = await instance.get(`/reservations/pre-reserved`, { params: { date } });
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};

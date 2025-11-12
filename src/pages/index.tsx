@@ -35,6 +35,7 @@ interface StoryPost {
 export default function Home() {
   const [activeButton, setActiveButton] = useState(0);
   const [storyList, setStoryList] = useState<Array<{
+    postId: string;
     title: string;
     content: string;
     date: string;
@@ -45,6 +46,9 @@ export default function Home() {
 
   const handleHelp = () => router.push("/help");
   const handleMoreStories = () => router.push("/helpStory");
+  const handleStoryClick = (postId: string) => {
+    router.push(`/helpStory/${postId}`);
+  };
 
   // 버튼 목록
   const guideButtons = [
@@ -82,8 +86,8 @@ export default function Home() {
 
   // 안내 3번
   const whenList = [
-    { img: calendar, title: "주말 방문", desc: "현재는 수요일과 금요일만 가능" },
-    { img: clock, title: "요청 가능 시간", desc: "오전 10시 ~ 오후 5시" },
+    { img: calendar, title: "수/목 방문", desc: "수요일, 목요일에만 방문이 가능해요." },
+    { img: clock, title: "요청 가능 시간", desc: "오전 10시부터 오후 5시까지 요청할 수 있어요. 요청 순서에 따라 순차적으로 도와드려요." },
   ];
 
   // 날짜 포맷팅 함수
@@ -120,6 +124,7 @@ export default function Home() {
           
           // 최신 몇 개만 홈페이지에 표시 (최대 4개)
           const latestPosts = postsData.slice(0, 4).map((post) => ({
+            postId: post.postId,
             title: post.title,
             content: post.content,
             date: formatDate(post.createdAt),
@@ -254,7 +259,7 @@ export default function Home() {
               <>
                 <ul className={cn("storyList")}>
                   {storyList.map((s, i) => (
-                    <li key={i}>
+                    <li key={i} onClick={() => handleStoryClick(s.postId)}>
                       <div>
                         <p className={cn("storyTitle")}>{s.title}</p>
                         <span className={cn("storyContent")}>{s.content}</span>

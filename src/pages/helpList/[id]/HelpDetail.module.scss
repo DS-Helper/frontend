@@ -46,6 +46,10 @@
   transform: translateY(0);
 }
 
+.modalContent.closing {
+  transform: translateY(100%);
+}
+
 // 헤더
 .header {
   width: 100%;

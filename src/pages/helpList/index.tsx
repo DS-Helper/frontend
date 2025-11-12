@@ -30,6 +30,7 @@ export default function HelpListPage() {
   
   // 모달 관련 상태
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isClosing, setIsClosing] = useState<boolean>(false);
   const [selectedReservationId, setSelectedReservationId] = useState<string | null>(null);
   const [helpRequest, setHelpRequest] = useState<HelpRequest | null>(null);
   const [helpDetail, setHelpDetail] = useState<HelpDetailData | null>(null);
@@ -265,7 +266,7 @@ export default function HelpListPage() {
           return;
         }
         
-        // 시간 포맷 함수
+        // 시간 포맷 함수 (오전/오후 형식)
         const formatTime = (time: string) => {
           if (!time) return '';
           const [hours, minutes] = time.split(':').map(Number);
@@ -274,7 +275,7 @@ export default function HelpListPage() {
           return `${period} ${hour12}:${String(minutes).padStart(2, '0')}`;
         };
         
-        // 날짜 포맷 함수
+        // 날짜 포맷 함수 (MM.DD 형식)
         const formatDate = (dateString: string) => {
           if (!dateString) return '';
           const date = new Date(dateString);
@@ -283,21 +284,33 @@ export default function HelpListPage() {
           return `${month}.${day}`;
         };
         
+        // 상태 변환 함수
+        const convertStatus = (status: string) => {
+          if (status === 'REQUESTED' || status === '대기') return '대기';
+          if (status === 'CANCELED' || status === '취소') return '취소';
+          if (status === 'COMPLETED' || status === '완료') return '완료';
+          return status || '대기';
+        };
+        
+        // 성별 변환 함수
+        const convertGender = (gender: string) => {
+          if (gender === 'FEMALE' || gender === '여' || gender === '여자') return '여자';
+          if (gender === 'MALE' || gender === '남' || gender === '남자') return '남자';
+          return gender || "성별 없음";
+        };
+        
         // API 데이터를 HelpRequest 형식으로 매핑
         const mappedRequest: HelpRequest = {
           id: reservationId,
           userId: currentUserType === 'organization' 
             ? reservation.reservationHolderId 
-            : (reservation.user?.id || reservation.userId || ''),
+            : (reservation.user?.id || reservation.userId || reservation.reservationHolderId || ''),
           date: reservation.visitDate ? formatDate(reservation.visitDate) : '',
           dayOfWeek: reservation.visitDate ? new Date(reservation.visitDate).toLocaleDateString('ko-KR', { weekday: 'short' }) : '',
           content: reservation.requirement || '',
           startTime: formatTime(reservation.startTime || ''),
           endTime: formatTime(reservation.endTime || ''),
-          status: reservation.reservationStatus === 'REQUESTED' ? '대기' : 
-                 reservation.reservationStatus === 'CANCELED' ? '취소' : 
-                 reservation.reservationStatus === 'COMPLETED' || reservation.reservationStatus === '완료' ? '완료' :
-                 reservation.reservationStatus || '대기'
+          status: convertStatus(reservation.reservationStatus || '')
         };
         
         setHelpRequest(mappedRequest);
@@ -307,27 +320,34 @@ export default function HelpListPage() {
           id: reservationId,
           userId: currentUserType === 'organization' 
             ? reservation.reservationHolderId 
-            : (reservation.user?.id || reservation.userId || ''),
+            : (reservation.user?.id || reservation.userId || reservation.reservationHolderId || ''),
           location: reservation.address || "위치 정보 없음",
           applicantInfo: {
-            name: currentUserType === 'organization' 
-              ? reservation.reservationHolder 
-              : (reservation.name || reservation.userName || "이름 없음"),
-            contact: currentUserType === 'organization' 
-              ? reservation.reservationPhoneNumber 
-              : (reservation.phoneNumber || reservation.phone || "연락처 없음"),
+            // 개인 예약과 기관 예약 모두 reservationHolder를 우선 사용
+            name: reservation.reservationHolder 
+              || reservation.name 
+              || reservation.userName 
+              || reservation.user?.name
+              || "이름 없음",
+            // 개인 예약과 기관 예약 모두 reservationPhoneNumber를 우선 사용
+            contact: reservation.reservationPhoneNumber 
+              || reservation.phoneNumber 
+              || reservation.phone
+              || "연락처 없음",
             organizationName: currentUserType === 'organization' 
               ? reservation.organizationName 
               : ""
           },
           recipientInfo: {
-            gender: reservation.recipientGender === 'FEMALE' ? '여자' : 
-                   reservation.recipientGender === 'MALE' ? '남자' : 
-                   reservation.recipientGender || "성별 없음",
+            gender: convertGender(reservation.recipientGender || ''),
             count: reservation.recipientNumber || 1
           },
-          rejectionReason: "",
-          specialNotes: ""
+          rejectionReason: reservation.rejectionReason || "", 
+          specialNotes: reservation.specialNotes 
+            || reservation.specialNote 
+            || reservation.note
+            || reservation.notes
+            || ""
         };
         
         setHelpDetail(mappedDetail);
@@ -346,10 +366,17 @@ export default function HelpListPage() {
   };
   
   const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedReservationId(null);
-    setHelpRequest(null);
-    setHelpDetail(null);
+    // slide out 애니메이션 시작
+    setIsClosing(true);
+    
+    // 애니메이션 완료 후 실제로 모달 닫기
+    setTimeout(() => {
+      setIsModalOpen(false);
+      setIsClosing(false);
+      setSelectedReservationId(null);
+      setHelpRequest(null);
+      setHelpDetail(null);
+    }, 300); // CSS transition 시간과 동일하게 설정
   };
   
   const handleCancelReservationInModal = async () => {
@@ -554,11 +581,11 @@ export default function HelpListPage() {
       {/* 상세보기 모달 */}
       {isModalOpen && (
         <div 
-          className={detailCn("modalOverlay", { visible: isModalOpen })} 
+          className={detailCn("modalOverlay", { visible: isModalOpen && !isClosing })} 
           onClick={handleCloseModal}
         >
           <div 
-            className={detailCn("modalContent")} 
+            className={detailCn("modalContent", { closing: isClosing })} 
             onClick={(e) => e.stopPropagation()}
           >
             {isDetailLoading ? (
@@ -614,11 +641,19 @@ export default function HelpListPage() {
                     )}
                     <div className={detailCn("infoRow", "nameRow")}>
                       <span className={detailCn("label")}>이름 :</span>
-                      <span className={detailCn("value")}>{helpDetail.applicantInfo?.name || "이름 없음"}</span>
+                      <span className={detailCn("value")}>
+                        {helpDetail.applicantInfo?.name && helpDetail.applicantInfo.name.trim() 
+                          ? helpDetail.applicantInfo.name 
+                          : "이름 없음"}
+                      </span>
                     </div>
                     <div className={detailCn("infoRow", "contactRow")}>
                       <span className={detailCn("label")}>연락처 :</span>
-                      <span className={detailCn("value")}>{helpDetail.applicantInfo?.contact || "연락처 없음"}</span>
+                      <span className={detailCn("value")}>
+                        {helpDetail.applicantInfo?.contact && helpDetail.applicantInfo.contact.trim() 
+                          ? helpDetail.applicantInfo.contact 
+                          : "연락처 없음"}
+                      </span>
                     </div>
                   </section>
 
@@ -644,7 +679,9 @@ export default function HelpListPage() {
                   <section className={detailCn("infoSection")}>
                     <h3 className={detailCn("sectionTitle")}>특이사항</h3>
                     <div className={detailCn("contentText")}>
-                      {helpDetail.specialNotes || "특이사항 없음"}
+                      {helpDetail.specialNotes && helpDetail.specialNotes.trim() 
+                        ? helpDetail.specialNotes 
+                        : "특이사항 없음"}
                     </div>
                   </section>
 

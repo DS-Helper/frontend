@@ -2,6 +2,7 @@ import { useState } from "react";
 import Calendar from "react-calendar";
 import classNames from "classnames/bind";
 import styles from "@/styles/Modify.module.scss";
+import { getReservationReserved } from "@/lib/apis/reservationUser";
 
 const cn = classNames.bind(styles);
 type TimeSlot = string;
@@ -13,10 +14,8 @@ type DateTimeSelectorProps = {
 export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTimeBlocks, setSelectedTimeBlocks] = useState<TimeSlot[]>([]);
-
-  const reservedTimes: { [key: string]: TimeSlot[] } = {
-    "2024-12-14": ["10:00", "10:30", "11:00", "11:30", "14:00", "14:30", "15:00", "15:30"],
-  };
+  const [reservedTimes, setReservedTimes] = useState<{ [key: string]: TimeSlot[] }>({});
+  const [isLoadingReservedTimes, setIsLoadingReservedTimes] = useState<boolean>(false);
 
   const getTimes = () => {
     const times: TimeSlot[] = [];
@@ -30,10 +29,58 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
     return times;
   };
 
-  const handleDateChange = (date: Date) => {
+  const handleDateChange = async (date: Date) => {
     setSelectedDate(date);
     setSelectedTimeBlocks([]);
-    // 날짜만 선택했을 때는 onChange를 호출하지 않음
+    
+    // 날짜를 yyyy-mm-dd 형식으로 변환
+    const dateKey = date.toISOString().split("T")[0];
+    
+    // 이미 로드된 예약 시간이 있으면 재사용
+    if (reservedTimes[dateKey]) {
+      return;
+    }
+    
+    // API 호출하여 예약된 시간 가져오기
+    setIsLoadingReservedTimes(true);
+    try {
+      const response = await getReservationReserved(dateKey);
+      
+      if (response && response.data) {
+        // API 응답 형식에 따라 예약된 시간 배열 추출
+        // 응답이 배열인 경우와 객체인 경우 모두 처리
+        let reservedTimeSlots: TimeSlot[] = [];
+        
+        if (Array.isArray(response.data)) {
+          reservedTimeSlots = response.data;
+        } else if (response.data.times && Array.isArray(response.data.times)) {
+          reservedTimeSlots = response.data.times;
+        } else if (response.data.reservedTimes && Array.isArray(response.data.reservedTimes)) {
+          reservedTimeSlots = response.data.reservedTimes;
+        }
+        
+        // 예약된 시간을 상태에 저장
+        setReservedTimes(prev => ({
+          ...prev,
+          [dateKey]: reservedTimeSlots
+        }));
+      } else {
+        // 응답이 없거나 데이터가 없으면 빈 배열로 설정
+        setReservedTimes(prev => ({
+          ...prev,
+          [dateKey]: []
+        }));
+      }
+    } catch (error) {
+      console.error('예약된 시간 조회 실패:', error);
+      // 에러 발생 시 빈 배열로 설정
+      setReservedTimes(prev => ({
+        ...prev,
+        [dateKey]: []
+      }));
+    } finally {
+      setIsLoadingReservedTimes(false);
+    }
   };
 
   const handleTimeClick = (time: TimeSlot) => {
@@ -234,6 +281,11 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
 
         {selectedDate && (
           <div className={cn("timeSelectionContainer")}>
+            {isLoadingReservedTimes && (
+              <div className={cn("loadingMessage")}>
+                <p>예약 가능한 시간을 불러오는 중...</p>
+              </div>
+            )}
             <div className={cn("timeGrid")}>
               {getTimes().map((time) => {
                 const dateKey = selectedDate.toISOString().split("T")[0];
@@ -252,7 +304,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
                     key={time}
                     type="button"
                     onClick={() => handleTimeClick(time)}
-                    disabled={isReserved}
+                    disabled={isReserved || isLoadingReservedTimes}
                     className={cn({
                       'timeButton': true,
                       'reservedTime': isReserved,
@@ -260,7 +312,8 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
                       'singleTime': isSingleTime,
                       'startTime': isStartTime,
                       'endTime': isEndTime,
-                      'middleTime': isMiddleTime
+                      'middleTime': isMiddleTime,
+                      'loadingTime': isLoadingReservedTimes
                     })}
                   >
                     <span className={cn("timeText")}>{time}</span>
