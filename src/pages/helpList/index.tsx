@@ -343,11 +343,7 @@ export default function HelpListPage() {
             count: reservation.recipientNumber || 1
           },
           rejectionReason: reservation.rejectionReason || "", 
-          specialNotes: reservation.specialNotes 
-            || reservation.specialNote 
-            || reservation.note
-            || reservation.notes
-            || ""
+          requirement: reservation.requirement || ""
         };
         
         setHelpDetail(mappedDetail);
@@ -679,8 +675,8 @@ export default function HelpListPage() {
                   <section className={detailCn("infoSection")}>
                     <h3 className={detailCn("sectionTitle")}>특이사항</h3>
                     <div className={detailCn("contentText")}>
-                      {helpDetail.specialNotes && helpDetail.specialNotes.trim() 
-                        ? helpDetail.specialNotes 
+                      {helpDetail.requirement && helpDetail.requirement.trim() 
+                        ? helpDetail.requirement 
                         : "특이사항 없음"}
                     </div>
                   </section>

@@ -60,6 +60,6 @@ export interface HelpDetailData {
     gender: string;
     count: number;
   };
-  specialNotes?: string;
+  requirement?: string;
   rejectionReason?: string;
 }
