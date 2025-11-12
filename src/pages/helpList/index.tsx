@@ -285,11 +285,11 @@ export default function HelpListPage() {
         };
         
         // 상태 변환 함수
-        const convertStatus = (status: string) => {
+        const convertStatus = (status: string): HelpRequestStatus => {
           if (status === 'REQUESTED' || status === '대기') return '대기';
           if (status === 'CANCELED' || status === '취소') return '취소';
           if (status === 'COMPLETED' || status === '완료') return '완료';
-          return status || '대기';
+          return '대기';
         };
         
         // 성별 변환 함수
