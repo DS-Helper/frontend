@@ -134,10 +134,12 @@
   .homePageContent {
     width: 100%;
     display: flex;
+    justify-content: space-between;
 
     @media (max-width: 611px) {
       flex-direction: column;
       gap: 5rem;
+      align-items: center;
 
       @media (max-width: 1200px) {
         gap: 2rem;
@@ -154,6 +156,7 @@
         flex-direction: row;
         overflow-x: scroll;
         gap: 0.8rem;
+        align-self: flex-start;
       }
 
       button {
@@ -187,13 +190,13 @@
     }
 
     .homePageListWrapper {
+      width: 76%;
       display: flex;
       justify-content: center;
     }
 
     .homePageList {
       display: flex;
-      justify-content: center;
       gap: 1.6rem;
       flex-wrap: wrap;
 
@@ -300,11 +303,12 @@
     }
 
     .homePageList4 {
-      width: 100%;
+      width: 76%;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       gap: 8rem;
+      padding: 4rem 0;
 
       li {
         display: flex;
@@ -390,6 +394,12 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 5rem;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+
+      &:hover {
+        opacity: 0.8;
+      }
 
       .storyImage {
         width: 24rem;
