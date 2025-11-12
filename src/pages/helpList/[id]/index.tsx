@@ -7,7 +7,7 @@ import styles from "./HelpDetail.module.scss";
 import { getPersonalReservationDetail, patchPersonalReservation } from "@/lib/apis/reservationUser";
 import { getOrganizationReservationDetail, patchOrganizationReservation } from "@/lib/apis/reservationOrg";
 import { useUserStore } from "@/lib/store/userStore";
-import { HelpRequest, HelpDetailData } from "@/types/helpList";
+import { HelpRequest, HelpDetailData, HelpRequestStatus } from "@/types/helpList";
 import { IoChevronDown } from "react-icons/io5";
 import Image from 'next/image';
 
@@ -73,11 +73,11 @@ export default function HelpDetailPage() {
             };
 
             // 상태 변환 함수
-            const convertStatus = (status: string) => {
+            const convertStatus = (status: string): HelpRequestStatus => {
               if (status === 'REQUESTED' || status === '대기') return '대기';
               if (status === 'CANCELED' || status === '취소') return '취소';
               if (status === 'COMPLETED' || status === '완료') return '완료';
-              return status || '대기';
+              return '대기';
             };
 
             // API 데이터를 HelpRequest 형식으로 매핑
