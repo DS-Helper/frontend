@@ -147,7 +147,6 @@
     }
 
     .homePageButton {
-      width: 100%;
       display: flex;
       flex-direction: column;
       gap: 3.4rem;
@@ -158,6 +157,7 @@
         overflow-x: scroll;
         gap: 0.8rem;
         align-self: flex-start;
+        width: 100%;
       }
 
       button {
@@ -191,7 +191,6 @@
     }
 
     .homePageListWrapper {
-      width: 76%;
       display: flex;
       justify-content: center;
     }
