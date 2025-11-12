@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from 'next/router';
 import classNames from "classnames/bind";
 import styles from "./HelpStoryDetail.module.scss";
 import { getPost } from "@/lib/apis/helpStory";
 import Image from "next/image";
-import { IoShareOutline } from "react-icons/io5";
 
 const cn = classNames.bind(styles);
 
@@ -25,13 +24,7 @@ export default function HelpStoryDetailPage() {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (router.isReady && id) {
-      fetchPost();
-    }
-  }, [router.isReady, id]);
-
-  const fetchPost = async () => {
+  const fetchPost = useCallback(async () => {
     try {
       setLoading(true);
       const response = await getPost(id as string);
@@ -48,7 +41,13 @@ export default function HelpStoryDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, router]);
+
+  useEffect(() => {
+    if (router.isReady && id) {
+      fetchPost();
+    }
+  }, [router.isReady, id, fetchPost]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -72,29 +71,30 @@ export default function HelpStoryDetailPage() {
     }
   };
 
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: post?.title || '도와드린 이야기',
-          text: post?.content || '',
-          url: window.location.href,
-        });
-      } catch (error) {
-        // 사용자가 공유를 취소한 경우
-        console.log('공유가 취소되었습니다.');
-      }
-    } else {
-      // 공유 API를 지원하지 않는 경우 클립보드에 복사
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        alert('링크가 클립보드에 복사되었습니다.');
-      } catch (error) {
-        console.error('클립보드 복사 실패:', error);
-        alert('공유 기능을 사용할 수 없습니다.');
-      }
-    }
-  };
+  // 주석 처리된 공유 기능을 위한 함수 (현재 사용하지 않음)
+  // const handleShare = async () => {
+  //   if (navigator.share) {
+  //     try {
+  //       await navigator.share({
+  //         title: post?.title || '도와드린 이야기',
+  //         text: post?.content || '',
+  //         url: window.location.href,
+  //       });
+  //     } catch {
+  //       // 사용자가 공유를 취소한 경우
+  //       console.log('공유가 취소되었습니다.');
+  //     }
+  //   } else {
+  //     // 공유 API를 지원하지 않는 경우 클립보드에 복사
+  //     try {
+  //       await navigator.clipboard.writeText(window.location.href);
+  //       alert('링크가 클립보드에 복사되었습니다.');
+  //     } catch (err) {
+  //       console.error('클립보드 복사 실패:', err);
+  //       alert('공유 기능을 사용할 수 없습니다.');
+  //     }
+  //   }
+  // };
 
   if (!router.isReady || loading) {
     return (
