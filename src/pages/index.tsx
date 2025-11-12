@@ -86,7 +86,7 @@ export default function Home() {
 
   // 안내 3번
   const whenList = [
-    { img: calendar, title: "수/목 방문", desc: "수요일, 목요일에만 방문이 가능해요." },
+    { img: calendar, title: "수/금 방문", desc: "수요일, 금요일에만 방문이 가능해요." },
     { img: clock, title: "요청 가능 시간", desc: "오전 10시부터 오후 5시까지 요청할 수 있어요. 요청 순서에 따라 순차적으로 도와드려요." },
   ];
 
