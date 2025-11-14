@@ -29,12 +29,20 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
     return times;
   };
 
+  // 로컬 날짜를 yyyy-mm-dd 형식으로 변환하는 함수
+  const formatLocalDate = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const handleDateChange = async (date: Date) => {
     setSelectedDate(date);
     setSelectedTimeBlocks([]);
     
-    // 날짜를 yyyy-mm-dd 형식으로 변환
-    const dateKey = date.toISOString().split("T")[0];
+    // 날짜를 로컬 시간 기준으로 yyyy-mm-dd 형식으로 변환
+    const dateKey = formatLocalDate(date);
     
     // 이미 로드된 예약 시간이 있으면 재사용
     if (reservedTimes[dateKey]) {
@@ -85,7 +93,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
 
   const handleTimeClick = (time: TimeSlot) => {
     if (!selectedDate) return;
-    const dateKey = selectedDate.toISOString().split("T")[0];
+    const dateKey = formatLocalDate(selectedDate);
     const reserved = reservedTimes[dateKey] || [];
 
     if (reserved.includes(time)) return;
@@ -242,8 +250,8 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
           }}
           tileClassName={({ date, view }) => {
             if (view === 'month') {
-              const dateKey = date.toISOString().split("T")[0];
-              const isSelected = selectedDate && dateKey === selectedDate.toISOString().split("T")[0];
+              const dateKey = formatLocalDate(date);
+              const isSelected = selectedDate && dateKey === formatLocalDate(selectedDate);
               const isPast = isPastDate(date);
               const isAvailable = isAvailableDay(date);
               const isWednesdayDay = isWednesday(date);
@@ -290,7 +298,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
             )}
             <div className={cn("timeGrid")}>
               {getTimes().map((time) => {
-                const dateKey = selectedDate.toISOString().split("T")[0];
+                const dateKey = formatLocalDate(selectedDate);
                 const reserved = reservedTimes[dateKey] || [];
                 const isReserved = reserved.includes(time);
                 const isSelected = selectedTimeBlocks.includes(time);
