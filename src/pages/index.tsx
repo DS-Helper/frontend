@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getPosts } from "@/lib/apis/helpStory";
 import { IoIosArrowForward } from "react-icons/io";
+import { isAuthenticated } from "@/lib/utils/auth";
 
 // 이미지들
 import mainImage from "@/public/Hero-image.svg";
@@ -44,7 +45,14 @@ export default function Home() {
   const [storyLoading, setStoryLoading] = useState(true);
   const router = useRouter();
 
-  const handleHelp = () => router.push("/help");
+  const handleHelp = async () => {
+    const authenticated = await isAuthenticated();
+    if (authenticated) {
+      router.push("/help");
+    } else {
+      router.push("/login");
+    }
+  };
   const handleMoreStories = () => router.push("/helpStory");
   const handleStoryClick = (postId: string) => {
     router.push(`/helpStory/${postId}`);

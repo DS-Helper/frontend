@@ -196,7 +196,9 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
   const isPastDate = (date: Date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return date < today;
+    const dateToCheck = new Date(date);
+    dateToCheck.setHours(0, 0, 0, 0);
+    return dateToCheck <= today;
   };
 
   const isWednesday = (date: Date) => {
