@@ -36,12 +36,16 @@ instance.interceptors.response.use(
     }
     
     // 403 에러 (권한 없음) 시 처리
+    // 예약 관련 API는 modify.tsx에서 별도로 처리하므로 여기서는 alert를 표시하지 않음
     if (error.response?.status === 403) {
       console.error('403 에러: 권한이 없습니다.');
       console.error('에러 응답:', error.response?.data);
       
-      // 사용자에게 권한 에러 알림
-      if (typeof window !== 'undefined') {
+      // 예약 관련 API가 아닌 경우에만 alert 표시
+      const url = error.config?.url || '';
+      const isReservationApi = url.includes('/personal-reservations') || url.includes('/organization-reservations');
+      
+      if (typeof window !== 'undefined' && !isReservationApi) {
         alert('해당 기능에 대한 권한이 없습니다. 관리자에게 문의하세요.');
       }
     }

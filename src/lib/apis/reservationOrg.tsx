@@ -6,7 +6,8 @@ export const postOrganizationReservation = async (data: any) => {
     return res;
   } catch (e) {
     console.error(e);
-    return null;
+    // 에러를 throw하여 호출하는 곳에서 처리할 수 있도록 함
+    throw e;
   }
 };
 

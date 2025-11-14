@@ -91,8 +91,16 @@ export default function ModifyPage() {
 
   // 달력 변경 시 validation 상태 초기화
   const handleDateTimeChange = (data: any) => {
-    // 날짜는 ISO 문자열로 전송
-    setVisitDate(data.visitDate.toISOString());
+    // 날짜를 로컬 시간 기준으로 YYYY-MM-DD 형식으로 변환
+    const formatLocalDate = (date: Date): string => {
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    
+    // 로컬 날짜 문자열로 저장 (ISO 문자열 대신)
+    setVisitDate(formatLocalDate(data.visitDate));
     
     // 시간은 HH:mm 형식으로 전송 (LocalTime 형식)
     const formatTime = (date: Date) => {
@@ -129,17 +137,8 @@ export default function ModifyPage() {
 
     if (!hasErrors) {
       try {
-        // visitDate를 YYYY-MM-DD 형식으로 변환
-        const formatVisitDate = (isoString: string): string => {
-          if (!isoString) return '';
-          const date = new Date(isoString);
-          const year = date.getFullYear();
-          const month = (date.getMonth() + 1).toString().padStart(2, '0');
-          const day = date.getDate().toString().padStart(2, '0');
-          return `${year}-${month}-${day}`;
-        };
-
-        const formattedVisitDate = formatVisitDate(visitDate);
+        // visitDate는 이미 YYYY-MM-DD 형식이므로 그대로 사용
+        const formattedVisitDate = visitDate;
 
         // endTime에 +1시간 추가
         const addOneHour = (timeString: string): string => {
@@ -184,18 +183,33 @@ export default function ModifyPage() {
         console.log('선택된 타입:', type);
         console.log('전송할 payload:', payload);
         
-        const res = type === 'personal' 
-          ? await postPersonalReservation(payload)
-          : await postOrganizationReservation(payload);
+        let res;
+        try {
+          res = type === 'personal' 
+            ? await postPersonalReservation(payload)
+            : await postOrganizationReservation(payload);
+        } catch (apiError: any) {
+          // 403 에러인 경우 중복 예약 불가 메시지 표시
+          if (apiError?.response?.status === 403) {
+            alert("대기중인 예약이 있는 경우 중복 예약이 불가합니다.");
+            return;
+          }
+          // 다른 에러는 다시 throw하여 아래 catch 블록에서 처리
+          throw apiError;
+        }
+        
         console.log(res);
         if (res) {
           router.push("/help/complete");
         } else {
           alert("예약에 실패했습니다. 다시 시도해주세요.");
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error(err);
-        alert("서버 에러가 발생했습니다.");
+        // 403 에러는 이미 위에서 처리했으므로 여기서는 다른 에러만 처리
+        if (err?.response?.status !== 403) {
+          alert("서버 에러가 발생했습니다.");
+        }
       }
     }
   };
