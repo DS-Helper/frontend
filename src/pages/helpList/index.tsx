@@ -125,20 +125,40 @@ export default function HelpListPage() {
             return `${period} ${hour12}:${String(minutes).padStart(2, '0')}`;
           };
 
-          // 날짜를 MM.DD 형식으로 변환
+          // 날짜를 MM.DD 형식으로 변환 (로컬 시간 기준)
           const formatDate = (dateString: string) => {
             if (!dateString) return '';
+            // YYYY-MM-DD 형식인 경우 직접 파싱
+            if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+              const [year, month, day] = dateString.split('-').map(Number);
+              return `${String(month).padStart(2, '0')}.${String(day).padStart(2, '0')}`;
+            }
+            // ISO 문자열인 경우 로컬 시간 기준으로 파싱
             const date = new Date(dateString);
+            // 로컬 시간 기준으로 날짜 추출
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');
             return `${month}.${day}`;
+          };
+
+          // 요일 계산 함수 (로컬 시간 기준)
+          const getDayOfWeek = (dateString: string) => {
+            if (!dateString) return '';
+            // YYYY-MM-DD 형식인 경우 직접 파싱
+            if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+              const [year, month, day] = dateString.split('-').map(Number);
+              const date = new Date(year, month - 1, day);
+              return date.toLocaleDateString('ko-KR', { weekday: 'short' });
+            }
+            // ISO 문자열인 경우 로컬 시간 기준으로 파싱
+            return new Date(dateString).toLocaleDateString('ko-KR', { weekday: 'short' });
           };
 
           return {
             id: reservationId,
             userId: userId,
             date: item.visitDate ? formatDate(item.visitDate) : '',
-            dayOfWeek: item.visitDate ? new Date(item.visitDate).toLocaleDateString('ko-KR', { weekday: 'short' }) : '',
+            dayOfWeek: item.visitDate ? getDayOfWeek(item.visitDate) : '',
             content: item.requirement || '',
             startTime: formatTime(item.startTime),
             endTime: formatTime(item.endTime),
@@ -275,13 +295,33 @@ export default function HelpListPage() {
           return `${period} ${hour12}:${String(minutes).padStart(2, '0')}`;
         };
         
-        // 날짜 포맷 함수 (MM.DD 형식)
+        // 날짜 포맷 함수 (MM.DD 형식, 로컬 시간 기준)
         const formatDate = (dateString: string) => {
           if (!dateString) return '';
+          // YYYY-MM-DD 형식인 경우 직접 파싱
+          if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            const [year, month, day] = dateString.split('-').map(Number);
+            return `${String(month).padStart(2, '0')}.${String(day).padStart(2, '0')}`;
+          }
+          // ISO 문자열인 경우 로컬 시간 기준으로 파싱
           const date = new Date(dateString);
+          // 로컬 시간 기준으로 날짜 추출
           const month = String(date.getMonth() + 1).padStart(2, '0');
           const day = String(date.getDate()).padStart(2, '0');
           return `${month}.${day}`;
+        };
+        
+        // 요일 계산 함수 (로컬 시간 기준)
+        const getDayOfWeek = (dateString: string) => {
+          if (!dateString) return '';
+          // YYYY-MM-DD 형식인 경우 직접 파싱
+          if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            const [year, month, day] = dateString.split('-').map(Number);
+            const date = new Date(year, month - 1, day);
+            return date.toLocaleDateString('ko-KR', { weekday: 'short' });
+          }
+          // ISO 문자열인 경우 로컬 시간 기준으로 파싱
+          return new Date(dateString).toLocaleDateString('ko-KR', { weekday: 'short' });
         };
         
         // 상태 변환 함수
@@ -306,7 +346,7 @@ export default function HelpListPage() {
             ? reservation.reservationHolderId 
             : (reservation.user?.id || reservation.userId || reservation.reservationHolderId || ''),
           date: reservation.visitDate ? formatDate(reservation.visitDate) : '',
-          dayOfWeek: reservation.visitDate ? new Date(reservation.visitDate).toLocaleDateString('ko-KR', { weekday: 'short' }) : '',
+          dayOfWeek: reservation.visitDate ? getDayOfWeek(reservation.visitDate) : '',
           content: reservation.requirement || '',
           startTime: formatTime(reservation.startTime || ''),
           endTime: formatTime(reservation.endTime || ''),
