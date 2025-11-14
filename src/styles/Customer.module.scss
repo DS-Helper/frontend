@@ -438,6 +438,12 @@ textarea.customSelect {
 
 .imageWrapper{
     margin-top: 0.8rem;
+    
+    .inquiryImage {
+        width: 200px;
+        height: auto;
+        object-fit: contain;
+    }
 }
 
 .contentInput{

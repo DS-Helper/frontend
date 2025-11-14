@@ -286,8 +286,9 @@ export default function Customer(){
                         src={item.image}
                         alt="문의 이미지"
                         width={200}
-                        height={150}
-                        className={cn("inquiryImage")}/>
+                        height={200}
+                        className={cn("inquiryImage")}
+                        style={{ height: 'auto' }}/>
                     </div>
                 )}
 
