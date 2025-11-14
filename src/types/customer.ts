@@ -1,11 +1,22 @@
 export interface Inquiry {
-  id: number;
+  id: number | string;
   status: "답변 보기" | "답변 대기";
   content: string;
   date: string;
   time: string;
   image?: string;
+  imageUrls?: string[];
   answer?: string | null;
+  reply?: {
+    replyId: string;
+    content: string;
+    user?: {
+      userId: string;
+      name: string;
+      email?: string | null;
+      role: string;
+    };
+  } | null;
 }
 
 export interface InquiryFormData {

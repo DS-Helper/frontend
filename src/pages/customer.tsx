@@ -30,17 +30,46 @@ export default function Customer(){
             if (response && response.data) {
                 // 배열인지 확인하고 안전하게 설정
                 const data = response.data;
+                let rawInquiries: any[] = [];
+                
                 if (Array.isArray(data)) {
-                    setInquiries(data);
+                    rawInquiries = data;
                 } else if (Array.isArray(data.inquiries)) {
-                    setInquiries(data.inquiries);
+                    rawInquiries = data.inquiries;
                 } else if (Array.isArray(data.items)) {
-                    setInquiries(data.items);
+                    rawInquiries = data.items;
                 } else {
                     console.error('예상하지 못한 응답 구조:', data);
                     setInquiries([]);
                     setError('문의 내역 데이터 형식이 올바르지 않습니다.');
+                    return;
                 }
+                
+                // API 응답을 Inquiry 형식으로 매핑
+                const mappedInquiries: Inquiry[] = rawInquiries.map((item: any) => {
+                    // 날짜와 시간 분리 (createdAt: "2025-11-09 22:20")
+                    const createdAt = item.createdAt || item.date || '';
+                    const [date, time] = createdAt.split(' ');
+                    
+                    // 이미지 URL 처리
+                    const imageUrl = item.imageUrls && item.imageUrls.length > 0 
+                        ? item.imageUrls[0] 
+                        : (item.image || undefined);
+                    
+                    return {
+                        id: item.inquiryId || item.id,
+                        status: item.status || (item.reply ? "답변 보기" : "답변 대기"),
+                        content: item.content || '',
+                        date: date || '',
+                        time: time || '',
+                        image: imageUrl,
+                        imageUrls: item.imageUrls || [],
+                        reply: item.reply || null,
+                        answer: item.reply?.content || item.answer || null, // 호환성을 위해 answer도 설정
+                    };
+                });
+                
+                setInquiries(mappedInquiries);
             } else {
                 setInquiries([]);
                 setError('문의 내역을 불러오는데 실패했습니다.');
@@ -66,7 +95,12 @@ export default function Customer(){
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
     
     const openModal = (answer: string | null) => {
-        if (!answer) return; // 답변 없는 경우 클릭 x
+        console.log('openModal called with answer:', answer);
+        if (!answer || answer.trim() === '') {
+            console.log('Answer is empty, not opening modal');
+            return; // 답변 없는 경우 클릭 x
+        }
+        console.log('Setting modal state');
         setSelectedAnswer(answer);
         setModalOpen(true);
     };
@@ -132,12 +166,12 @@ export default function Customer(){
      expandedItems는 확장된 상태의 아이템 ID들을 저장하는 배열로 확장 여부 추적
      기본은 43자까지만 표시 -> 클릭 시 전체 내용 -> 재클릭시 접힘
     */
-    const [expandedItems, setExpandedItems] = useState<number[]>([]);
+    const [expandedItems, setExpandedItems] = useState<(string | number)[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
     
     /* 항목 확장/축소 토글 기능 구현 */
-    const itemToggle = (id: number) =>{
+    const itemToggle = (id: string | number) =>{
         setExpandedItems((prev) =>
             prev.includes(id) ? prev.filter((x)=>x!==id) : [...prev, id]
         );
@@ -198,7 +232,7 @@ export default function Customer(){
     const InquiryItem = ({ item, isExpanded, onToggle, onOpenModal }: {
         item: Inquiry;
         isExpanded: boolean;
-        onToggle: (id: number) => void;
+        onToggle: (id: string | number) => void;
         onOpenModal: (answer: string | null) => void;
     }) => {
         const contentRef = useRef<HTMLParagraphElement>(null);
@@ -215,10 +249,21 @@ export default function Customer(){
 
         return (
             <li className={cn("inquiryItem")}>
-                <span className={cn("status", 
-                    {waiting: item.status==="답변 대기", 
-                    done: item.status==="답변 보기"})}
-                    onClick={() => onOpenModal(item.answer || null)}
+                <span 
+                    className={cn("status", 
+                        {waiting: item.status==="답변 대기", 
+                        done: item.status==="답변 보기"})}
+                    onClick={() => {
+                        console.log('Status clicked, item:', item);
+                        console.log('item.reply:', item.reply);
+                        console.log('item.answer:', item.answer);
+                        console.log('item.status:', item.status);
+                        const answerContent = item.reply?.content || item.answer;
+                        if (item.status === "답변 보기" && answerContent) {
+                            onOpenModal(answerContent);
+                        }
+                    }}
+                    style={{ cursor: item.status === "답변 보기" ? 'pointer' : 'default' }}
                 > 
                     {item.status}
                 </span>
@@ -414,10 +459,13 @@ export default function Customer(){
 
             {/* 답변 내용 모달 */}
             {isModalOpen && selectedAnswer && (
-                <AnswerModal 
-                    answer={selectedAnswer} 
-                    onClose={closeModal}
-                />
+                <>
+                    {console.log('Rendering AnswerModal, isModalOpen:', isModalOpen, 'selectedAnswer:', selectedAnswer)}
+                    <AnswerModal 
+                        answer={selectedAnswer} 
+                        onClose={closeModal}
+                    />
+                </>
             )}
         </div>
     );
