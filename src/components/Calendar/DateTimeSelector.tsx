@@ -337,7 +337,22 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
             {selectedTimeBlocks.length > 0 && (
               <div className={cn("selectedTimesInfo")}>
                 <p>선택된 시간: {selectedDate?.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })} {selectedTimeBlocks.length > 1 ? `${selectedTimeBlocks[0]} ~ ${selectedTimeBlocks[selectedTimeBlocks.length - 1]}` : selectedTimeBlocks[0]}</p>
-                <p>총 예약 시간: {formatDuration(selectedTimeBlocks.length * 30)}</p>
+                <p>총 예약 시간: {(() => {
+                  // 시작 시간과 종료 시간의 실제 차이를 계산
+                  const startTime = selectedTimeBlocks[0];
+                  const endTime = selectedTimeBlocks[selectedTimeBlocks.length - 1];
+                  const [startHour, startMin] = startTime.split(":").map(Number);
+                  const [endHour, endMin] = endTime.split(":").map(Number);
+                  
+                  // 시작 시간과 종료 시간을 분 단위로 변환
+                  const startMinutes = startHour * 60 + startMin;
+                  const endMinutes = endHour * 60 + endMin;
+                  
+                  // 시간 차이 계산 (종료 시간 - 시작 시간)
+                  const durationMinutes = endMinutes - startMinutes;
+                  
+                  return formatDuration(durationMinutes);
+                })()}</p>
                 <p className={cn("timeLimitInfo")}>최대 예약 가능: 3시간</p>
               </div>
             )}
