@@ -135,6 +135,7 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
+    gap: 2rem;
 
     @media (max-width: 611px) {
       flex-direction: column;
