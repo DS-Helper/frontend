@@ -45,6 +45,8 @@ export interface HelpRequest {
   content: string;
   startTime: string;
   endTime: string;
+  requirement: string;
+  note?: string;
 }
 
 export interface HelpDetailData {
@@ -62,4 +64,5 @@ export interface HelpDetailData {
   };
   requirement?: string;
   rejectionReason?: string;
+  note?: string;
 }

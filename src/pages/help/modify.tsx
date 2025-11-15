@@ -28,7 +28,7 @@ export default function ModifyPage() {
   const [address, setAddress] = useState("");
   const [requirement, setRequirement] = useState("");
   const [recipientNumber, setRecipientNumber] = useState("");
-  const [specialNotes, setSpecialNotes] = useState("");
+  const [note, setNote] = useState("");
   const [visitDate, setVisitDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -133,7 +133,7 @@ export default function ModifyPage() {
     setShowErrors(true);
 
     // 필수 필드 검증
-    const hasErrors = !name || !phoneNumber || !address || !requirement || !recipientNumber || !specialNotes || (type === 'org' && !organizationName);
+    const hasErrors = !name || !phoneNumber || !address || !requirement || !recipientNumber || !note || (type === 'org' && !organizationName);
 
     if (!hasErrors) {
       try {
@@ -151,6 +151,7 @@ export default function ModifyPage() {
               requirement,
               recipientGenderType,
               recipientNumber,
+              note,
             }
           : {
               name,
@@ -163,6 +164,7 @@ export default function ModifyPage() {
               requirement,
               recipientGenderType,
               recipientNumber,
+              note,
             };
   
         // 사용자 타입에 따라 적절한 API 호출
@@ -329,11 +331,11 @@ export default function ModifyPage() {
             <label>특이사항 <span className={cn("required")}>*</span></label>
             <input 
               type="text" 
-              value={specialNotes} 
-              onChange={(e) => setSpecialNotes(e.target.value)} 
-              className={showErrors && !specialNotes ? cn("error") : undefined} 
+              value={note} 
+              onChange={(e) => setNote(e.target.value)} 
+              className={showErrors && !note ? cn("error") : undefined} 
             />
-            {showErrors && !specialNotes && <p className={cn("errorMsg")}>특이사항을 입력해주세요.</p>}
+            {showErrors && !note && <p className={cn("errorMsg")}>특이사항을 입력해주세요.</p>}
           </div>
 
           <button type="submit" className={cn("submitBtn")}>
