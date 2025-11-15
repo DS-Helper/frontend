@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import classNames from "classnames/bind";
 import styles from "@/styles/HelpList.module.scss";
-import detailStyles from "@/pages/helpList/[id]/HelpDetail.module.scss";
 import { HelpRequestStatus, HelpRequest, ApiReservationData, HelpDetailData } from "@/types/helpList"
 import { useUserStore } from "@/lib/store/userStore";
 import { getPersonalReservation, patchPersonalReservation, getPersonalReservationDetail } from "@/lib/apis/reservationUser";
