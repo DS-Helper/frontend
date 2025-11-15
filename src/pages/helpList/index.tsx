@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import classNames from "classnames/bind";
+import detailStyles from "@/styles/HelpListDetail.module.scss";
 import styles from "@/styles/HelpList.module.scss";
 import { HelpRequestStatus, HelpRequest, ApiReservationData, HelpDetailData } from "@/types/helpList"
 import { useUserStore } from "@/lib/store/userStore";
@@ -11,6 +12,7 @@ import mapIcon from "@/public/mapIcon.svg";
 import calendarIcon from "@/public/calendarIcon.svg";
  
 const cn = classNames.bind(styles);
+const detailCn = classNames.bind(detailStyles);
 
 const ITEMS_PER_PAGE = 10;
 
