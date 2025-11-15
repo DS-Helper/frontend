@@ -11,7 +11,6 @@ import mapIcon from "@/public/mapIcon.svg";
 import calendarIcon from "@/public/calendarIcon.svg";
  
 const cn = classNames.bind(styles);
-const detailCn = classNames.bind(detailStyles);
 
 const ITEMS_PER_PAGE = 10;
 
