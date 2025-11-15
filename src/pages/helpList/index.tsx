@@ -160,6 +160,7 @@ export default function HelpListPage() {
             date: item.visitDate ? formatDate(item.visitDate) : '',
             dayOfWeek: item.visitDate ? getDayOfWeek(item.visitDate) : '',
             content: item.note || '',
+            requirement: item.requirement || '',
             startTime: formatTime(item.startTime),
             endTime: formatTime(item.endTime),
             status: uiStatus
