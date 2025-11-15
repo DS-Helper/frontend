@@ -20,7 +20,7 @@ export default function ModifyPage() {
   const router = useRouter();
   const { user, userType } = useUserStore();
   const [type, setType] = useState<"personal" | "org">("personal");
-  const [recipientGenderType, setRecipientGenderType] = useState<"남" | "여" | "둘 다" | null>("남");
+  const [recipientGenderType, setRecipientGenderType] = useState<"남" | "여" | "모두" | null>("남");
 
   const [name, setName] = useState("");
   const [organizationName, setOrganizationName] = useState("");
