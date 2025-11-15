@@ -9,7 +9,7 @@ import { IoChevronDown } from "react-icons/io5";
 import Image from 'next/image';
 import mapIcon from "@/public/mapIcon.svg";
 import calendarIcon from "@/public/calendarIcon.svg";
-
+ 
 const cn = classNames.bind(styles);
 const detailCn = classNames.bind(detailStyles);
 
