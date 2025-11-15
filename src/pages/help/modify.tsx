@@ -295,7 +295,7 @@ export default function ModifyPage() {
               {([
                 { value: "남", label: "남자", src: male },
                 { value: "여", label: "여자", src: female },
-                { value: "둘 다", label: "둘 다 있음", src: both },
+                { value: "모두", label: "둘 다 있음", src: both },
               ] as const).map((g) => (
                 <button
                   key={g.value}
