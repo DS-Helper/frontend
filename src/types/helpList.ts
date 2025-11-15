@@ -46,6 +46,7 @@ export interface HelpRequest {
   startTime: string;
   endTime: string;
   requirement: string;
+  note?: string;
 }
 
 export interface HelpDetailData {
