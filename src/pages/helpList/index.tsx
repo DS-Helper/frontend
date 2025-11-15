@@ -159,7 +159,7 @@ export default function HelpListPage() {
             userId: userId,
             date: item.visitDate ? formatDate(item.visitDate) : '',
             dayOfWeek: item.visitDate ? getDayOfWeek(item.visitDate) : '',
-            content: item.requirement || '',
+            content: item.note || '',
             startTime: formatTime(item.startTime),
             endTime: formatTime(item.endTime),
             status: uiStatus
@@ -347,7 +347,8 @@ export default function HelpListPage() {
             : (reservation.user?.id || reservation.userId || reservation.reservationHolderId || ''),
           date: reservation.visitDate ? formatDate(reservation.visitDate) : '',
           dayOfWeek: reservation.visitDate ? getDayOfWeek(reservation.visitDate) : '',
-          content: reservation.requirement || '',
+          content: reservation.note || '',
+          requirement: reservation.requirement || '',
           startTime: formatTime(reservation.startTime || ''),
           endTime: formatTime(reservation.endTime || ''),
           status: convertStatus(reservation.reservationStatus || '')
@@ -383,7 +384,7 @@ export default function HelpListPage() {
             count: reservation.recipientNumber || 1
           },
           rejectionReason: reservation.rejectionReason || "", 
-          requirement: reservation.requirement || ""
+          note: reservation.note || ""
         };
         
         setHelpDetail(mappedDetail);
@@ -542,7 +543,7 @@ export default function HelpListPage() {
 
               {/* 내용 */}
               <div className={cn("cardContent")}>
-                <p className={cn("contentText")}>{request.content}</p>
+                <p className={cn("contentText")}>{request.requirement}</p>
                 {user?.type === "기업" && (
                   <div className={cn("organizationInfo")}>
                     <span className={cn("organizationTag")}>기관 요청</span>
@@ -697,7 +698,7 @@ export default function HelpListPage() {
                   <section className={detailCn("infoSection")}>
                     <h3 className={detailCn("sectionTitle")}>도움 요청 내용</h3>
                     <div className={detailCn("contentText")}>
-                      {helpRequest.content}
+                      {helpDetail.requirement}
                     </div>
                   </section>
 
@@ -715,8 +716,8 @@ export default function HelpListPage() {
                   <section className={detailCn("infoSection")}>
                     <h3 className={detailCn("sectionTitle")}>특이사항</h3>
                     <div className={detailCn("contentText")}>
-                      {helpDetail.requirement && helpDetail.requirement.trim() 
-                        ? helpDetail.requirement 
+                      {helpRequest.note && helpRequest.note.trim() 
+                        ? helpRequest.note 
                         : "특이사항 없음"}
                     </div>
                   </section>
