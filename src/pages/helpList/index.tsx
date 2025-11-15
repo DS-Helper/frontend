@@ -699,7 +699,7 @@ export default function HelpListPage() {
                   <section className={detailCn("infoSection")}>
                     <h3 className={detailCn("sectionTitle")}>도움 요청 내용</h3>
                     <div className={detailCn("contentText")}>
-                      {helpDetail.requirement}
+                      {helpRequest.requirement}
                     </div>
                   </section>
 
@@ -717,8 +717,8 @@ export default function HelpListPage() {
                   <section className={detailCn("infoSection")}>
                     <h3 className={detailCn("sectionTitle")}>특이사항</h3>
                     <div className={detailCn("contentText")}>
-                      {helpRequest.note && helpRequest.note.trim() 
-                        ? helpRequest.note 
+                      {helpRequest.content && helpRequest.content.trim() 
+                        ? helpRequest.content
                         : "특이사항 없음"}
                     </div>
                   </section>
