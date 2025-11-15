@@ -125,7 +125,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
       newTimeBlocks = newTimeBlocks.filter((t) => t !== time);
     } else {
       // 새로운 시간 추가 (최대 6개)
-      if (newTimeBlocks.length >= 6) {
+      if (newTimeBlocks.length >= 7) {
         alert("최대 예약 가능 시간은 3시간입니다.");
         return;
       }
@@ -163,7 +163,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
         }
         
         // 최대 6개 블록 제한 확인
-        if (newTimeBlocks.length > 6) {
+        if (newTimeBlocks.length > 7) {
           alert("최대 예약 가능 시간은 3시간입니다.");
           return;
         }
