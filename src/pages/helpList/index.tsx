@@ -717,8 +717,8 @@ export default function HelpListPage() {
                   <section className={detailCn("infoSection")}>
                     <h3 className={detailCn("sectionTitle")}>특이사항</h3>
                     <div className={detailCn("contentText")}>
-                      {helpRequest.content && helpRequest.content.trim() 
-                        ? helpRequest.content
+                      {helpDetail.note && helpDetail.note.trim() 
+                        ? helpDetail.note
                         : "특이사항 없음"}
                     </div>
                   </section>
