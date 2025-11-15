@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import classNames from "classnames/bind";
+import detailStyles from "@/styles/HelpListDetail.module.scss";
 import styles from "@/styles/HelpList.module.scss";
 import { HelpRequestStatus, HelpRequest, ApiReservationData, HelpDetailData } from "@/types/helpList"
 import { useUserStore } from "@/lib/store/userStore";
