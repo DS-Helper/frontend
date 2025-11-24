@@ -1,0 +1,21 @@
+{
+  "files.hotExit": "off",
+  "files.autoSave": "off",
+  "files.autoSaveDelay": 0,
+  "workbench.editor.enablePreview": false,
+  "workbench.editor.enablePreviewFromQuickOpen": false,
+  "extensions.autoUpdate": false,
+  "files.watcherExclude": {
+    "**/.history/**": true,
+    "**/node_modules/**": true,
+    "**/.git/**": true
+  },
+  "search.exclude": {
+    "**/.history": true,
+    "**/node_modules": true,
+    "**/.git": true
+  },
+  "files.exclude": {
+    "**/.history": true
+  }
+}

@@ -1,0 +1,528 @@
+.home {
+  width: 100%;
+  height: 100%;
+}
+
+.homePage {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 6.4rem;
+  align-items: center;
+  justify-content: center;
+
+  @media (max-width: 611px) {
+    height: auto;
+  }
+
+  .homePage1Content {
+    display: flex;
+    align-items: center;
+    gap: 7.3rem;
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+      gap: 3rem;
+    }
+  }
+
+  .homePage1Title {
+    font-size: 78px;
+    font-weight: 700;
+
+    @media (max-width: 1000px) {
+      font-size: 60px;
+    }
+
+    @media (max-width: 800px) {
+      font-size: 50px;
+    }
+
+    @media (max-width: 700px) {
+      font-size: 40px;
+    }
+
+    @media (max-width: 600px) {
+      font-size: 50px;
+    }
+
+    @media (max-width: 450px) {
+      font-size: 40px;
+    }
+
+    @media (max-width: 370px) {
+      font-size: 30px;
+    }
+
+    @media (max-width: 290px) {
+      font-size: 24px;
+    }
+  }
+
+  .homePage1Image {
+    width: 250px;
+    height: 329px;
+
+    @media (max-width: 1000px) {
+      width: 200px;
+      height: 260px;
+    }
+
+    @media (max-width: 800px) {
+      width: 150px;
+      height: 200px;
+    }
+
+    @media (max-width: 600px) {
+      width: 200px;
+      height: 260px;
+    }
+    
+    @media (max-width: 450px) {
+      width: 150px;
+      height: 200px;
+    }
+
+    @media (max-width: 290px) {
+      width: 100px;
+      height: 130px;
+    }
+  }
+
+  .homePage1Button {
+    padding: 1.7rem 3.5rem;
+    background-color: var(--primary-color);
+    border-radius: 10rem;
+    color: #fff;
+    font-size: 2.2rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: var(--primary-color-soft);
+      color: var(--primary-color);
+    }
+  }
+}
+
+.homePage2 {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--grey-100);
+  padding: 10rem 20rem;
+  text-align: center;
+
+  @media (max-width: 611px) {
+    min-height: auto;
+  }
+
+  @media (max-width: 1200px) {
+    padding: 100px 20px;
+  }
+
+  .homePageWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10rem;
+
+    @media (max-width: 1200px) {
+      gap: 2rem;
+    }
+  }
+
+  .homePageContent {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+
+    @media (max-width: 611px) {
+      flex-direction: column;
+      gap: 5rem;
+      align-items: center;
+
+      @media (max-width: 1200px) {
+        gap: 2rem;
+      }
+    }
+
+    .homePageButton {
+      display: flex;
+      flex-direction: column;
+      gap: 3.4rem;
+      padding-bottom: 1rem;
+
+      @media (max-width: 611px) {
+        flex-direction: row;
+        overflow-x: scroll;
+        gap: 0.8rem;
+        align-self: flex-start;
+        width: 100%;
+      }
+
+      button {
+        width: 100%;
+        padding: 0.8rem 1.4rem;
+        border: 1px solid var(--grey-300);
+        color: var(--grey-500);
+        font-weight: 600;
+        font-size: 1.5rem;
+        border-radius: 10rem;
+        white-space: nowrap;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: var(--grey-100);
+          color: var(--grey-700);
+        }
+
+        &.active {
+          background-color: var(--primary-color);
+          border: 1px solid var(--primary-color);
+          font-weight: 700;
+          color: #fff;
+        }
+      }
+    }
+
+    .homePageListImage {
+      width: 18rem;
+      height: 18rem;
+    }
+
+    .homePageListWrapper {
+      display: flex;
+      justify-content: center;
+    }
+
+    .homePageList {
+      display: flex;
+      gap: 1.6rem;
+      flex-wrap: wrap;
+
+      @media (max-width: 611px) {
+        gap: 10rem;
+      }
+
+      li {
+        width: 30%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        p {
+          font-weight: 600;
+          font-size: 1.9rem;
+          color: var(--grey-800);
+          margin: 2rem 0 0.8rem;
+          white-space: nowrap;
+        }
+
+        span {
+          font-weight: 500;
+          font-size: 1.3rem;
+          color: var(--grey-600);
+        }
+      }
+    }
+
+    .homePageList2 {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+      flex-wrap: wrap;
+
+      li {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 2.5rem 3rem;
+        border-bottom: 1px solid var(--grey-300);
+        font-weight: 600;
+        font-size: 2.2rem;
+      }
+    }
+
+    .homePageList3 {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+
+      li {
+        display: flex;
+        gap: 5.2rem;
+        margin-right: 5rem;
+
+        @media (max-width: 611px) {
+          flex-direction: column;
+          gap: 2rem;
+        }
+
+        .homePageList3Image {
+          width: 30.8rem;
+          height: 53rem;
+
+          @media (max-width: 611px) {
+            width: 27.5rem;
+            height: 47.4rem;
+          }
+        }
+
+        div {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 1.6rem;
+          text-align: left;
+
+          p {
+            font-weight: 600;
+            font-size: 3.2rem;
+
+            @media (max-width: 611px) {
+              font-size: 2.2rem;
+            }
+          }
+
+          span {
+            font-weight: 500;
+            font-size: 1.7rem;
+            color: var(--grey-700);
+
+            @media (max-width: 611px) {
+              font-size: 1.5rem;
+            }
+          }
+        }
+      }
+    }
+
+    .homePageList4 {
+      width: 76%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8rem;
+      padding: 4rem 0;
+
+      li {
+        display: flex;
+        align-items: center;
+        gap: 5.5rem;
+
+        @media (max-width: 611px) {
+          gap: 2.4rem;
+        }
+
+        .homePageList4Image {
+          width: 20.4rem;
+          height: 17rem;
+
+          @media (max-width: 611px) {
+            width: 11.2rem;
+            height: 9.4rem;
+          }
+        }
+
+        div {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 1rem;
+          text-align: left;
+        }
+
+        p {
+          font-weight: 600;
+          font-size: 3.2rem;
+
+          @media (max-width: 611px) {
+            font-size: 2.4rem;
+          }
+        }
+
+        span {
+          font-weight: 600;
+          font-size: 2.2rem;
+          color: var(--grey-600);
+
+          @media (max-width: 611px) {
+            font-size: 1.5rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+.homePage3 {
+  width: 100%;
+  min-height: 100vh;
+  padding: 16rem 26rem;
+  text-align: center;
+  
+  @media (max-width: 611px) {
+    min-height: auto;
+  }
+
+  @media (max-width: 1200px) {
+    padding: 100px 20px;
+  }
+
+  @media (max-width: 611px) {
+    padding: 10rem 2rem;
+  }
+
+  .homePageWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10rem;
+  }
+
+  .storyList {
+    display: flex;
+    flex-direction: column;
+    gap: 8rem;
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 5rem;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+
+      &:hover {
+        opacity: 0.8;
+      }
+
+      .storyImage {
+        width: 24rem;
+        height: 18rem;
+        object-fit: cover;
+
+        @media (max-width: 611px) {
+          width: 13.5rem;
+          height: 10.1rem;
+        }
+      }
+
+      div {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        text-align: left;
+
+        p {
+          font-weight: 600;
+          font-size: 2.4rem;
+          color: var(--grey-800);
+
+          @media (max-width: 611px) {
+            font-size: 1.9rem;
+          }
+        }
+
+        .storyContent {
+          font-weight: 500;
+          font-size: 1.7rem;
+          color: var(--grey-600);
+
+          @media (max-width: 611px) {
+            display: none;
+          }
+        }
+
+        .storyDate {
+          font-weight: 500;
+          font-size: 1.5rem;
+          color: var(--grey-500);
+
+          @media (max-width: 611px) {
+            font-size: 1.3rem;
+          }
+        }
+      }
+    }
+  }
+
+  .storyLoading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5rem 0;
+    
+    p {
+      font-weight: 500;
+      font-size: 1.8rem;
+      color: var(--grey-600);
+      
+      @media (max-width: 611px) {
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  .storyEmpty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5rem 0;
+    
+    p {
+      font-weight: 500;
+      font-size: 1.8rem;
+      color: var(--grey-600);
+      
+      @media (max-width: 611px) {
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  .moreStoriesButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    margin: 4rem auto 0;
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--grey-500);
+    font-size: 1.7rem;
+    font-weight: 400;
+    cursor: pointer;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--grey-700);
+    }
+
+    @media (max-width: 611px) {
+      font-size: 1.5rem;
+      margin-top: 3rem;
+
+      &::after {
+        font-size: 1.5rem;
+      }
+    }
+  }
+}
+
+.title {
+  font-weight: 700;
+  font-size: 5rem;
+  color: #222222;
+  display: inline-block;
+
+  @media (max-width: 611px) {
+    font-size: 3.2rem;
+  }
+}

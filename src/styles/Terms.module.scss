@@ -1,0 +1,93 @@
+.termsContainer {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  line-height: 1.6;
+  color: #333;
+}
+
+.termsTitle {
+  font-size: 3.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #2c3e50;
+}
+
+.termsContent {
+  margin-bottom: 2rem;
+}
+
+.termsSectionTitle {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #34495e;
+}
+
+.termsText {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  line-height: 1.7;
+}
+
+.termsList {
+  margin-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+.termsListItem {
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1.6;
+}
+
+.termsSubList {
+  margin-left: 1rem;
+  margin-top: 0.5rem;
+}
+
+.termsSubListItem {
+  margin-bottom: 0.25rem;
+  font-size: 1.5rem;
+  color: #666;
+}
+
+.termsNote {
+  background-color: #f8f9fa;
+  border-left: 4px solid #17a2b8;
+  padding: 2rem;
+  margin: 1rem 0;
+  border-radius: 0 4px 4px 0;
+}
+
+.contactInfo {
+  background-color: #e8f4fd;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #bee5eb;
+  margin-top: 1rem;
+}
+
+// 반응형 디자인
+@media (max-width: 768px) {
+  .termsContainer {
+    padding: 1rem 0.5rem;
+  }
+  
+  .termsTitle {
+    font-size: 1.5rem;
+  }
+  
+  .termsSectionTitle {
+    font-size: 1.1rem;
+  }
+  
+  .termsList {
+    margin-left: 1rem;
+  }
+  
+  .termsSubList {
+    margin-left: 0.5rem;
+  }
+}
