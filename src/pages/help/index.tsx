@@ -14,7 +14,7 @@ export default function Help(){
     "방문시간은 수요일, 금요일 오전 10시 ~ 오후 5시 사이만 가능해요.",
     "최소 30분, 최대 3시간까지 예약 할 수 있어요.",
     "예약 완료 전에는 추가 예약이 불가해요.",
-    "도움 요청 내용은 자세히 작성 해주시면 보다 정확하고 따뜻한 동행이 가능해요.",
+    "도움 활동 중 촬영된 사진은 SNS와 ‘도와드린 이야기’ 페이지에 공유될 수 있습니다.",
   ];
 
   const [checkedItems, setCheckedItems] = useState(
@@ -45,12 +45,14 @@ export default function Help(){
         <ul className={cn("list")}>
           {checklist.map((text, i) => (
             <li key={i}>
-              <input
-                type="checkbox"
-                checked={checkedItems[i]}
-                onChange={() => handleCheck(i)}
-              />
-              <p>{text}</p>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={checkedItems[i]}
+                  onChange={() => handleCheck(i)}
+                />
+                <p>{text}</p>
+              </label>
             </li>
           ))}
         </ul>

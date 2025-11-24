@@ -6,6 +6,7 @@ import classNames from "classnames/bind";
 import styles from "./HelpStoryDetail.module.scss";
 import { getPost } from "@/lib/apis/helpStory";
 import Image from "next/image";
+import { IoShareOutline } from "react-icons/io5";
 
 const cn = classNames.bind(styles);
 
@@ -23,6 +24,7 @@ export default function HelpStoryDetailPage() {
   const { id } = router.query;
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showToast, setShowToast] = useState(false);
 
   const fetchPost = useCallback(async () => {
     try {
@@ -71,30 +73,101 @@ export default function HelpStoryDetailPage() {
     }
   };
 
-  // 주석 처리된 공유 기능을 위한 함수 (현재 사용하지 않음)
-  // const handleShare = async () => {
-  //   if (navigator.share) {
-  //     try {
-  //       await navigator.share({
-  //         title: post?.title || '도와드린 이야기',
-  //         text: post?.content || '',
-  //         url: window.location.href,
-  //       });
-  //     } catch {
-  //       // 사용자가 공유를 취소한 경우
-  //       console.log('공유가 취소되었습니다.');
-  //     }
-  //   } else {
-  //     // 공유 API를 지원하지 않는 경우 클립보드에 복사
-  //     try {
-  //       await navigator.clipboard.writeText(window.location.href);
-  //       alert('링크가 클립보드에 복사되었습니다.');
-  //     } catch (err) {
-  //       console.error('클립보드 복사 실패:', err);
-  //       alert('공유 기능을 사용할 수 없습니다.');
-  //     }
-  //   }
-  // };
+  // 공유 기능
+  const handleShare = async () => {
+    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+    
+    // width 기준으로 웹/앱 구분 (661px 이상 = 웹, 미만 = 앱)
+    const isWeb = typeof window !== 'undefined' && window.innerWidth >= 661;
+    
+    if (isWeb) {
+      // 웹 브라우저: 클립보드에 복사
+      try {
+        if (typeof navigator !== 'undefined' && navigator.clipboard) {
+          await navigator.clipboard.writeText(shareUrl);
+          // 토스트 메시지 표시
+          setShowToast(true);
+          setTimeout(() => {
+            setShowToast(false);
+          }, 2000);
+        } else {
+          // 클립보드 API를 지원하지 않는 경우 fallback
+          const textArea = document.createElement('textarea');
+          textArea.value = shareUrl;
+          textArea.style.position = 'fixed';
+          textArea.style.opacity = '0';
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          
+          setShowToast(true);
+          setTimeout(() => {
+            setShowToast(false);
+          }, 2000);
+        }
+      } catch (err) {
+        console.error('클립보드 복사 실패:', err);
+        alert('링크 복사에 실패했습니다.');
+      }
+    } else {
+      // 앱: 네이티브 공유 기능 사용
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        try {
+          await navigator.share({
+            title: post?.title || '도와드린 이야기',
+            text: post?.content || '',
+            url: shareUrl,
+          });
+        } catch (error: any) {
+          // 사용자가 공유를 취소한 경우는 에러로 처리하지 않음
+          if (error.name !== 'AbortError') {
+            console.error('공유 실패:', error);
+            // 공유 실패 시 클립보드 복사로 fallback
+            try {
+              if (navigator.clipboard) {
+                await navigator.clipboard.writeText(shareUrl);
+                setShowToast(true);
+                setTimeout(() => {
+                  setShowToast(false);
+                }, 2000);
+              }
+            } catch (clipboardErr) {
+              console.error('클립보드 복사 실패:', clipboardErr);
+            }
+          }
+        }
+      } else {
+        // navigator.share를 지원하지 않는 경우 클립보드 복사로 fallback
+        try {
+          if (typeof navigator !== 'undefined' && navigator.clipboard) {
+            await navigator.clipboard.writeText(shareUrl);
+            setShowToast(true);
+            setTimeout(() => {
+              setShowToast(false);
+            }, 2000);
+          } else {
+            const textArea = document.createElement('textarea');
+            textArea.value = shareUrl;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            setShowToast(true);
+            setTimeout(() => {
+              setShowToast(false);
+            }, 2000);
+          }
+        } catch (err) {
+          console.error('클립보드 복사 실패:', err);
+          alert('링크 복사에 실패했습니다.');
+        }
+      }
+    }
+  };
 
   if (!router.isReady || loading) {
     return (
@@ -146,14 +219,21 @@ export default function HelpStoryDetailPage() {
             <p className={cn("contentText")}>{post.content}</p>
           </div>
 
-          {/* <div className={cn("shareSection")}>
+          <div className={cn("shareSection")}>
             <button className={cn("shareButton")} onClick={handleShare}>
               <IoShareOutline className={cn("shareIcon")} />
               공유하기
             </button>
-          </div> */}
+          </div>
         </article>
       </main>
+      
+      {/* 토스트 메시지 */}
+      {showToast && (
+        <div className={cn("toast")}>
+          <p>링크가 복사되었습니다.</p>
+        </div>
+      )}
     </div>
   );
 }
