@@ -433,6 +433,12 @@
           font-weight: 500;
           font-size: 1.7rem;
           color: var(--grey-600);
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          line-height: 1.5;
 
           @media (max-width: 611px) {
             display: none;
