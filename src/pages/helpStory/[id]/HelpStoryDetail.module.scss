@@ -140,3 +140,49 @@
   }
 }
 
+.toast {
+  position: fixed;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 1.2rem 2.4rem;
+  border-radius: 1.2rem;
+  font-size: 1.4rem;
+  font-weight: 500;
+  z-index: 9999;
+  animation: slideUp 0.3s ease-out, fadeOut 0.3s ease-in 1.7s;
+  pointer-events: none;
+
+  @media (max-width: 611px) {
+    bottom: 2rem;
+    padding: 1rem 2rem;
+    font-size: 1.3rem;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateX(-50%) translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+

@@ -132,8 +132,8 @@ export default function ModifyPage() {
     // 검증 통과 후 에러 상태 표시
     setShowErrors(true);
 
-    // 필수 필드 검증
-    const hasErrors = !name || !phoneNumber || !address || !requirement || !recipientNumber || !note || (type === 'org' && !organizationName);
+    // 필수 필드 검증 (특이사항은 선택 필드)
+    const hasErrors = !name || !phoneNumber || !address || !requirement || !recipientNumber || (type === 'org' && !organizationName);
 
     if (!hasErrors) {
       try {
@@ -328,14 +328,12 @@ export default function ModifyPage() {
 
           {/* 특이사항 */}
           <div className={cn("inputGroup")}>
-            <label>특이사항 <span className={cn("required")}>*</span></label>
+            <label>특이사항</label>
             <input 
               type="text" 
               value={note} 
               onChange={(e) => setNote(e.target.value)} 
-              className={showErrors && !note ? cn("error") : undefined} 
             />
-            {showErrors && !note && <p className={cn("errorMsg")}>특이사항을 입력해주세요.</p>}
           </div>
 
           <button type="submit" className={cn("submitBtn")}>

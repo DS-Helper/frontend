@@ -86,7 +86,7 @@
   display: inline-block;
   text-align: left;
 
-  li {
+  li > label {
     display: flex;
     align-items: flex-start;
     gap: 1rem;

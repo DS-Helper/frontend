@@ -2,10 +2,10 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import classNames from "classnames/bind";
 import detailStyles from "@/styles/HelpListDetail.module.scss";
 import styles from "@/styles/HelpList.module.scss";
-import { HelpRequestStatus, HelpRequest, ApiReservationData, HelpDetailData } from "@/types/helpList"
+import { HelpRequestStatus } from "@/types/helpList"
 import { useUserStore } from "@/lib/store/userStore";
-import { getPersonalReservation, patchPersonalReservation, getPersonalReservationDetail } from "@/lib/apis/reservationUser";
-import { getOrganizationReservation, patchOrganizationReservation, getOrganizationReservationDetail } from "@/lib/apis/reservationOrg";
+import { getPersonalReservation, patchPersonalReservation } from "@/lib/apis/reservationUser";
+import { getOrganizationReservation, patchOrganizationReservation } from "@/lib/apis/reservationOrg";
 import { IoChevronDown } from "react-icons/io5";
 import Image from 'next/image';
 import mapIcon from "@/public/mapIcon.svg";
@@ -22,7 +22,7 @@ export default function HelpListPage() {
   const [activeTab, setActiveTab] = useState<"전체" | "대기" | "완료" | "취소">("전체");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [apiRequests, setApiRequests] = useState<HelpRequest[]>([]);
+  const [apiRequests, setApiRequests] = useState<any[]>([]);
   const [isApiLoading, setIsApiLoading] = useState<boolean>(false);
   const [hasMorePages, setHasMorePages] = useState<boolean>(true);
   const observerRef = useRef<HTMLDivElement>(null);
@@ -31,10 +31,9 @@ export default function HelpListPage() {
   // 모달 관련 상태
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isClosing, setIsClosing] = useState<boolean>(false);
+  const [isOpening, setIsOpening] = useState<boolean>(false);
   const [selectedReservationId, setSelectedReservationId] = useState<string | null>(null);
-  const [helpRequest, setHelpRequest] = useState<HelpRequest | null>(null);
-  const [helpDetail, setHelpDetail] = useState<HelpDetailData | null>(null);
-  const [isDetailLoading, setIsDetailLoading] = useState<boolean>(false);
+  const [reservationDetail, setReservationDetail] = useState<any | null>(null);
 
   // userType이 변경될 때 ref 업데이트
   useEffect(() => {
@@ -83,102 +82,22 @@ export default function HelpListPage() {
       
       if (response && response.data) {
         const rawData = response.data.content || response.data || [];
-        // const totalPages = response.data.totalPages || 0;
-        // const totalElements = response.data.totalElements || 0;
-        
-        console.log('API 응답 데이터:', response.data);
-        console.log('rawData:', rawData);
         
         // 유효한 데이터만 필터링 (personalReservationId 또는 organizationReservationId가 존재하는 항목만)
         const validData = rawData.filter((item: any) => {
           return item && (item.personalReservationId || item.organizationReservationId || item.id);
         });
         
-        console.log('validData:', validData);
-        
-        // API 응답 데이터를 HelpRequest 형식으로 매핑
-        const mappedData = validData.map((item: any) => {
-          // ID 필드 확인 (개인/기관 구분)
-          const reservationId = item.personalReservationId || item.organizationReservationId || item.id;
-          
-          // userId 필드 확인 (개인/기관 구분)
-          const userId = item.reservationHolderId || item.user?.id || item.userId || '';
-          
-          // API 상태를 UI 상태로 변환
-          let uiStatus = item.reservationStatus;
-          
-          // API 상태를 UI 상태로 변환 (이미 한글이면 그대로 사용)
-          if (uiStatus === 'REQUESTED') {
-            uiStatus = '대기';
-          } else if (uiStatus === 'CANCELED') {
-            uiStatus = '취소';
-          } else if (uiStatus === 'COMPLETED' || uiStatus === '완료') {
-            uiStatus = '완료';
-          }
-          
-          // 시간을 오전/오후 형식으로 변환 (13:00 -> 오후 1:00, 12:00 -> 오후 12:00)
-          const formatTime = (time: string) => {
-            if (!time) return '';
-            const [hours, minutes] = time.split(':').map(Number);
-            const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-            const period = hours < 12 ? '오전' : '오후';
-            return `${period} ${hour12}:${String(minutes).padStart(2, '0')}`;
-          };
-
-          // 날짜를 MM.DD 형식으로 변환 (로컬 시간 기준)
-          const formatDate = (dateString: string) => {
-            if (!dateString) return '';
-            // YYYY-MM-DD 형식인 경우 직접 파싱
-            if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-              const [year, month, day] = dateString.split('-').map(Number);
-              return `${String(month).padStart(2, '0')}.${String(day).padStart(2, '0')}`;
-            }
-            // ISO 문자열인 경우 로컬 시간 기준으로 파싱
-            const date = new Date(dateString);
-            // 로컬 시간 기준으로 날짜 추출
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${month}.${day}`;
-          };
-
-          // 요일 계산 함수 (로컬 시간 기준)
-          const getDayOfWeek = (dateString: string) => {
-            if (!dateString) return '';
-            // YYYY-MM-DD 형식인 경우 직접 파싱
-            if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-              const [year, month, day] = dateString.split('-').map(Number);
-              const date = new Date(year, month - 1, day);
-              return date.toLocaleDateString('ko-KR', { weekday: 'short' });
-            }
-            // ISO 문자열인 경우 로컬 시간 기준으로 파싱
-            return new Date(dateString).toLocaleDateString('ko-KR', { weekday: 'short' });
-          };
-
-          return {
-            id: reservationId,
-            userId: userId,
-            date: item.visitDate ? formatDate(item.visitDate) : '',
-            dayOfWeek: item.visitDate ? getDayOfWeek(item.visitDate) : '',
-            content: item.note || '',
-            requirement: item.requirement || '',
-            startTime: formatTime(item.startTime),
-            endTime: formatTime(item.endTime),
-            status: uiStatus
-          };
-        });
-        
-        console.log('mappedData:', mappedData);
-        
         if (append) {
           // 추가 로딩인 경우 기존 데이터에 추가
-          setApiRequests(prev => [...prev, ...mappedData]);
+          setApiRequests(prev => [...prev, ...validData]);
         } else {
           // 새로 로딩인 경우 기존 데이터 교체
-          setApiRequests(mappedData);
+          setApiRequests(validData);
         }
         
-        // 더 이상 페이지가 있는지 확인 - 더 간단한 조건
-        const hasMoreData = mappedData.length > 0 && mappedData.length >= ITEMS_PER_PAGE;
+        // 더 이상 페이지가 있는지 확인
+        const hasMoreData = validData.length > 0 && validData.length >= ITEMS_PER_PAGE;
         setHasMorePages(hasMoreData);
       } else {
         if (!append) {
@@ -215,14 +134,58 @@ export default function HelpListPage() {
     }
   }, [activeTab, isVerified, fetchReservations]);
 
-  // API 데이터를 사용하거나, 없으면 목업 데이터 사용
-  const userRequests = apiRequests.length > 0 
-    ? apiRequests 
-    : (user ? apiRequests.filter((request: HelpRequest) => request.userId === user.id) : []);
-  
+  // 상태 변환 함수
+  const convertStatus = (status: string): HelpRequestStatus => {
+    if (status === 'REQUESTED' || status === '대기') return '대기';
+    if (status === 'CANCELED' || status === '취소') return '취소';
+    if (status === 'COMPLETED' || status === '완료') return '완료';
+    return '대기';
+  };
+
+  // 시간 포맷 함수 (오전/오후 형식)
+  const formatTime = (time: string) => {
+    if (!time) return '';
+    const [hours, minutes] = time.split(':').map(Number);
+    const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+    const period = hours < 12 ? '오전' : '오후';
+    return `${period} ${hour12}:${String(minutes).padStart(2, '0')}`;
+  };
+
+  // 날짜 포맷 함수 (MM.DD 형식, 로컬 시간 기준)
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    // YYYY-MM-DD 형식인 경우 직접 파싱
+    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const [year, month, day] = dateString.split('-').map(Number);
+      return `${String(month).padStart(2, '0')}.${String(day).padStart(2, '0')}`;
+    }
+    // ISO 문자열인 경우 로컬 시간 기준으로 파싱
+    const date = new Date(dateString);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${month}.${day}`;
+  };
+
+  // 요일 계산 함수 (로컬 시간 기준)
+  const getDayOfWeek = (dateString: string) => {
+    if (!dateString) return '';
+    // YYYY-MM-DD 형식인 경우 직접 파싱
+    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const [year, month, day] = dateString.split('-').map(Number);
+      const date = new Date(year, month - 1, day);
+      return date.toLocaleDateString('ko-KR', { weekday: 'short' });
+    }
+    // ISO 문자열인 경우 로컬 시간 기준으로 파싱
+    return new Date(dateString).toLocaleDateString('ko-KR', { weekday: 'short' });
+  };
+
+  // 필터링된 요청 목록
   const filteredRequests = activeTab === "전체" 
-    ? userRequests 
-    : userRequests.filter((request: HelpRequest) => request.status === activeTab);
+    ? apiRequests 
+    : apiRequests.filter((request: any) => {
+        const status = convertStatus(request.reservationStatus || '');
+        return status === activeTab;
+      });
 
   const loadMoreItems = useCallback(() => {
     
@@ -265,168 +228,79 @@ export default function HelpListPage() {
   };
 
 
-  // 상세 정보 가져오기
-  const fetchReservationDetail = useCallback(async (id: string) => {
-    setIsDetailLoading(true);
-    try {
-      const currentUserType = userType || 'individual';
-      
-      const response = currentUserType === 'organization' 
-        ? await getOrganizationReservationDetail(id)
-        : await getPersonalReservationDetail(id);
-      
-      if (response && response.data) {
-        const reservation = response.data;
-        
-        const reservationId = currentUserType === 'organization' 
-          ? reservation.organizationReservationId 
-          : (reservation.id || reservation.personalReservationId);
-          
-        if (!reservation || !reservationId) {
-          console.error('예약 데이터가 없거나 형식이 올바르지 않음:', reservation);
-          return;
-        }
-        
-        // 시간 포맷 함수 (오전/오후 형식)
-        const formatTime = (time: string) => {
-          if (!time) return '';
-          const [hours, minutes] = time.split(':').map(Number);
-          const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-          const period = hours < 12 ? '오전' : '오후';
-          return `${period} ${hour12}:${String(minutes).padStart(2, '0')}`;
-        };
-        
-        // 날짜 포맷 함수 (MM.DD 형식, 로컬 시간 기준)
-        const formatDate = (dateString: string) => {
-          if (!dateString) return '';
-          // YYYY-MM-DD 형식인 경우 직접 파싱
-          if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-            const [year, month, day] = dateString.split('-').map(Number);
-            return `${String(month).padStart(2, '0')}.${String(day).padStart(2, '0')}`;
-          }
-          // ISO 문자열인 경우 로컬 시간 기준으로 파싱
-          const date = new Date(dateString);
-          // 로컬 시간 기준으로 날짜 추출
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const day = String(date.getDate()).padStart(2, '0');
-          return `${month}.${day}`;
-        };
-        
-        // 요일 계산 함수 (로컬 시간 기준)
-        const getDayOfWeek = (dateString: string) => {
-          if (!dateString) return '';
-          // YYYY-MM-DD 형식인 경우 직접 파싱
-          if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-            const [year, month, day] = dateString.split('-').map(Number);
-            const date = new Date(year, month - 1, day);
-            return date.toLocaleDateString('ko-KR', { weekday: 'short' });
-          }
-          // ISO 문자열인 경우 로컬 시간 기준으로 파싱
-          return new Date(dateString).toLocaleDateString('ko-KR', { weekday: 'short' });
-        };
-        
-        // 상태 변환 함수
-        const convertStatus = (status: string): HelpRequestStatus => {
-          if (status === 'REQUESTED' || status === '대기') return '대기';
-          if (status === 'CANCELED' || status === '취소') return '취소';
-          if (status === 'COMPLETED' || status === '완료') return '완료';
-          return '대기';
-        };
-        
-        // 성별 변환 함수
-        const convertGender = (gender: string) => {
-          if (gender === 'FEMALE' || gender === '여' || gender === '여자') return '여자';
-          if (gender === 'MALE' || gender === '남' || gender === '남자') return '남자';
-          return gender || "성별 없음";
-        };
-        
-        // API 데이터를 HelpRequest 형식으로 매핑
-        const mappedRequest: HelpRequest = {
-          id: reservationId,
-          userId: currentUserType === 'organization' 
-            ? reservation.reservationHolderId 
-            : (reservation.user?.id || reservation.userId || reservation.reservationHolderId || ''),
-          date: reservation.visitDate ? formatDate(reservation.visitDate) : '',
-          dayOfWeek: reservation.visitDate ? getDayOfWeek(reservation.visitDate) : '',
-          content: reservation.note || '',
-          requirement: reservation.requirement || '',
-          startTime: formatTime(reservation.startTime || ''),
-          endTime: formatTime(reservation.endTime || ''),
-          status: convertStatus(reservation.reservationStatus || '')
-        };
-        
-        setHelpRequest(mappedRequest);
-        
-        // 상세 정보를 API 데이터로 구성
-        const mappedDetail: HelpDetailData = {
-          id: reservationId,
-          userId: currentUserType === 'organization' 
-            ? reservation.reservationHolderId 
-            : (reservation.user?.id || reservation.userId || reservation.reservationHolderId || ''),
-          location: reservation.address || "위치 정보 없음",
-          applicantInfo: {
-            // 개인 예약과 기관 예약 모두 reservationHolder를 우선 사용
-            name: reservation.reservationHolder 
-              || reservation.name 
-              || reservation.userName 
-              || reservation.user?.name
-              || "이름 없음",
-            // 개인 예약과 기관 예약 모두 reservationPhoneNumber를 우선 사용
-            contact: reservation.reservationPhoneNumber 
-              || reservation.phoneNumber 
-              || reservation.phone
-              || "연락처 없음",
-            organizationName: currentUserType === 'organization' 
-              ? reservation.organizationName 
-              : ""
-          },
-          recipientInfo: {
-            gender: convertGender(reservation.recipientGender || ''),
-            count: reservation.recipientNumber || 1
-          },
-          rejectionReason: reservation.rejectionReason || "", 
-          note: reservation.note || ""
-        };
-        
-        setHelpDetail(mappedDetail);
-        setSelectedReservationId(reservationId);
-        setIsModalOpen(true);
-      }
-    } catch (error) {
-      console.error('예약 상세 조회 실패:', error);
-    } finally {
-      setIsDetailLoading(false);
-    }
-  }, [userType]);
-
+  // 상세 정보 가져오기 (목록 데이터에서 찾기)
   const handleViewDetails = (id: string) => {
-    fetchReservationDetail(id);
+    // 목록에서 해당 ID의 예약 데이터 찾기
+    const reservation = apiRequests.find((item: any) => {
+      const itemId = item.personalReservationId || item.organizationReservationId;
+      return itemId === id;
+    });
+    
+    if (!reservation) {
+      console.error('예약 데이터를 찾을 수 없습니다:', id);
+      return;
+    }
+    
+    const currentUserType = userType || 'individual';
+    const reservationId = currentUserType === 'organization' 
+      ? reservation.organizationReservationId 
+      : reservation.personalReservationId;
+    
+    if (!reservationId) {
+      console.error('예약 ID를 찾을 수 없습니다:', reservation);
+      return;
+    }
+    
+    setReservationDetail(reservation);
+    setSelectedReservationId(reservationId);
+    setIsModalOpen(true);
+    // 모달 열기 애니메이션을 위해 약간의 지연 후 visible 상태로 전환
+    setTimeout(() => {
+      setIsOpening(true);
+    }, 10);
   };
   
   const handleCloseModal = () => {
     // slide out 애니메이션 시작
     setIsClosing(true);
+    setIsOpening(false);
     
     // 애니메이션 완료 후 실제로 모달 닫기
     setTimeout(() => {
       setIsModalOpen(false);
       setIsClosing(false);
+      setIsOpening(false);
       setSelectedReservationId(null);
-      setHelpRequest(null);
-      setHelpDetail(null);
+      setReservationDetail(null);
     }, 300); // CSS transition 시간과 동일하게 설정
   };
   
   const handleCancelReservationInModal = async () => {
-    if (!selectedReservationId) return;
+    if (!reservationDetail) return;
+    
+    const currentUserType = userType || 'individual';
+    
+    // personalReservationId 또는 organizationReservationId를 직접 사용
+    let cancelId: string | undefined;
+    if (currentUserType === 'organization') {
+      cancelId = reservationDetail.organizationReservationId;
+    } else {
+      cancelId = reservationDetail.personalReservationId;
+    }
+    
+    if (!cancelId) {
+      console.error('취소할 예약 ID를 찾을 수 없습니다:', reservationDetail);
+      return;
+    }
+    
+    console.log('취소할 예약 ID:', cancelId);
+    console.log('reservationDetail:', reservationDetail);
     
     if(confirm("예약을 취소하시겠습니까?")) {
       try {
-        const currentUserType = userType || 'individual';
-        
         const response = currentUserType === 'organization' 
-          ? await patchOrganizationReservation(selectedReservationId)
-          : await patchPersonalReservation(selectedReservationId);
+          ? await patchOrganizationReservation(cancelId)
+          : await patchPersonalReservation(cancelId);
         
         if (response) {
           alert("예약이 취소되었습니다.");
@@ -529,56 +403,64 @@ export default function HelpListPage() {
           )}
           
           {/* 예약 목록 */}
-          {!isApiLoading && filteredRequests.map((request: HelpRequest) => (
-            <div key={request.id} className={cn("helpCard")}>
-              {/* 날짜 및 상태 */}
-              <div className={cn("cardHeader")}>
-                <div className={cn("dateInfo")}>
-                  <span className={cn("date")}>{request.date}</span>
-                  <span className={cn("dayOfWeek")}>{request.dayOfWeek}</span>
-                  <span className={cn("statusTag", getStatusClass(request.status))}>
-                    {request.status}
+          {!isApiLoading && filteredRequests.map((request: any) => {
+            // personalReservationId를 우선적으로 사용
+            const reservationId = request.personalReservationId || request.organizationReservationId;
+            const status = convertStatus(request.reservationStatus || '');
+            
+            if (!reservationId) return null;
+            
+            return (
+              <div key={reservationId} className={cn("helpCard")}>
+                {/* 날짜 및 상태 */}
+                <div className={cn("cardHeader")}>
+                  <div className={cn("dateInfo")}>
+                    <span className={cn("date")}>{request.visitDate ? formatDate(request.visitDate) : ''}</span>
+                    <span className={cn("dayOfWeek")}>{request.visitDate ? getDayOfWeek(request.visitDate) : ''}</span>
+                    <span className={cn("statusTag", getStatusClass(status))}>
+                      {status}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 내용 */}
+                <div className={cn("cardContent")}>
+                  <p className={cn("contentText")}>{request.requirement || ''}</p>
+                  {user?.type === "기업" && (
+                    <div className={cn("organizationInfo")}>
+                      <span className={cn("organizationTag")}>기관 요청</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* 시간 정보 */}
+                <div className={cn("timeInfo")}>
+                  <span className={cn("clockIcon")}>🕐</span>
+                  <span className={cn("timeRange")}>
+                    {formatTime(request.startTime || '')} ~ {formatTime(request.endTime || '')}
                   </span>
                 </div>
-              </div>
 
-              {/* 내용 */}
-              <div className={cn("cardContent")}>
-                <p className={cn("contentText")}>{request.requirement}</p>
-                {user?.type === "기업" && (
-                  <div className={cn("organizationInfo")}>
-                    <span className={cn("organizationTag")}>기관 요청</span>
-                  </div>
-                )}
-              </div>
-
-              {/* 시간 정보 */}
-              <div className={cn("timeInfo")}>
-                <span className={cn("clockIcon")}>🕐</span>
-                <span className={cn("timeRange")}>
-                  {request.startTime} ~ {request.endTime}
-                </span>
-              </div>
-
-              {/* 액션 버튼 */}
-              <div className={cn("cardActions")}>
-                <button
-                  className={cn("viewDetailsButton")}
-                  onClick={() => handleViewDetails(request.id)}
-                >
-                  상세 보기
-                </button>
-                {request.status === "대기" && (
+                {/* 액션 버튼 */}
+                <div className={cn("cardActions")}>
                   <button
-                    className={cn("cancelButton")}
-                    onClick={() => handleCancelReservation(request.id)}
+                    className={cn("viewDetailsButton")}
+                    onClick={() => handleViewDetails(reservationId)}
                   >
-                    예약 취소
+                    상세 보기
                   </button>
-                )}
+                  {status === "대기" && (
+                    <button
+                      className={cn("cancelButton")}
+                      onClick={() => handleCancelReservation(reservationId)}
+                    >
+                      예약 취소
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           
           {/* 로딩 인디케이터 (추가 데이터 로딩 중) */}
           {isLoading && (
@@ -619,134 +501,141 @@ export default function HelpListPage() {
       {/* 상세보기 모달 */}
       {isModalOpen && (
         <div 
-          className={detailCn("modalOverlay", { visible: isModalOpen && !isClosing })} 
+          className={detailCn("modalOverlay", { visible: isOpening && !isClosing })} 
           onClick={handleCloseModal}
         >
           <div 
-            className={detailCn("modalContent", { closing: isClosing })} 
+            className={detailCn("modalContent", { closing: isClosing, opening: isOpening && !isClosing })} 
             onClick={(e) => e.stopPropagation()}
           >
-            {isDetailLoading ? (
-              <div className={cn("loadingIndicator")}>
-                <div className={cn("spinner")}></div>
-                <span>상세 정보를 불러오는 중...</span>
-              </div>
-            ) : helpRequest && helpDetail ? (
-              <>
-                {/* 헤더 */}
-                <div className={detailCn("header", getStatusClass(helpRequest.status))}>
-                  <div className={detailCn("statusContainer")}>
-                    <span className={detailCn("status", getStatusClass(helpRequest.status))}>
-                      {helpRequest.status}
-                    </span>
-                  </div>
-                  <button className={detailCn("closeButton")} onClick={handleCloseModal}>
-                    <IoChevronDown size={20} className={detailCn("chevronIcon", getStatusClass(helpRequest.status))} />
-                  </button>
-                </div>
-
-                {/* 메인 콘텐츠 */}
-                <div className={detailCn("mainContent")}>
-                  {/* 날짜 및 시간 */}
-                  <section className={detailCn("infoSection", "infoDate")}>
-                    <h3 className={detailCn("sectionTitle")}>날짜 및 시간</h3>
-                    <div className={detailCn("infoRow")}>
-                      <span className={detailCn("icon")}>
-                        <Image width={30} height={30} alt="예약 날짜" src={calendarIcon} />
-                      </span>
-                      <span className={detailCn("infoText")}>
-                        {helpRequest.date} ({helpRequest.dayOfWeek}) {helpRequest.startTime} ~ {helpRequest.endTime}
+            {reservationDetail ? (() => {
+              const status = convertStatus(reservationDetail.reservationStatus || '');
+              const convertGender = (gender: string) => {
+                if (gender === 'FEMALE' || gender === '여' || gender === '여자') return '여자';
+                if (gender === 'MALE' || gender === '남' || gender === '남자') return '남자';
+                return gender || "성별 없음";
+              };
+              
+              return (
+                <>
+                  {/* 헤더 */}
+                  <div className={detailCn("header", getStatusClass(status))}>
+                    <div className={detailCn("statusContainer")}>
+                      <span className={detailCn("status", getStatusClass(status))}>
+                        {status}
                       </span>
                     </div>
-                    <div className={detailCn("infoRow")}>
-                      <span className={detailCn("icon")}>
-                        <Image width={30} height={30} alt="예약 시간" src={mapIcon} />
-                      </span>
-                      <span className={detailCn("infoText")}>
-                        {helpDetail.location || "위치 정보 없음"}
-                      </span>
-                    </div>
-                  </section>
-
-                  {/* 신청자 정보 */}
-                  <section className={detailCn("infoSection")}>
-                    <h3 className={detailCn("sectionTitle")}>신청자 정보</h3>
-                    {user?.type === "기업" && helpDetail.applicantInfo?.organizationName && (
-                      <div className={detailCn("infoRow")}>
-                        <span className={detailCn("label")}>기관명 :</span>
-                        <span className={detailCn("value")}>{helpDetail.applicantInfo.organizationName}</span>
-                      </div>
-                    )}
-                    <div className={detailCn("infoRow", "nameRow")}>
-                      <span className={detailCn("label")}>이름 :</span>
-                      <span className={detailCn("value")}>
-                        {helpDetail.applicantInfo?.name && helpDetail.applicantInfo.name.trim() 
-                          ? helpDetail.applicantInfo.name 
-                          : "이름 없음"}
-                      </span>
-                    </div>
-                    <div className={detailCn("infoRow", "contactRow")}>
-                      <span className={detailCn("label")}>연락처 :</span>
-                      <span className={detailCn("value")}>
-                        {helpDetail.applicantInfo?.contact && helpDetail.applicantInfo.contact.trim() 
-                          ? helpDetail.applicantInfo.contact 
-                          : "연락처 없음"}
-                      </span>
-                    </div>
-                  </section>
-
-                  {/* 도움 요청 내용 */}
-                  <section className={detailCn("infoSection")}>
-                    <h3 className={detailCn("sectionTitle")}>도움 요청 내용</h3>
-                    <div className={detailCn("contentText")}>
-                      {helpRequest.requirement}
-                    </div>
-                  </section>
-
-                  {/* 도움 받는 사람의 성별/수 */}
-                  <section className={detailCn("infoSection")}>
-                    <h3 className={detailCn("sectionTitle")}>도움 받는 사람의 성별 / 수</h3>
-                    <div className={detailCn("infoRow")}>
-                      <span className={detailCn("value")}>
-                        {helpDetail.recipientInfo?.gender || "성별 없음"} / {helpDetail.recipientInfo?.count || 0}
-                      </span>
-                    </div>
-                  </section>
-
-                  {/* 특이사항 */}
-                  <section className={detailCn("infoSection")}>
-                    <h3 className={detailCn("sectionTitle")}>특이사항</h3>
-                    <div className={detailCn("contentText")}>
-                      {helpDetail.note && helpDetail.note.trim() 
-                        ? helpDetail.note
-                        : "특이사항 없음"}
-                    </div>
-                  </section>
-
-                  {/* 취소된 경우 거절사유 표시 */}
-                  {helpRequest.status === "취소" && (
-                    <section className={detailCn("infoSection")}>
-                      <h3 className={detailCn("sectionTitle")}>거절사유</h3>
-                      <div className={detailCn("contentText", "rejectionReason")}>
-                        {helpDetail.rejectionReason || "거절사유 없음"}
-                      </div>
-                    </section>
-                  )}
-                </div>
-
-                {/* 액션 버튼 */}
-                {helpRequest.status === "대기" && (
-                  <div className={detailCn("actionSection")}>
-                    <button 
-                      className={detailCn("cancelButton")} 
-                      onClick={handleCancelReservationInModal}
-                    >
-                      예약 취소하기
+                    <button className={detailCn("closeButton")} onClick={handleCloseModal}>
+                      <IoChevronDown size={20} className={detailCn("chevronIcon", getStatusClass(status))} />
                     </button>
                   </div>
-                )}
-              </>
-            ) : null}
+
+                  {/* 메인 콘텐츠 */}
+                  <div className={detailCn("mainContent")}>
+                    {/* 날짜 및 시간 */}
+                    <section className={detailCn("infoSection", "infoDate")}>
+                      <h3 className={detailCn("sectionTitle")}>날짜 및 시간</h3>
+                      <div className={detailCn("infoRow")}>
+                        <span className={detailCn("icon")}>
+                          <Image width={30} height={30} alt="예약 날짜" src={calendarIcon} />
+                        </span>
+                        <span className={detailCn("infoText")}>
+                          {reservationDetail.visitDate ? formatDate(reservationDetail.visitDate) : ''} ({reservationDetail.visitDate ? getDayOfWeek(reservationDetail.visitDate) : ''}) {formatTime(reservationDetail.startTime || '')} ~ {formatTime(reservationDetail.endTime || '')}
+                        </span>
+                      </div>
+                      <div className={detailCn("infoRow")}>
+                        <span className={detailCn("icon")}>
+                          <Image width={30} height={30} alt="예약 시간" src={mapIcon} />
+                        </span>
+                        <span className={detailCn("infoText")}>
+                          {reservationDetail.address || "위치 정보 없음"}
+                        </span>
+                      </div>
+                    </section>
+
+                    {/* 신청자 정보 */}
+                    <section className={detailCn("infoSection")}>
+                      <h3 className={detailCn("sectionTitle")}>신청자 정보</h3>
+                      {user?.type === "기업" && reservationDetail.organizationName && (
+                        <div className={detailCn("infoRow")}>
+                          <span className={detailCn("label")}>기관명 :</span>
+                          <span className={detailCn("value")}>{reservationDetail.organizationName}</span>
+                        </div>
+                      )}
+                      <div className={detailCn("infoRow", "nameRow")}>
+                        <span className={detailCn("label")}>이름 :</span>
+                        <span className={detailCn("value")}>
+                          {(reservationDetail.reservationHolder 
+                            || reservationDetail.name 
+                            || reservationDetail.userName 
+                            || reservationDetail.user?.name
+                            || "이름 없음").trim() || "이름 없음"}
+                        </span>
+                      </div>
+                      <div className={detailCn("infoRow", "contactRow")}>
+                        <span className={detailCn("label")}>연락처 :</span>
+                        <span className={detailCn("value")}>
+                          {(reservationDetail.reservationPhoneNumber 
+                            || reservationDetail.phoneNumber 
+                            || reservationDetail.phone
+                            || "연락처 없음").trim() || "연락처 없음"}
+                        </span>
+                      </div>
+                    </section>
+
+                    {/* 도움 요청 내용 */}
+                    <section className={detailCn("infoSection")}>
+                      <h3 className={detailCn("sectionTitle")}>도움 요청 내용</h3>
+                      <div className={detailCn("contentText")}>
+                        {reservationDetail.requirement || ''}
+                      </div>
+                    </section>
+
+                    {/* 도움 받는 사람의 성별/수 */}
+                    <section className={detailCn("infoSection")}>
+                      <h3 className={detailCn("sectionTitle")}>도움 받는 사람의 성별 / 수</h3>
+                      <div className={detailCn("infoRow")}>
+                        <span className={detailCn("value")}>
+                          {convertGender(reservationDetail.recipientGender || '')} / {reservationDetail.recipientNumber || 0}
+                        </span>
+                      </div>
+                    </section>
+
+                    {/* 특이사항 */}
+                    <section className={detailCn("infoSection")}>
+                      <h3 className={detailCn("sectionTitle")}>특이사항</h3>
+                      <div className={detailCn("contentText")}>
+                        {reservationDetail.note && reservationDetail.note.trim() 
+                          ? reservationDetail.note
+                          : "특이사항 없음"}
+                      </div>
+                    </section>
+
+                    {/* 취소된 경우 거절사유 표시 */}
+                    {status === "취소" && (
+                      <section className={detailCn("infoSection")}>
+                        <h3 className={detailCn("sectionTitle")}>거절사유</h3>
+                        <div className={detailCn("contentText", "rejectionReason")}>
+                          {reservationDetail.rejectionReason || "거절사유 없음"}
+                        </div>
+                      </section>
+                    )}
+                  </div>
+
+                  {/* 액션 버튼 */}
+                  {status === "대기" && (
+                    <div className={detailCn("actionSection")}>
+                      <button 
+                        className={detailCn("cancelButton")} 
+                        onClick={handleCancelReservationInModal}
+                      >
+                        예약 취소하기
+                      </button>
+                    </div>
+                  )}
+                </>
+              );
+            })() : null}
           </div>
         </div>
       )}
