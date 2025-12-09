@@ -14,7 +14,7 @@
     "axios": "^1.11.0",
     "classnames": "^2.5.1",
     "js-cookie": "^3.0.5",
-    "next": "15.4.2",
+    "next": "^16.0.8",
     "react": "19.1.0",
     "react-calendar": "^6.0.0",
     "react-dom": "19.1.0",
@@ -29,7 +29,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.4.2",
+    "eslint-config-next": "^16.0.8",
     "typescript": "^5"
   }
 }
