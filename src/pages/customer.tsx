@@ -3,7 +3,7 @@ import styles from '@/styles/Customer.module.scss';
 import classNames from 'classnames/bind';
 import React, { useState, useEffect, ChangeEvent, useRef } from "react";
 import { getInquiries, postInquiry } from '@/lib/apis/customer';
-import { Inquiry, InquiryFormData } from '@/types/customer';
+import { Inquiry } from '@/types/customer';
 import { IoIosArrowDown } from "react-icons/io";
 import Image from 'next/image';
 import AnswerModal from '@/components/Modal/AnswerModal';
