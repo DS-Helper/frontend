@@ -32,7 +32,6 @@ export default function HelpListPage() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isClosing, setIsClosing] = useState<boolean>(false);
   const [isOpening, setIsOpening] = useState<boolean>(false);
-  const [selectedReservationId, setSelectedReservationId] = useState<string | null>(null);
   const [reservationDetail, setReservationDetail] = useState<any | null>(null);
 
   // userType이 변경될 때 ref 업데이트
@@ -156,7 +155,7 @@ export default function HelpListPage() {
     if (!dateString) return '';
     // YYYY-MM-DD 형식인 경우 직접 파싱
     if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      const [year, month, day] = dateString.split('-').map(Number);
+      const [, month, day] = dateString.split('-').map(Number);
       return `${String(month).padStart(2, '0')}.${String(day).padStart(2, '0')}`;
     }
     // ISO 문자열인 경우 로컬 시간 기준으로 파싱
@@ -252,7 +251,6 @@ export default function HelpListPage() {
     }
     
     setReservationDetail(reservation);
-    setSelectedReservationId(reservationId);
     setIsModalOpen(true);
     // 모달 열기 애니메이션을 위해 약간의 지연 후 visible 상태로 전환
     setTimeout(() => {
@@ -270,7 +268,6 @@ export default function HelpListPage() {
       setIsModalOpen(false);
       setIsClosing(false);
       setIsOpening(false);
-      setSelectedReservationId(null);
       setReservationDetail(null);
     }, 300); // CSS transition 시간과 동일하게 설정
   };
