@@ -1,6 +1,6 @@
 import { GetServerSideProps } from 'next';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.dshelper.kro.kr';
+const SITE_URL = 'https://www.dshelper.kr/';
 
 interface SitemapUrl {
   loc: string;

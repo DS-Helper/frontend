@@ -273,7 +273,21 @@ export default function Home() {
                         <span className={cn("storyContent")}>{s.content}</span>
                         <span className={cn("storyDate")}>{s.date}</span>
                       </div>
-                      <Image src={s.img} className={cn("storyImage")} alt="도와드린 이야기" width={240} height={180} />
+                      <div className={cn("storyImage")}>
+                        {typeof s.img === 'string' && isValidImageUrl(s.img) ? (
+                          <Image
+                            src={s.img}
+                            alt="도와드린 이야기"
+                            width={240}
+                            height={180}
+                            className={cn("image")}
+                          />
+                        ) : (
+                          <div className={cn("placeholderImage")}>
+                            <span>이미지 없음</span>
+                          </div>
+                        )}
+                      </div>
                     </li>
                   ))}
                 </ul>
