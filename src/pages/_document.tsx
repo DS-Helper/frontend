@@ -10,7 +10,8 @@ export default function Document() {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         
         <meta name="theme-color" content="#0DBA53" />
-        <link rel="canonical" href="https://www.dshelper.kro.kr" />
+        <link rel="canonical" href="https://www.dshelper.kr/" />
+        <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
       </Head>
       <body>
         <Main />
