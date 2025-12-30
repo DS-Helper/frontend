@@ -157,7 +157,6 @@ export default function HelpStoryPage() {
               >
                 <div className={cn("storyContent")}>
                   <h3 className={cn("storyTitle")}>{post.title}</h3>
-                  <p className={cn("storyDescription")}>{post.content}</p>
                   <span className={cn("storyDate")}>{formatDate(post.createdAt)}</span>
                 </div>
                 <div className={cn("storyImage")}>
