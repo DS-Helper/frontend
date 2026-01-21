@@ -58,7 +58,7 @@ export default function LoginPage() {
         
         if (loginUrl) {
           // 네이버 로그인 페이지로 리다이렉트
-          window.location.href = loginUrl;
+          window.location.href = response.data;
         } else {
           throw new Error('로그인 URL을 받아오지 못했습니다.');
         }
@@ -86,7 +86,7 @@ export default function LoginPage() {
         
         if (loginUrl) {
           // 구글 로그인 페이지로 리다이렉트
-          window.location.href = loginUrl;
+          window.location.href = response.data;
         } else {
           throw new Error('로그인 URL을 받아오지 못했습니다.');
         }
