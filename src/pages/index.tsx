@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { getPosts } from "@/lib/apis/helpStory";
 import { IoIosArrowForward } from "react-icons/io";
 import { isAuthenticated } from "@/lib/utils/auth";
+import NotificationListModal from "@/components/Modal/NotificationListModal";
 
 // 이미지들
 import mainImage from "@/public/Hero-image.svg";
@@ -44,6 +45,11 @@ export default function Home() {
   }>>([]);
   const [storyLoading, setStoryLoading] = useState(true);
   const router = useRouter();
+  
+  // 알림 모달 상태
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
+  const [isNotificationModalClosing, setIsNotificationModalClosing] = useState(false);
+  const [isNotificationModalOpening, setIsNotificationModalOpening] = useState(false);
 
   const handleHelp = async () => {
     const authenticated = await isAuthenticated();
@@ -155,6 +161,38 @@ export default function Home() {
 
     fetchStories();
   }, []);
+
+  // 알림 모달 열기 이벤트 리스너
+  useEffect(() => {
+    const handleOpenNotificationModal = () => {
+      setIsNotificationModalOpen(true);
+      setTimeout(() => {
+        setIsNotificationModalOpening(true);
+      }, 10);
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('openNotificationModal', handleOpenNotificationModal);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('openNotificationModal', handleOpenNotificationModal);
+      }
+    };
+  }, []);
+
+  // 알림 모달 닫기 핸들러
+  const handleCloseNotificationModal = () => {
+    setIsNotificationModalClosing(true);
+    setIsNotificationModalOpening(false);
+    
+    setTimeout(() => {
+      setIsNotificationModalOpen(false);
+      setIsNotificationModalClosing(false);
+      setIsNotificationModalOpening(false);
+    }, 300);
+  };
 
   // 버튼별 렌더링
   const renderContent = () => {
@@ -304,6 +342,14 @@ export default function Home() {
           </div>
         </div>
       </div>
+      
+      {/* 알림 모달 */}
+      <NotificationListModal
+        isOpen={isNotificationModalOpen}
+        isClosing={isNotificationModalClosing}
+        isOpening={isNotificationModalOpening}
+        onClose={handleCloseNotificationModal}
+      />
     </div>
   );
 }

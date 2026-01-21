@@ -27,7 +27,15 @@ export default function Header() {
         <div className={cn("headerLogin")}>
           {isVerified ? (
             <button className={cn("userMenu")}>
-              <div className={cn("userMenuIcon")}>
+              <div 
+                className={cn("userMenuIcon")}
+                onClick={() => {
+                  // 커스텀 이벤트 발생
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('openNotificationModal'));
+                  }
+                }}
+              >
                 <BiSolidBell size={20} className={cn("userMenuIconBell")} />
               </div>
               <div
