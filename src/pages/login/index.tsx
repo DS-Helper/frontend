@@ -27,10 +27,8 @@ const normalizeUrl = (url: string): string => {
   if (url.startsWith('/')) {
     return url;
   }
-  
-  // 프로토콜 없이 도메인으로 시작하는 경우 (예: accounts.google.com/...)
-  // https://를 추가
-  return `https://${url}`;
+
+  return url;
 };
 
 export default function LoginPage() {
