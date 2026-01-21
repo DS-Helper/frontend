@@ -12,6 +12,27 @@ import { getLoginUrl, naverLoginUrl, googleLoginUrl } from "@/lib/apis/authUser"
 
 const cn = classNames.bind(styles);
 
+// URL이 절대 URL인지 확인하고, 절대 URL로 변환하는 함수
+const normalizeUrl = (url: string): string => {
+  if (!url || typeof url !== 'string') {
+    return url;
+  }
+  
+  // 이미 절대 URL인 경우 (http:// 또는 https://로 시작)
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // 상대 경로인 경우 (/로 시작)
+  if (url.startsWith('/')) {
+    return url;
+  }
+  
+  // 프로토콜 없이 도메인으로 시작하는 경우 (예: accounts.google.com/...)
+  // https://를 추가
+  return `https://${url}`;
+};
+
 export default function LoginPage() {
   const router = useRouter();
 
@@ -26,9 +47,11 @@ export default function LoginPage() {
         console.log('카카오 로그인 URL 응답:', response.data);
         
         // 응답에서 URL 추출 (백엔드 응답 구조에 따라 조정 필요)
-        const loginUrl = response.data.url || response.data.loginUrl || response.data;
+        let loginUrl = response.data.url || response.data.loginUrl || response.data;
         
         if (loginUrl) {
+          // URL 정규화 (절대 URL로 변환)
+          loginUrl = normalizeUrl(loginUrl);
           // 카카오 로그인 페이지로 리다이렉트
           window.location.href = loginUrl;
         } else {
@@ -54,9 +77,11 @@ export default function LoginPage() {
         console.log('네이버 로그인 URL 응답:', response.data);
         
         // 응답에서 URL 추출 (백엔드 응답 구조에 따라 조정 필요)
-        const loginUrl = response.data.url || response.data.loginUrl || response.data;
+        let loginUrl = response.data.url || response.data.loginUrl || response.data;
         
         if (loginUrl) {
+          // URL 정규화 (절대 URL로 변환)
+          loginUrl = normalizeUrl(loginUrl);
           // 네이버 로그인 페이지로 리다이렉트
           window.location.href = loginUrl;
         } else {
@@ -82,9 +107,11 @@ export default function LoginPage() {
         console.log('구글 로그인 URL 응답:', response.data);
         
         // 응답에서 URL 추출 (백엔드 응답 구조에 따라 조정 필요)
-        const loginUrl = response.data.url || response.data.loginUrl || response.data;
+        let loginUrl = response.data.url || response.data.loginUrl || response.data;
         
         if (loginUrl) {
+          // URL 정규화 (절대 URL로 변환)
+          loginUrl = normalizeUrl(loginUrl);
           // 구글 로그인 페이지로 리다이렉트
           window.location.href = loginUrl;
         } else {
