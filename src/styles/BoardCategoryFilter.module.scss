@@ -1,0 +1,95 @@
+.categoryFilter {
+  width: 100%;
+  background-color: #fff;
+}
+
+.categoryTitle {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 1.6rem 0;
+}
+
+.categoryList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.categoryItem {
+  margin: 0;
+}
+
+.categoryLabel {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  padding: 0.8rem 0;
+  user-select: none;
+}
+
+.categoryCheckbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.customCheckbox {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--grey-300, #dee2e6);
+  border-radius: 0.4rem;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  
+  &.checked {
+    background-color: var(--primary-color, #0DBA53);
+    border-color: var(--primary-color, #0DBA53);
+  }
+}
+
+.checkIcon {
+  width: 1.4rem;
+  height: 1.4rem;
+  display: block;
+  
+  path {
+    stroke: #fff;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+.categoryText {
+  font-size: 1.6rem;
+  color: #222;
+  font-weight: 400;
+}
+
+// 반응형 디자인
+@media (max-width: 768px) {
+  .categoryFilter {
+    padding: 1.6rem;
+  }
+
+  .categoryTitle {
+    font-size: 1.6rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .categoryText {
+    font-size: 1.5rem;
+  }
+}

@@ -5,6 +5,7 @@ import type { AppProps } from "next/app";
 import Head from "next/head";
 import Header from "@/components/common/Header"
 import Footer from "@/components/common/Footer"
+import NotificationListModal from "@/components/Modal/NotificationListModal";
 import { useUserStore } from "@/lib/store/userStore";
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -12,6 +13,11 @@ export default function App({ Component, pageProps }: AppProps) {
   const { checkAuthStatus } = useUserStore();
   const [isHydrated, setIsHydrated] = useState(false);
   const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
+  
+  // 알림 모달 상태
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
+  const [isNotificationModalClosing, setIsNotificationModalClosing] = useState(false);
+  const [isNotificationModalOpening, setIsNotificationModalOpening] = useState(false);
 
   useEffect(() => {
     // 클라이언트 사이드에서 하이드레이션 완료 후 인증 상태 확인
@@ -26,6 +32,38 @@ export default function App({ Component, pageProps }: AppProps) {
     }
   }, [isHydrated, hasCheckedAuth, checkAuthStatus]);
 
+  // 알림 모달 열기 이벤트 리스너 (모든 페이지에서 작동)
+  useEffect(() => {
+    const handleOpenNotificationModal = () => {
+      setIsNotificationModalOpen(true);
+      setTimeout(() => {
+        setIsNotificationModalOpening(true);
+      }, 10);
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('openNotificationModal', handleOpenNotificationModal);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('openNotificationModal', handleOpenNotificationModal);
+      }
+    };
+  }, []);
+
+  // 알림 모달 닫기 핸들러
+  const handleCloseNotificationModal = () => {
+    setIsNotificationModalClosing(true);
+    setIsNotificationModalOpening(false);
+    
+    setTimeout(() => {
+      setIsNotificationModalOpen(false);
+      setIsNotificationModalClosing(false);
+      setIsNotificationModalOpening(false);
+    }, 300);
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <Head>
@@ -34,6 +72,14 @@ export default function App({ Component, pageProps }: AppProps) {
       <Header />
       <Component {...pageProps} />
       <Footer />
+      
+      {/* 알림 모달 - 모든 페이지에서 작동 */}
+      <NotificationListModal
+        isOpen={isNotificationModalOpen}
+        isClosing={isNotificationModalClosing}
+        isOpening={isNotificationModalOpening}
+        onClose={handleCloseNotificationModal}
+      />
     </QueryClientProvider>
   );
 }
