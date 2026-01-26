@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useUserStore } from "@/lib/store/userStore";
 import { BiSolidBell } from "react-icons/bi";
 import { FiMenu } from "react-icons/fi";
+import userIcon from "@/public/userIcon.svg";
 import Sidebar from "./Sidebar";
 
 import logo from "@/public/logo.svg";
@@ -30,13 +31,15 @@ export default function Header() {
               <div 
                 className={cn("userMenuIcon")}
                 onClick={() => {
-                  // 커스텀 이벤트 발생
-                  if (typeof window !== 'undefined') {
-                    window.dispatchEvent(new CustomEvent('openNotificationModal'));
-                  }
+                  window.dispatchEvent(new CustomEvent('openNotificationModal'));
                 }}
               >
                 <BiSolidBell size={20} className={cn("userMenuIconBell")} />
+              </div>
+              <div
+                className={cn("userMenuIcon")}
+              >
+                <Image src={userIcon} alt="userIcon" width={30} height={30} />
               </div>
               <div
                 className={cn("userMenuIcon")}
