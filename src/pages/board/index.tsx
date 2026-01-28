@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/router";
 import classNames from "classnames/bind";
 import styles from "@/styles/Board.module.scss";
 import searchIcon from "@/public/searchIcon.svg";
 import BoardCategoryFilter from "@/components/BoardCategoryFilter";
-import { BoardPost, BoardCategory, mockBoardPosts } from "@/types/board";
+import { BoardCategory, mockBoardPosts, boardCategories } from "@/types/board";
 import Image from "next/image";
 
 import heartIcon from "@/public/boardLikeIcon.svg";
@@ -13,16 +14,44 @@ import commentIcon from "@/public/boardCommentIcon.svg";
 
 const cn = classNames.bind(styles);
 
+function getCategoryFromQuery(
+  query: Record<string, string | string[] | undefined>
+): BoardCategory | null {
+  const c = query.category;
+  if (typeof c !== "string") return null;
+  return boardCategories.includes(c as BoardCategory) ? (c as BoardCategory) : null;
+}
+
 export default function BoardPage() {
-  const [selectedCategory, setSelectedCategory] = useState<BoardCategory | null>('수다');
+  const router = useRouter();
+  const [selectedCategory, setSelectedCategory] = useState<BoardCategory | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isCategorySynced, setIsCategorySynced] = useState(false);
+
+  // URL 쿼리에서 카테고리 복원 (상세에서 돌아왔을 때)
+  useEffect(() => {
+    if (!router.isReady) return;
+    const fromQuery = getCategoryFromQuery(router.query);
+    setSelectedCategory(fromQuery ?? "수다");
+    setIsCategorySynced(true);
+  }, [router.isReady, router.query]);
+
+  // 카테고리 변경 시 URL 반영 (다음에 상세 갔다 와도 유지되도록)
+  const handleCategoryChange = (category: BoardCategory | null) => {
+    setSelectedCategory(category);
+    const query = category ? { category } : {};
+    router.replace({ pathname: "/board", query }, undefined, { shallow: true });
+  };
+
+  // URL 복원 전까지 기본값, 복원 후에는 선택값 사용
+  const effectiveCategory = isCategorySynced ? (selectedCategory ?? "수다") : "수다";
 
   // 필터링된 게시글 목록
   const filteredPosts = useMemo(() => {
     let posts = mockBoardPosts;
 
-    if (selectedCategory) {
-      posts = posts.filter((post) => post.category === selectedCategory);
+    if (effectiveCategory) {
+      posts = posts.filter((post) => post.category === effectiveCategory);
     }
 
     if (searchQuery.trim()) {
@@ -35,7 +64,7 @@ export default function BoardPage() {
     }
 
     return posts;
-  }, [selectedCategory, searchQuery]);
+  }, [effectiveCategory, searchQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,8 +91,8 @@ export default function BoardPage() {
       <div className={cn("boardContainer")}>
         <aside className={cn("sidebar")}>
           <BoardCategoryFilter
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
+            selectedCategory={effectiveCategory}
+            onCategoryChange={handleCategoryChange}
           />
         </aside>
 
@@ -71,7 +100,19 @@ export default function BoardPage() {
           <div className={cn("postList")}>
             {filteredPosts.length > 0 ? (
               filteredPosts.map((post) => (
-                <article key={post.id} className={cn("postItem")}>
+                <article
+                  key={post.id}
+                  className={cn("postItem")}
+                  onClick={() => router.push(`/board/${post.id}`)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      router.push(`/board/${post.id}`);
+                    }
+                  }}
+                >
                   <div className={cn("postContent")}>
                     <h3 className={cn("postTitle")}>{post.title}</h3>
                     <p className={cn("postText")}>{post.content}</p>
