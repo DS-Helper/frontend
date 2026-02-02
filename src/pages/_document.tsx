@@ -25,8 +25,14 @@ export default function Document() {
         <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
       </Head>
       <body>
-        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P6VCF2RG"
-        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-W9SFJS2J"
+            height={0}
+            width={0}
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
         <Main />
         <NextScript />
       </body>
