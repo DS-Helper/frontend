@@ -27,8 +27,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       </Head>
       <body>
         {/* GTM */}
-        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W9SFJS2J"
-        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-W9SFJS2J"
+            height={0}
+            width={0}
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
         <Main />
         <NextScript />
       </body>
