@@ -1,0 +1,405 @@
+.boardDetailPage {
+  min-height: 100vh;
+  max-width: 102.4rem;
+  margin: 0 auto;
+  padding: 3.2rem 0;
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem;
+  color: var(--grey-600);
+  font-size: 1.6rem;
+}
+
+// 게시글 영역
+.postSection {
+  background-color: #fff;
+  border-radius: 0.8rem;
+}
+
+.postTitle {
+  font-size: 2.8rem;
+  font-weight: 600;
+  color: #222;
+  margin: 0 0 1.8rem 0;
+  word-break: keep-all;
+  line-height: 1;
+  font-style: semi-bold;
+  vertical-align: middle;
+}
+
+.postMetaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3.8rem;
+}
+
+.authorInfo {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.authorAvatar {
+  width: 3.8rem;
+  height: 3.8rem;   
+  border-radius: 50%;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.authorAvatarPlaceholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: #d9d9d9;
+}
+
+.authorMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.authorName {
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: var(--primary-color-dark);
+}
+
+.authorMetaDot {
+  color: var(--grey-500);
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.postTime {
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--grey-500);
+}
+
+.postActions {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.iconButton {
+  padding: 0.4rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--grey-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    color: var(--grey-800);
+  }
+}
+
+.moreMenuWrapper {
+  position: relative;
+}
+
+.moreMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.4rem;
+  min-width: 10rem;
+  background: #fff;
+  border-radius: 0.8rem;
+  box-shadow: 0 0.2rem 1rem rgba(0, 0, 0, 0.24);
+  z-index: 100;
+}
+
+.moreMenuItem {
+  display: block;
+  width: 100%;
+  padding: 1.2rem 2rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: var(--grey-800);
+  text-align: left;
+
+  &:hover {
+    background-color: var(--grey-100, #f5f5f5);
+  }
+
+  &.danger {
+    color: var(--red-color);
+  }
+}
+
+.postContent {
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: var(--primary-color-dark);
+  line-height: 1.6;
+  margin-bottom: 2.4rem;
+  word-break: keep-all;
+}
+
+.postImageWrap {
+  position: relative;
+  width: 56.2rem;
+  height: 72.3rem;
+  margin-bottom: 4.8rem;
+  overflow: hidden;
+}
+
+.postImage {
+  object-fit: cover;
+}
+
+.engagementRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid var(--grey-200);
+}
+
+.engagementLeft {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+}
+
+.engagementItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.5rem;
+  color: var(--grey-700);
+
+  span {
+    font-weight: 400;
+  }
+}
+
+.engagementButton {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.engagementIconWrap {
+  display: inline-flex;
+  align-items: center;
+
+  &.active img {
+    filter: brightness(0);
+  }
+}
+
+.engagementIcon {
+  color: var(--grey-800);
+}
+
+.bookmarkIcon {
+  color: var(--grey-800);
+
+  &.active {
+    color: #000;
+  }
+}
+
+.viewCount {
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--primary-color-dark);
+}
+
+// 댓글 섹션
+.commentsSection {
+  background-color: #fff;
+  border-radius: 0.8rem;
+  margin-top: 1.8rem;
+}
+
+.commentsTitle {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--grey-600);
+  margin-bottom: 2.4rem;
+}
+
+.commentList {
+  display: flex;
+  flex-direction: column;
+  gap: 4.8rem;
+}
+
+.commentThread {
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+}
+
+.commentItem {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+
+  &.isReply {
+    position: relative;
+    margin-left: 1.2rem;
+    padding-left: 2.8rem; // 1.2rem(선 좌측 간격) + 1.6rem(선 우측 간격)
+  }
+
+  &.isReply::before {
+    content: "";
+    position: absolute;
+    left: 1.2rem;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: var(--grey-200, #e0e0e0);
+  }
+}
+
+.commentAvatar {
+  width: 3.8rem;
+  height: 3.8rem;
+  border-radius: 50%;
+  background-color: #d9d9d9;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.commentBody {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  min-width: 0;
+}
+
+.commentMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.commentAuthor {
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: var(--primary-color-dark);
+}
+
+.commentMetaDot {
+  color: var(--grey-500);
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.commentTime {
+  font-size: 1.6rem;
+  color: var(--grey-500);
+}
+
+.commentContent {
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: var(--primary-color-dark);
+  line-height: 1.4;
+  word-break: keep-all;
+}
+
+// 반응형
+@media (max-width: 768px) {
+  .boardDetailPage {
+    padding: 1.6rem;
+  }
+
+  .postSection,
+  .commentsSection {
+    padding: 1.6rem;
+  }
+
+  .postTitle {
+    font-size: 1.8rem;
+  }
+
+  .commentItem.isReply {
+    margin-left: 3.6rem;
+  }
+}
+
+// 공유 토스트
+.toast {
+  position: fixed;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 1.2rem 2.4rem;
+  border-radius: 1.2rem;
+  font-size: 1.4rem;
+  font-weight: 500;
+  z-index: 9999;
+  animation: toastSlideUp 0.3s ease-out, toastFadeOut 0.3s ease-in 1.7s;
+  pointer-events: none;
+
+  @media (max-width: 768px) {
+    bottom: 2rem;
+    padding: 1rem 2rem;
+    font-size: 1.3rem;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+@keyframes toastSlideUp {
+  from {
+    transform: translateX(-50%) translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toastFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
