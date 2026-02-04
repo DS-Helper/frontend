@@ -27,6 +27,7 @@ export interface BoardPost {
   author: {
     id: string;
     name: string;
+    avatar?: string;
   };
 }
 
@@ -39,9 +40,9 @@ export const mockBoardPosts: BoardPost[] = [
     category: '수다',
     likeCount: 56,
     commentCount: 12,
-    imageUrl: undefined,
+    imageUrl: '/hospital.jpg',
     createdAt: '2024-01-15T10:30:00Z',
-    author: { id: 'user1', name: '신인호' },
+    author: { id: 'user1', name: '신인호', avatar: '/userIcon.svg' },
   },
   {
     id: '2',
@@ -52,7 +53,7 @@ export const mockBoardPosts: BoardPost[] = [
     commentCount: 8,
     imageUrl: undefined,
     createdAt: '2024-01-14T09:20:00Z',
-    author: { id: 'user2', name: '김민지' },
+    author: { id: 'user2', name: '김민지', avatar: '/userIcon.svg' },
   },
   {
     id: '3',
@@ -63,7 +64,7 @@ export const mockBoardPosts: BoardPost[] = [
     commentCount: 15,
     imageUrl: undefined,
     createdAt: '2024-01-13T14:00:00Z',
-    author: { id: 'user3', name: '박준형' },
+    author: { id: 'user3', name: '박준형', avatar: '/userIcon.svg' },
   },
   {
     id: '4',
@@ -74,7 +75,7 @@ export const mockBoardPosts: BoardPost[] = [
     commentCount: 6,
     imageUrl: undefined,
     createdAt: '2024-01-12T11:15:00Z',
-    author: { id: 'user4', name: '이수진' },
+    author: { id: 'user4', name: '이수진', avatar: '/userIcon.svg' },
   },
   {
     id: '5',
@@ -85,7 +86,7 @@ export const mockBoardPosts: BoardPost[] = [
     commentCount: 22,
     imageUrl: undefined,
     createdAt: '2024-01-11T08:45:00Z',
-    author: { id: 'user5', name: '최동훈' },
+    author: { id: 'user5', name: '최동훈', avatar: '/userIcon.svg' },
   },
   {
     id: '6',
@@ -96,7 +97,7 @@ export const mockBoardPosts: BoardPost[] = [
     commentCount: 11,
     imageUrl: undefined,
     createdAt: '2024-01-10T16:30:00Z',
-    author: { id: 'user6', name: '정해은' },
+    author: { id: 'user6', name: '정해은', avatar: '/userIcon.svg' },
   },
   {
     id: '7',
@@ -107,7 +108,7 @@ export const mockBoardPosts: BoardPost[] = [
     commentCount: 5,
     imageUrl: undefined,
     createdAt: '2024-01-09T19:00:00Z',
-    author: { id: 'user7', name: '한지민' },
+    author: { id: 'user7', name: '한지민', avatar: '/userIcon.svg' },
   },
 ];
 
@@ -124,6 +125,7 @@ export interface BoardComment {
   author: {
     id: string;
     name: string;
+    avatar?: string;
   };
   content: string;
   createdAt: string; // ISO 또는 상대시간 표시용

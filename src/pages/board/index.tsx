@@ -9,10 +9,14 @@ import BoardCategoryFilter from "@/components/BoardCategoryFilter";
 import { BoardCategory, mockBoardPosts, boardCategories } from "@/types/board";
 import Image from "next/image";
 
-import heartIcon from "@/public/boardLikeIcon.svg";
-import commentIcon from "@/public/boardCommentIcon.svg";
+import heartIcon from "@/public/boardLikeGrey.svg";
+import commentIcon from "@/public/boardCommentGrey.svg";
+import boardPencilIcon from "@/public/boardPencilIcon.svg";
+import Pagination from "@/components/Pagination";
 
 const cn = classNames.bind(styles);
+
+const POSTS_PER_PAGE = 10;
 
 function getCategoryFromQuery(
   query: Record<string, string | string[] | undefined>
@@ -27,6 +31,7 @@ export default function BoardPage() {
   const [selectedCategory, setSelectedCategory] = useState<BoardCategory | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCategorySynced, setIsCategorySynced] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // URL 쿼리에서 카테고리 복원 (상세에서 돌아왔을 때)
   useEffect(() => {
@@ -66,6 +71,16 @@ export default function BoardPage() {
     return posts;
   }, [effectiveCategory, searchQuery]);
 
+  const totalPages = Math.max(1, Math.ceil(filteredPosts.length / POSTS_PER_PAGE));
+  const paginatedPosts = useMemo(() => {
+    const start = (currentPage - 1) * POSTS_PER_PAGE;
+    return filteredPosts.slice(start, start + POSTS_PER_PAGE);
+  }, [filteredPosts, currentPage]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(1);
+  }, [currentPage, totalPages]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // 검색은 이미 filteredPosts에서 처리됨
@@ -98,8 +113,8 @@ export default function BoardPage() {
 
         <main className={cn("mainContent")}>
           <div className={cn("postList")}>
-            {filteredPosts.length > 0 ? (
-              filteredPosts.map((post) => (
+            {paginatedPosts.length > 0 ? (
+              paginatedPosts.map((post) => (
                 <article
                   key={post.id}
                   className={cn("postItem")}
@@ -146,8 +161,24 @@ export default function BoardPage() {
               </div>
             )}
           </div>
+          {filteredPosts.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          )}
         </main>
       </div>
+
+      <button
+        type="button"
+        className={cn("writeFab")}
+        onClick={() => router.push("/board/write")}
+        aria-label="글쓰기"
+      >
+        <Image src={boardPencilIcon} alt="글쓰기" className={cn("writeFabIcon")} width={36} height={36} />
+      </button>
     </div>
   );
 }

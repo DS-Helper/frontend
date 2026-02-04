@@ -127,7 +127,7 @@
 .metricItem {
 	display: flex;
 	align-items: center;
-	gap: 0.6rem;
+	gap: 0.2rem;
 	color: #6c757d;
 }
 
@@ -160,6 +160,38 @@
 	width: 100%;
 	height: 100%;
 	background-color: #d9d9d9;
+}
+
+// 글쓰기 FAB
+.writeFab {
+	position: fixed;
+	bottom: 3rem;
+	right: 3rem;
+	width: 4.8rem;
+	height: 4.8rem;
+	border-radius: 50%;
+	border: none;
+	background-color: var(--primary-color, #2e7d32);
+	color: #fff;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 0.4rem 1.2rem rgba(0, 0, 0, 0.15);
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	z-index: 100;
+
+	&:hover {
+		transform: scale(1.05);
+		box-shadow: 0 0.6rem 1.6rem rgba(0, 0, 0, 0.2);
+	}
+
+}
+
+.writeFabIcon {
+	width: 3.6rem;
+	height: 3.6rem;
+	filter: brightness(0) invert(1);
 }
 
 // 빈 상태
@@ -212,5 +244,12 @@
 
 	.postText {
 		font-size: 1.5rem;
+	}
+
+	.writeFab {
+		bottom: 2.4rem;
+		right: 2.4rem;
+		width: 4.8rem;
+		height: 4.8rem;
 	}
 }
