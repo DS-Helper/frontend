@@ -38,6 +38,10 @@ export default function Header() {
               </div>
               <div
                 className={cn("userMenuIcon")}
+                onClick={() => router.push("/account")}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === "Enter" && router.push("/account")}
               >
                 <Image src={userIcon} alt="userIcon" width={30} height={30} />
               </div>

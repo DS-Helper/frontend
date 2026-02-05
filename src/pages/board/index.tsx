@@ -142,15 +142,18 @@ export default function BoardPage() {
                       </div>
                     </div>
                   </div>
-                  <div className={cn("postImage")}>
+                  <div className={cn("postImage")} aria-hidden>
                     {post.imageUrl ? (
-                      <img
+                      <Image
                         src={post.imageUrl}
                         alt={post.title}
+                        width={81}
+                        height={81}
                         className={cn("image")}
+                        unoptimized={post.imageUrl.startsWith("http")}
                       />
                     ) : (
-                      <div className={cn("imagePlaceholder")}></div>
+                      <div className={cn("imagePlaceholder")} />
                     )}
                   </div>
                 </article>

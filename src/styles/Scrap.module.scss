@@ -1,0 +1,137 @@
+.scrapMain {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.postList {
+  display: flex;
+  flex-direction: column;
+  gap: 5.7rem;
+  min-width: 0;
+}
+
+.postItem {
+  display: flex;
+  gap: 1.2rem;
+  background-color: #fff;
+  border-radius: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+
+  &:hover {
+    background-color: var(--grey-100);
+  }
+}
+
+.postContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  overflow: hidden;
+}
+
+.postTitle {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--primary-color-dark);
+  margin: 0;
+  word-break: keep-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.postText {
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--grey-700);
+  margin: 0;
+  word-break: keep-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.postMetrics {
+  display: flex;
+  gap: 1.6rem;
+  align-items: center;
+}
+
+.metricItem {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  color: var(--grey-500);
+}
+
+.metricIcon {
+  flex-shrink: 0;
+}
+
+.metricCount {
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--grey-700);
+}
+
+.postImage {
+  width: 8.1rem;
+  min-width: 8.1rem;
+  height: 8.1rem;
+  flex-shrink: 0;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  background-color: var(--grey-200);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.imagePlaceholder {
+  width: 100%;
+  height: 100%;
+  background-color: var(--grey-200);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 6rem 2rem;
+  color: var(--grey-600);
+  font-size: 1.6rem;
+}
+
+@media (max-width: 611px) {
+  .scrapMain {
+    padding: 2rem 1.6rem;
+  }
+
+  .postItem {
+    flex-direction: column;
+    padding: 1.6rem;
+    gap: 1.6rem;
+  }
+
+  .postImage {
+    width: 100%;
+    height: 20rem;
+  }
+
+  .postTitle {
+    font-size: 1.6rem;
+  }
+
+  .postText {
+    font-size: 1.5rem;
+  }
+}
