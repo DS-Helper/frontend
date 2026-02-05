@@ -1,0 +1,141 @@
+.wrapper {
+  max-width: 102.4rem;
+  margin: 4.2rem auto;
+  min-height: calc(100vh - 6rem);
+  display: flex;
+  background-color: var(--background);
+}
+
+.sidebar {
+  width: 28.4rem;
+  min-height: calc(100vh - 6rem);
+  flex-shrink: 0;
+}
+
+.navList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+}
+
+.navItem {
+  padding: 0.6rem 1.2rem;
+  font-size: 1.7rem;
+  color: var(--grey-400);
+  cursor: pointer;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--grey-800);
+  }
+}
+
+.navItemActive {
+  color: var(--grey-800);
+  font-weight: 500;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+}
+
+.profileSection {
+  display: flex;
+  gap: 2.8rem;
+  padding: 4.4rem 3.9rem;
+}
+
+.avatarWrap {
+  flex-shrink: 0;
+  width: 9.4rem;
+  height: 9.4rem;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: var(--grey-200);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.userName {
+  font-size: 3.2rem;
+  font-weight: 600;
+  color: var(--grey-800);
+  line-height: 1.4;
+}
+
+.userEmail,
+.userBirthGender,
+.userPhoneRow {
+  font-size: 1.7rem;
+  color: var(--grey-800);
+  line-height: 1.4;
+}
+
+.userPhoneRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--grey-400);
+}
+
+.verifyButton {
+  padding: 0.3rem 0.7rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--grey-800);
+  background-color: var(--grey-300);
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+}
+
+@media (max-width: 611px) {
+  .wrapper {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+    padding: 2rem;
+    border-right: none;
+    border-bottom: 1px solid var(--grey-200);
+  }
+
+  .navList {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .navItem {
+    padding: 0.8rem 1.6rem;
+    font-size: 1.5rem;
+  }
+
+  .profileSection {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .userInfo {
+    align-items: center;
+  }
+
+  .userPhoneRow {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
