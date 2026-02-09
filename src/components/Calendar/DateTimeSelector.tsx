@@ -195,10 +195,10 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
     }
   };
 
-  // 수요일(3)과 금요일(5)만 선택 가능
+  // 일요일(0)만 선택 가능
   const isAvailableDay = (date: Date) => {
     const day = date.getDay();
-    return day === 3 || day === 5; // 수요일 또는 금요일
+    return day === 0; // 일요일
   };
 
   const isPastDate = (date: Date) => {
@@ -209,12 +209,8 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
     return dateToCheck <= today;
   };
 
-  const isWednesday = (date: Date) => {
-    return date.getDay() === 3;
-  };
-
-  const isFriday = (date: Date) => {
-    return date.getDay() === 5;
+  const isSunday = (date: Date) => {
+    return date.getDay() === 0;
   };
 
   // 분을 시간과 분으로 변환하는 함수
@@ -254,15 +250,13 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
               const isSelected = selectedDate && dateKey === formatLocalDate(selectedDate);
               const isPast = isPastDate(date);
               const isAvailable = isAvailableDay(date);
-              const isWednesdayDay = isWednesday(date);
-              const isFridayDay = isFriday(date);
+              const isSundayDay = isSunday(date);
               
               return cn({
                 'calendarTile': true,
                 'selectedTile': isSelected,
                 'pastTile': isPast,
-                'wednesdayTile': isWednesdayDay,
-                'fridayTile': isFridayDay,
+                'sundayTile': isSundayDay,
                 'availableTile': isAvailable,
                 'disabledTile': isPast || !isAvailable
               });
