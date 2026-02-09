@@ -375,21 +375,14 @@
       opacity: 0.5 !important;
     }
     
-    // 수요일
-    &.wednesdayTile {
+    // 일요일 (선택 가능)
+    &.sundayTile {
       color: #000 !important;
       background: transparent !important;
       opacity: 1 !important;
     }
     
-    // 금요일
-    &.fridayTile {
-      color: #000 !important;
-      background: transparent !important;
-      opacity: 1 !important;
-    }
-    
-    // 선택 가능한 날짜 (수, 금)
+    // 선택 가능한 날짜 (일)
     &.availableTile {
       background: transparent !important;
       cursor: pointer !important;
