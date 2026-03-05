@@ -1,8 +1,11 @@
 import axios, { AxiosInstance } from "axios";
 import { useUserStore } from "../store/userStore";
 
+const baseURL = process.env.NEXT_PUBLIC_API_URL;
+const testURL = process.env.NEXT_PUBLIC_TEST_API_URL;
+
 export const instance: AxiosInstance = axios.create({
-  baseURL: "https://server.dshelper.kr/",
+  baseURL: process.env.NODE_ENV === 'test' ? testURL : baseURL,
   withCredentials: true,
 });
 
