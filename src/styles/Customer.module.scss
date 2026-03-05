@@ -138,7 +138,6 @@
     width: 100%;
     padding: 1.4rem 4rem 1.4rem 1.2rem; // 오른쪽 패딩 추가하여 아이콘 공간 확보
     font-size: 1.7rem;
-    font-family: inherit;
     font-weight: 400;
     line-height: 1.5;
     border: 1px solid #d1d1d1;
@@ -162,7 +161,6 @@
     // textarea에 대한 스타일
     &[type="textarea"],
     &textarea {
-        font-family: inherit;
         font-size: 1.7rem;
         font-weight: 400;
         line-height: 1.5;
@@ -173,7 +171,6 @@
 
 // textarea 전용 스타일
 textarea.customSelect {
-    font-family: inherit;
     font-size: 1.7rem;
     font-weight: 400;
     line-height: 1.5;
@@ -182,7 +179,6 @@ textarea.customSelect {
     min-height: 10rem;
 
     &::placeholder {
-        font-family: inherit;
         font-size: 1.7rem;
         font-weight: 400;
         color: #999;
@@ -369,7 +365,6 @@ textarea.customSelect {
 }
 
 .answerModalText {
-    font-family: inherit;
     white-space: pre-wrap;
     word-wrap: break-word;
     font-size: 1.7rem;
