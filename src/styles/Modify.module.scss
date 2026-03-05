@@ -173,6 +173,7 @@
   flex-direction: column;
   gap: 2rem;
   background: transparent;
+  font-family: 'Pretendard Variable', sans-serif;
 
   @media (max-width: 611px) {
     max-width: 100%;
@@ -197,24 +198,28 @@
   background: transparent !important;
   border: none !important;
   color: #000 !important;
-  font-family: inherit !important;
+  font-family: 'Pretendard Variable', sans-serif !important;
   width: 100% !important;
   
-  // react-calendar 루트 요소 배경 제거
+  // react-calendar 루트 요소 배경 제거 및 폰트 상속
   :global(.react-calendar) {
     background: transparent !important;
+    font-family: 'Pretendard Variable', sans-serif !important;
   }
   
   :global(.react-calendar__viewContainer) {
     background: transparent !important;
+    font-family: inherit !important;
   }
-  
+
   :global(.react-calendar__month-view) {
     background: transparent !important;
+    font-family: inherit !important;
   }
 
   // 달력 네비게이션 버튼 (화살표 버튼 제외)
   button:not(.react-calendar__navigation__arrow) {
+    font-family: 'Pretendard Variable', sans-serif !important;
     background: transparent !important;
     color: #000 !important;
     border: none !important;
@@ -249,6 +254,7 @@
 
   // 네비게이션 라벨 (년도, 월)
   :global(.react-calendar__navigation__label) {
+    font-family: 'Pretendard Variable', sans-serif !important;
     flex-grow: 0 !important;
     text-align: center !important;
     padding: 0 1.2rem !important;
@@ -297,6 +303,7 @@
       justify-content: center !important;
       
       abbr {
+        font-family: 'Pretendard Variable', sans-serif !important;
         color: #000 !important;
         font-size: 1.4rem !important;
         font-weight: 600 !important;
@@ -312,6 +319,7 @@
 
   // 날짜 타일
   .calendarTile {
+    font-family: 'Pretendard Variable', sans-serif !important;
     background: transparent !important;
     color: #000 !important;
     border: none !important;
@@ -453,12 +461,14 @@
 
   // react-calendar의 기본 타일 스타일 오버라이드
   :global(.react-calendar__tile) {
+    font-family: 'Pretendard Variable', sans-serif !important;
     opacity: 1 !important;
     color: #000 !important;
   }
-  
+
   // react-calendar 타일 내부 텍스트
   :global(.react-calendar__tile abbr) {
+    font-family: 'Pretendard Variable', sans-serif !important;
     opacity: 1 !important;
     color: inherit !important;
   }
@@ -471,6 +481,8 @@
 }
 
 .timeSelectionContainer {
+  font-family: 'Pretendard Variable', sans-serif;
+
   .timeSelectionTitle {
     font-size: 1.6rem;
     font-weight: 600;
@@ -490,6 +502,7 @@
 }
 
 .timeButton {
+  font-family: 'Pretendard Variable', sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -580,12 +593,13 @@
 }
 
 .selectedTimesInfo {
+  font-family: 'Pretendard Variable', sans-serif;
   margin-top: 1.6rem;
   padding: 1.2rem;
   background: #f8f9fa;
   border-radius: 0.8rem;
   border: 1px solid #e9ecef;
-  
+
   p {
     margin: 0.4rem 0;
     font-size: 1.4rem;

@@ -33,8 +33,16 @@ export default function Document() {
         
         {/* 추가 SEO 태그 */}
         <meta name="theme-color" content="#0DBA53" />
+
         <link rel="canonical" href="https://www.dshelper.kr/" />
         <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css"
+          crossOrigin="anonymous"
+        />
+        
       </Head>
       <body>
         <Main />
