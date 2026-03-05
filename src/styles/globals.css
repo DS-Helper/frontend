@@ -40,31 +40,31 @@ body {
   padding-top: 6rem;
   color: #222;
 }
-
+/* 
 @media (max-width: 800px) {
   html,
   body {
     font-size: 60%;
   }
-}
+} */
 
 @media (max-width: 611px) {
-  html,
+  /* html,
   body {
     font-size: 55%;
-  }
+  } */
 
   body {
     padding-top: 6rem;
   }
 }
 
-@media (max-width: 470px) {
+/* @media (max-width: 470px) {
   html,
   body {
     font-size: 50%;
   }
-}
+} */
 
 * {
   box-sizing: border-box;
