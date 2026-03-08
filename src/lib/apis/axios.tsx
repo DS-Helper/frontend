@@ -4,8 +4,9 @@ import { useUserStore } from "../store/userStore";
 const baseURL = process.env.NEXT_PUBLIC_API_URL;
 const testURL = process.env.NEXT_PUBLIC_TEST_API_URL;
 
+// 스웨거 테스트용: production이 아닐 때는 테스트 URL 사용 (복원 시 아래를 production 기준으로 되돌리기)
 export const instance: AxiosInstance = axios.create({
-  baseURL: process.env.NODE_ENV === 'test' ? testURL : baseURL,
+  baseURL: baseURL,
   withCredentials: true,
 });
 
