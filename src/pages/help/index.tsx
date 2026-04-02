@@ -56,7 +56,12 @@ export default function Help(){
             </li>
           ))}
         </ul>
-        <button className={cn("nextButton")} onClick={handleNext}>확인</button>
+        <button
+          className={cn("nextButton", { nextButtonDisabled: !allChecked })}
+          onClick={handleNext}
+        >
+          확인
+        </button>
       </div>
       <div className={cn("bannerWrapper")}>
         <Image src={banner} alt="배너" fill className={cn("bannerImage")} />

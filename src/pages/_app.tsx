@@ -68,6 +68,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <QueryClientProvider client={queryClient}>
       <Head>
         <title>디에스헬퍼 - 달성군 이웃을 위한 무료 방문 서비스</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <Header />
       <Component {...pageProps} />

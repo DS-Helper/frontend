@@ -7,7 +7,6 @@ export default function Document() {
         {/* 기본 META 태그 */}
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         
         {/* SEO 기본 정보 */}
         <meta name="description" content="달성군 이웃을 위한 무료 방문 서비스 디에스헬퍼. 생활 돌봄, 정서적 돌봄, 아이돌봄, 청년/성인 대상 지원, 기관/단체 대상 지원 등 다양한 봉사 활동을 제공합니다." />
