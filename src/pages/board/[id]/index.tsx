@@ -5,12 +5,10 @@ import { useState, useEffect, useRef } from "react";
 import classNames from "classnames/bind";
 import styles from "@/styles/BoardDetail.module.scss";
 import Image from "next/image";
-import {
-  getBoardPostDetail,
-  getBoardComments,
-  BoardPostDetail,
-  BoardComment,
-} from "@/types/board";
+import { BoardPostDetail, BoardComment } from "@/types/board";
+import { isScrapId, toggleScrapId } from "@/lib/board/scrapStorage";
+import { getBoardById } from "@/lib/apis/board";
+import { mapItemToBoardPostDetail } from "@/lib/board/mapBoardPost";
 import { useUserStore } from "@/lib/store/userStore";
 import shareIcon from "@/public/boardShareIcon.svg";
 import { HiOutlineEllipsisVertical } from "react-icons/hi2";
@@ -56,13 +54,27 @@ export default function BoardDetailPage() {
 
   useEffect(() => {
     if (!id || typeof id !== "string") return;
-    const detail = getBoardPostDetail(id);
-    if (detail) {
-      setPost(detail);
-      setComments(getBoardComments(id));
-    } else {
-      router.push("/board");
-    }
+    let cancelled = false;
+    (async () => {
+      const res = await getBoardById(id);
+      if (cancelled) return;
+      const d = res?.data;
+      if (d && typeof d === "object" && !Array.isArray(d)) {
+        const detail = mapItemToBoardPostDetail(d as Record<string, unknown>);
+        if (!detail.id) {
+          router.push("/board");
+          return;
+        }
+        setPost(detail);
+        setComments([]);
+        setIsBookmarked(isScrapId(id));
+      } else {
+        router.push("/board");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [id, router]);
 
   // 공유 기능 (helpStory 상세와 동일)
@@ -264,6 +276,7 @@ export default function BoardDetailPage() {
               fill
               className={cn("postImage")}
               sizes="56.2rem"
+              unoptimized={post.imageUrl.startsWith("http")}
             />
           </div>
         )}
@@ -288,7 +301,11 @@ export default function BoardDetailPage() {
               type="button"
               className={cn("iconButton", { active: isBookmarked })}
               aria-label={isBookmarked ? "북마크 취소" : "북마크"}
-              onClick={() => setIsBookmarked((prev) => !prev)}
+              onClick={() => {
+                if (typeof id !== "string") return;
+                toggleScrapId(id);
+                setIsBookmarked(isScrapId(id));
+              }}
             >
               <Image src={isBookmarked ? bookmarkActiveIcon : bookmarkIcon} alt="북마크" width={24} height={24} className={cn("bookmarkIcon", { active: isBookmarked })} />
             </button>

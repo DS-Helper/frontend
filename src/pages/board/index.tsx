@@ -9,6 +9,7 @@ import BoardCategoryFilter from "@/components/BoardCategoryFilter";
 import { BoardCategory, boardCategories, BoardPost } from "@/types/board";
 import Image from "next/image";
 import { getBoards } from "@/lib/apis/board";
+import { mapItemToBoardPost } from "@/lib/board/mapBoardPost";
 
 import heartIcon from "@/public/boardLikeGrey.svg";
 import commentIcon from "@/public/boardCommentGrey.svg";
@@ -18,26 +19,6 @@ import Pagination from "@/components/Pagination";
 const cn = classNames.bind(styles);
 
 const POSTS_PER_PAGE = 10;
-
-/** API 응답 항목을 BoardPost로 매핑 (백엔드 필드명이 다를 수 있음) */
-function mapItemToBoardPost(item: Record<string, unknown>): BoardPost {
-  const author = (item.author as Record<string, unknown>) || {};
-  return {
-    id: String(item.id ?? item.boardId ?? ""),
-    title: String(item.title ?? ""),
-    content: String(item.content ?? ""),
-    category: (item.category as BoardCategory) ?? "기타",
-    likeCount: Number(item.likeCount ?? item.like_count ?? 0),
-    commentCount: Number(item.commentCount ?? item.comment_count ?? 0),
-    imageUrl: item.imageUrl != null ? String(item.imageUrl) : (item.image_url != null ? String(item.image_url) : undefined),
-    createdAt: String(item.createdAt ?? item.created_at ?? ""),
-    author: {
-      id: String(author.id ?? ""),
-      name: String(author.name ?? ""),
-      avatar: author.avatar != null ? String(author.avatar) : undefined,
-    },
-  };
-}
 
 function getCategoryFromQuery(
   query: Record<string, string | string[] | undefined>
