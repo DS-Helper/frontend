@@ -26,9 +26,8 @@
 }
 
 .title {
-  font-size: 5rem;
-  font-weight: bold;
-  color: #222;
+  font-size: var(--Display-size);
+  font-weight: var(--Display-weight);
   margin-bottom: 1.6rem;
 
   @media (max-width: 611px) {
@@ -48,7 +47,8 @@
   align-items: center;
   justify-content: center;
   padding: 1.6rem;
-  border: 1px solid #ccc;
+  color: var(--color-semantic-text-tertiary);
+  border: 1px solid var(--color-semantic-border-default);
   border-radius: 1.2rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -61,20 +61,20 @@
 }
 
 .toggleButton.active {
-  border-color: var(--primary-color);
-  background: #e6f9ec;
+  color: var(--color-semantic-text-primary);
   filter: none;
 }
 
 .toggleLabel {
-  font-size: 1.7rem;
+  font-size: var(--title-S-size);
   letter-spacing: -1.5%;
-  font-weight: 600;
+  font-weight: var(--title-S-weight);
 }
 
 .toggleDescription {
-  font-size: 1.3rem;
-  color: var(--grey-500);
+  font-size: var(--caption-size);
+  font-weight: var(--caption-weight);
+  color: var(--color-semantic-text-secondary);
   text-align: center;
 }
 
@@ -89,35 +89,52 @@
   gap: 0.6rem;
 
   label {
-    font-weight: 500;
-    font-size: 1.7rem;
-    color: var(--grey-700);
+    font-weight: var(--label-M-weight);
+    font-size: var(--label-M-size);
   }
 
   input {
     padding: 1.2rem;
-    border: 1px solid #ccc;
-    border-radius: 0.8rem;
+    border: 1px solid var(--color-semantic-border-default);
+    border-radius: 1rem;
     outline: none;
-    font-size: 1.7rem;
-
-    &.success {
-      border: 1px solid var(--grey-800);
-    }
+    font-size: var(--value-M-size);
+    font-weight: var(--value-M-weight);
+    color: var(--color-primitive-gray-800);
   
     &.error {
-      border: 1px solid var(--red-color);
+      border: 1px solid var(--color-semantic-border-danger);
     }
   }
 }
 
-.required {
-  color: var(--red-color);
+.recipientCountControl {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 1.4rem 1rem;
+}
+
+.countButton {
+  font-size: 1.5rem;
+  color: var(--color-primitive-gray-800);
+
+  &:disabled {
+    color: var(--color-semantic-text-disabled);
+    cursor: not-allowed;
+  }
+}
+
+.countValue {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-primitive-gray-800);
+  text-align: center;
 }
 
 .errorMsg {
   font-size: 1.7rem;
-  color: var(--red-color);
+  color: var(--color-semantic-text-error);
   margin-top: 0.6rem;
 }
 
@@ -150,8 +167,8 @@
 
 .submitBtn {
   width: 100%;
-  background: var(--primary-color);
-  color: #fff;
+  background: var(--color-semantic-bg-brand);
+  color: var(--color-semantic-text-inverse);
   padding: 1.4rem 0;
   border-radius: 0.8rem;
   font-size: 1.8rem;
@@ -229,7 +246,7 @@
     }
     
     &:disabled {
-      color: #ccc !important;
+      color: var(--color-semantic-text-tertiary) !important;
     }
   }
 
@@ -268,15 +285,6 @@
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    
-    &:hover {
-      background: #f5f5f5 !important;
-    }
-    
-    &:active,
-    &:focus {
-      background: #f5f5f5 !important;
-    }
   }
 
   .calendarNavArrow {
@@ -361,7 +369,7 @@
       &.fridayTile,
       &.availableTile {
         background: transparent !important;
-        color: #fff !important;
+        color: var(--color-semantic-text-inverse) !important;
         opacity: 1 !important;
         
         &::before {
@@ -372,7 +380,7 @@
           transform: translate(-50%, -50%);
           width: 60%;
           height: 100%;
-          background: var(--primary-color);
+          background: var(--color-semantic-bg-brand);
           border-radius: 0.8rem;
           z-index: -1;
         }
@@ -404,7 +412,7 @@
     
     // 선택 불가능한 날짜 (비활성화)
     &.disabledTile {
-      color: #ccc !important;
+      color: var(--color-semantic-text-tertiary) !important;
       background: transparent !important;
       opacity: 0.5 !important;
       cursor: not-allowed !important;
@@ -498,7 +506,8 @@
 }
 
 .genderTitle {
-  font-size: 1.7rem;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .timeButton {
@@ -531,27 +540,27 @@
   
   // 선택된 시간 (기본)
   &.selectedTime {
-    background: var(--primary-color) !important;
-    color: #fff !important;
+    background: var(--color-semantic-bg-brand) !important;
+    color: var(--color-semantic-text-inverse) !important;
     font-weight: 600;
-    border-color: var(--primary-color);
+    border-color: var(--color-semantic-bg-brand);
   }
   
   // 단일 시간 선택 (하나만 선택된 경우)
   &.singleTime {
-    background: var(--primary-color) !important;
-    color: #fff !important;
+    background: var(--color-semantic-bg-brand) !important;
+    color: var(--color-semantic-text-inverse) !important;
     font-weight: 600;
-    border-color: var(--primary-color);
+    border-color: var(--color-semantic-bg-brand);
     border-radius: 0.8rem !important;
   }
   
   // 시작 시간
   &.startTime {
-    background: var(--primary-color) !important;
-    color: #fff !important;
+    background: var(--color-semantic-bg-brand) !important;
+    color: var(--color-semantic-text-inverse) !important;
     font-weight: 600;
-    border-color: var(--primary-color);
+    border-color: var(--color-semantic-bg-brand);
     border-top-left-radius: 0.8rem !important;
     border-bottom-left-radius: 0.8rem !important;
     border-top-right-radius: 0.2rem !important;
@@ -560,10 +569,10 @@
   
   // 종료 시간
   &.endTime {
-    background: var(--primary-color) !important;
-    color: #fff !important;
+    background: var(--color-semantic-bg-brand) !important;
+    color: var(--color-semantic-text-inverse) !important;
     font-weight: 600;
-    border-color: var(--primary-color);
+    border-color: var(--color-semantic-bg-brand);
     border-top-left-radius: 0.2rem !important;
     border-bottom-left-radius: 0.2rem !important;
     border-top-right-radius: 0.8rem !important;
@@ -572,10 +581,9 @@
   
   // 중간 시간 (연속된 블록 내부)
   &.middleTime {
-    background: var(--grey-100) !important;
-    color: #666 !important;
+    background: var(--color-semantic-bg-neutral-soft) !important;
+    color: var(--color-semantic-text-primary) !important;
     font-weight: 500;
-    border-color: #e0e0e0;
     border-radius: 0.2rem !important;
   }
   
@@ -635,22 +643,21 @@
 
 // 완료 페이지 스타일
 .completeContent {
-  max-width: 48rem;
+  max-width: 57rem;
   margin: 0 auto;
   padding: 4rem 2rem;
 }
 
 .completeTitle {
-  font-size: 3.2rem;
-  font-weight: bold;
-  color: #000;
+  font-size: var(--Display-size);
+  font-weight: var(--Display-weight);
   margin-bottom: 2.4rem;
   line-height: 1.3;
 }
 
 .completeMessage {
-  font-size: 1.8rem;
-  color: #000;
+  font-size: 1.7rem;
+  color: var(--color-primitive-gray-700);
   line-height: 1.6;
   margin-bottom: 4rem;
 }
@@ -694,8 +701,8 @@
 
 // 모달 제목
 .modalTitle {
-  font-size: 2.4rem;
-  font-weight: 600;
+  font-size: var(--title-L-size);
+  font-weight: var(--title-L-weight);
 }
 
 .modalText {
@@ -706,7 +713,9 @@
 
 // 모달 설명
 .modalDescription {
-  font-size: 1.5rem;
+  font-size: var(--body-M-size);
+  font-weight: var(--body-M-weight);
+  color: var(--color-semantic-text-secondary);
 }
 
 // 모달 버튼 영역
@@ -717,38 +726,181 @@
 
 .requestButton {
   flex: 1;
-  background: var(--primary-color);
-  color: #fff;
+  background: var(--color-semantic-bg-brand);
+  color: var(--color-semantic-text-inverse);
   border: none;
   padding: 1.4rem 2rem;
   border-radius: 0.8rem;
   font-size: 1.6rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  
-  &:hover {
-    background: #1a8f4a;
-  }
 }
 
 .laterButton {
   flex: 1;
-  color: var(--grey-600);
-  background: var(--grey-200);
+  color: var(--color-semantic-text-error);
+  background: var(--color-semantic-bg-danger-soft);
   padding: 1.4rem 2rem;
   border-radius: 0.8rem;
   font-size: 1.6rem;
+  cursor: pointer;
+}
+
+.addressReadonlyInput {
+  cursor: pointer;
+}
+
+.addressSearchModal {
+  background: #fff;
+  border-radius: 1.6rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  max-width: 52rem;
+  width: 100%;
+  max-height: min(85vh, 64rem);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.addressSearchHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  padding: 1.6rem 2rem;
+  border-bottom: 1px solid var(--color-semantic-border-default);
+}
+
+.addressSearchTitle {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--color-primitive-gray-800);
+  margin: 0;
+}
+
+.addressSearchClose {
+  flex-shrink: 0;
+  width: 3.6rem;
+  height: 3.6rem;
+  border: none;
+  border-radius: 0.8rem;
+  background: transparent;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--color-semantic-text-tertiary);
+  cursor: pointer;
+
+  &:hover {
+    background: #f0f0f0;
+    color: var(--color-primitive-gray-800);
+  }
+}
+
+.addressSearchBody {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.addressSearchForm {
+  display: flex;
+  flex-direction: row;
+  gap: 0.8rem;
+  align-items: stretch;
+}
+
+.addressSearchInput {
+  flex: 1;
+  min-width: 0;
+  padding: 1.2rem;
+  border: 1px solid var(--color-semantic-border-default);
+  border-radius: 1rem;
+  outline: none;
+  font-size: var(--value-M-size);
+  font-weight: var(--value-M-weight);
+  color: var(--color-primitive-gray-800);
+}
+
+.addressSearchSubmit {
+  flex-shrink: 0;
+  padding: 0 1.6rem;
+  border: none;
+  border-radius: 1rem;
+  background: var(--color-semantic-bg-brand);
+  color: var(--color-semantic-text-inverse);
+  font-size: var(--value-M-size);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.addressSearchResults {
+  flex: 1;
+  min-height: 12rem;
+  max-height: 40rem;
+  overflow-y: auto;
+  border: 1px solid var(--color-semantic-border-default);
+  border-radius: 1rem;
+  background: #fafafa;
+}
+
+.addressSearchItem {
+  display: block;
+  width: 100%;
+  padding: 1.2rem 1.4rem;
+  border: none;
+  border-bottom: 1px solid var(--color-semantic-border-default);
+  background: #fff;
+  text-align: left;
+  font-size: 1.5rem;
+  line-height: 1.45;
+  color: var(--color-primitive-gray-800);
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
   &:hover {
-    background: #f8f9fa;
-    border-color: #ccc;
+    background: #f3f6ff;
   }
-  
-  &:active {
-    transform: translateY(0);
-  }
+}
+
+.addressSearchSub {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 1.3rem;
+  color: var(--color-semantic-text-secondary);
+}
+
+.addressSearchHint {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--color-semantic-text-tertiary);
+}
+
+.addressSearchError {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--color-semantic-text-error);
+  white-space: pre-line;
+  line-height: 1.5;
+}
+
+.addressSearchEmpty {
+  padding: 2rem;
+  text-align: center;
+  font-size: 1.4rem;
+  color: var(--color-semantic-text-tertiary);
 }

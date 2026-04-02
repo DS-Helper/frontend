@@ -13,7 +13,83 @@
   text-align: center;
   font-size: 3rem;
   font-weight: 700;
-  margin-bottom: 10rem;
+  margin-bottom: 5.6rem;
+}
+
+.listToolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  margin-bottom: 2.4rem;
+}
+
+.searchForm {
+  position: relative;
+  width: 100%;
+}
+
+.searchInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1.4rem 2rem;
+  border: none;
+  border-radius: 50rem;
+  background-color: var(--color-semantic-bg-neutral-soft);
+  font-size: 1.6rem;
+  outline: none;
+
+  &::placeholder {
+    font-weight: 400;
+    color: var(--color-semantic-text-tertiary);
+  }
+
+  &::-webkit-search-cancel-button {
+    display: none;
+  }
+}
+
+.searchIconWrap {
+  position: absolute;
+  right: 1.3rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.searchIcon {
+  display: block;
+  width: 3rem;
+  height: 3rem;
+  flex-shrink: 0;
+  color: var(--color-semantic-icon-tertiary);
+}
+
+.sortRow {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.sortButton {
+  padding: 0.85rem 1.8rem;
+  border-radius: 10rem;
+  font-size: 1.4rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--color-semantic-border-default);
+  background-color: var(--color-semantic-bg-page);
+  color: var(--color-semantic-text-tertiary);
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+
+  &.sortButtonActive {
+    background-color: var(--color-semantic-bg-enabled);
+    color: var(--color-semantic-text-inverse);
+    border-color: var(--color-semantic-bg-enabled);
+  }
 }
 
 .loading {
@@ -24,13 +100,16 @@
 }
 
 .storyList {
+  display: flex;
+  flex-direction: column;
   gap: 3.2rem;
   margin-bottom: 9rem;
 }
 
 .storyItem {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
+  justify-content: space-between;
   gap: 3.2rem;
   padding: 3.2rem;
   border-radius: 1.2rem;
@@ -39,11 +118,40 @@
   transition: all 0.2s ease;
 }
 
-.storyContent {
-  flex: 1;
+.storyTextBox {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 18rem;
+
+  @media (max-width: 611px) {
+    min-height: 10rem;
+  }
+}
+
+.storyContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  margin-top: auto;
+
+  .storyDate {
+    font-weight: var(--caption-weight);
+    font-size: var(--caption-size);
+    color: var(--color-semantic-text-tertiary);
+
+    @media (max-width: 611px) {
+      font-size: 1.3rem;
+    }
+  }
+
+  .storyView {
+    font-weight: var(--caption-weight);
+    font-size: var(--caption-size);
+    color: var(--color-semantic-text-tertiary);
+  }
 }
 
 .storyTitle {
@@ -63,11 +171,6 @@
     width: 13rem;
     height: 10rem;
   }
-}
-
-.storyDate {
-  font-size: 1.3rem;
-  color: #999;
 }
 
 .storyWriter {

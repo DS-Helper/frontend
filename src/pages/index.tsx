@@ -30,6 +30,7 @@ interface StoryPost {
   content: string;
   writerName: string;
   imageUrls: string[];
+  viewCount: number;
   createdAt: string;
 }
 
@@ -39,6 +40,7 @@ export default function Home() {
     postId: string;
     title: string;
     content: string;
+    viewCount: number;
     date: string;
     img: string | typeof story;
   }>>([]);
@@ -135,6 +137,7 @@ export default function Home() {
             postId: post.postId,
             title: post.title,
             content: post.content,
+            viewCount: post.viewCount,
             date: formatDate(post.createdAt),
             img: post.imageUrls && post.imageUrls.length > 0 && isValidImageUrl(post.imageUrls[0])
               ? post.imageUrls[0]
@@ -268,10 +271,12 @@ export default function Home() {
                 <ul className={cn("storyList")}>
                   {storyList.map((s, i) => (
                     <li key={i} onClick={() => handleStoryClick(s.postId)}>
-                      <div>
+                      <div className={cn("storyTextBox")}>
                         <p className={cn("storyTitle")}>{s.title}</p>
-                        <span className={cn("storyContent")}>{s.content}</span>
-                        <span className={cn("storyDate")}>{s.date}</span>
+                        <div className={cn("storyContent")}>
+                          <span className={cn("storyDate")}>{s.date}</span>
+                          <span className={cn("storyView")}>조회 {s.viewCount}</span>
+                        </div>
                       </div>
                       <div className={cn("storyImage")}>
                         {typeof s.img === 'string' && isValidImageUrl(s.img) ? (

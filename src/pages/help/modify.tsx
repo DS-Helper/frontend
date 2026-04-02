@@ -16,6 +16,26 @@ import male from "@/public/reservate_male.svg"
 import female from "@/public/reservate_female.svg"
 import both from "@/public/reservate_both.svg"
 
+type KakaoRoadAddress = {
+  address_name: string;
+  building_name?: string;
+};
+
+type KakaoAddressDoc = {
+  address_name: string;
+  road_address: KakaoRoadAddress | null;
+  address?: { address_name: string };
+};
+
+function formatKakaoAddressLabel(doc: KakaoAddressDoc): string {
+  const rd = doc.road_address;
+  if (rd?.address_name) {
+    const building = rd.building_name?.trim();
+    return building ? `${rd.address_name} ${building}` : rd.address_name;
+  }
+  return doc.address?.address_name ?? doc.address_name;
+}
+
 export default function ModifyPage() {
   const router = useRouter();
   const { user, userType } = useUserStore();
@@ -26,13 +46,20 @@ export default function ModifyPage() {
   const [organizationName, setOrganizationName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
+  const [detailAddress, setDetailAddress] = useState("");
   const [requirement, setRequirement] = useState("");
-  const [recipientNumber, setRecipientNumber] = useState("");
+  const [recipientNumber, setRecipientNumber] = useState(1);
   const [note, setNote] = useState("");
   const [visitDate, setVisitDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [showErrors, setShowErrors] = useState(false);
+
+  const [addressModalOpen, setAddressModalOpen] = useState(false);
+  const [addressSearchQuery, setAddressSearchQuery] = useState("");
+  const [addressSearchResults, setAddressSearchResults] = useState<KakaoAddressDoc[]>([]);
+  const [addressSearchLoading, setAddressSearchLoading] = useState(false);
+  const [addressSearchError, setAddressSearchError] = useState<string | null>(null);
 
   // 사용자 타입에 따라 자동으로 개인/기관 선택
   useEffect(() => {
@@ -42,6 +69,57 @@ export default function ModifyPage() {
       setType('personal');
     }
   }, [userType]);
+
+  useEffect(() => {
+    if (!addressModalOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setAddressModalOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [addressModalOpen]);
+
+  const openAddressSearchModal = () => {
+    setAddressSearchQuery(address);
+    setAddressSearchResults([]);
+    setAddressSearchError(null);
+    setAddressModalOpen(true);
+  };
+
+  const runAddressSearch = async () => {
+    const q = addressSearchQuery.trim();
+    if (!q) return;
+    setAddressSearchLoading(true);
+    setAddressSearchError(null);
+    try {
+      const res = await fetch(
+        `/api/kakao-address?q=${encodeURIComponent(q)}`,
+      );
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const errMsg =
+          typeof data.error === "string" ? data.error : "주소 검색에 실패했습니다.";
+        const detail =
+          typeof (data as { detail?: string }).detail === "string"
+            ? (data as { detail: string }).detail.trim()
+            : "";
+        throw new Error(detail ? `${errMsg}\n\n${detail}` : errMsg);
+      }
+      setAddressSearchResults((data.documents as KakaoAddressDoc[]) ?? []);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "주소 검색에 실패했습니다.";
+      setAddressSearchError(message);
+      setAddressSearchResults([]);
+    } finally {
+      setAddressSearchLoading(false);
+    }
+  };
+
+  const selectAddressFromSearch = (doc: KakaoAddressDoc) => {
+    setAddress(formatKakaoAddressLabel(doc));
+    setAddressModalOpen(false);
+  };
 
   // 휴대폰 번호 포맷팅 함수
   const formatPhoneNumber = (value: string) => {
@@ -77,16 +155,19 @@ export default function ModifyPage() {
   };
 
   // 도움받는 사람 수 검증 함수
-  const validateRecipientNumber = (number: string): boolean => {
-    // 숫자만 있고 1 이상의 정수인지 확인
-    return /^\d+$/.test(number) && parseInt(number) > 0;
+  const validateRecipientNumber = (number: number): boolean => {
+    // 1 이상의 정수인지 확인
+    return Number.isInteger(number) && number > 0;
   };
 
-  // 숫자만 입력 가능한 핸들러
-  const handleNumberOnlyChange = (value: string, setter: (value: string) => void) => {
-    // 숫자만 추출
-    const numbers = value.replace(/\D/g, '');
-    setter(numbers);
+  // 도움받는 사람 수 증감 핸들러 (최소 1명)
+  const handleRecipientCountChange = (type: "increase" | "decrease") => {
+    setRecipientNumber((prev) => {
+      if (type === "decrease") {
+        return Math.max(1, prev - 1);
+      }
+      return prev + 1;
+    });
   };
 
   // 달력 변경 시 validation 상태 초기화
@@ -133,12 +214,16 @@ export default function ModifyPage() {
     setShowErrors(true);
 
     // 필수 필드 검증 (특이사항은 선택 필드)
-    const hasErrors = !name || !phoneNumber || !address || !requirement || !recipientNumber || (type === 'org' && !organizationName);
+    const hasErrors = !name || !phoneNumber || !address || !requirement || !validateRecipientNumber(recipientNumber) || (type === 'org' && !organizationName);
 
     if (!hasErrors) {
       try {
         // visitDate는 이미 YYYY-MM-DD 형식이므로 그대로 사용
         const formattedVisitDate = visitDate;
+
+        const fullAddress = detailAddress.trim()
+          ? `${address} ${detailAddress.trim()}`
+          : address;
 
         const payload = type === 'personal' 
           ? {
@@ -147,10 +232,10 @@ export default function ModifyPage() {
               visitDate: formattedVisitDate,
               startTime,
               endTime,
-              address,
+              address: fullAddress,
               requirement,
               recipientGenderType,
-              recipientNumber,
+              recipientNumber: String(recipientNumber),
               note,
             }
           : {
@@ -160,10 +245,10 @@ export default function ModifyPage() {
               visitDate: formattedVisitDate,
               startTime,
               endTime,
-              address,
+              address: fullAddress,
               requirement,
               recipientGenderType,
-              recipientNumber,
+              recipientNumber: String(recipientNumber),
               note,
             };
   
@@ -241,7 +326,7 @@ export default function ModifyPage() {
 
           {/* 입력 필드 */}
           <div className={cn("inputGroup")}>
-            <label>이름 <span className={cn("required")}>*</span></label>
+            <label>이름</label>
             <input type="text" value={name} onChange={(e) => setName(e.target.value)} className={showErrors && !name ? cn("error") : undefined}  />
             {showErrors && !name && <p className={cn("errorMsg")}>이름을 입력해주세요.</p>}
           </div>
@@ -249,7 +334,7 @@ export default function ModifyPage() {
           {/* 기관 이름 필드 (기관 사용자만 표시) */}
           {type === 'org' && (
             <div className={cn("inputGroup")}>
-              <label>기관 이름 <span className={cn("required")}>^</span></label>
+              <label>기관 이름</label>
               <input 
                 type="text"
                 value={organizationName} 
@@ -261,7 +346,7 @@ export default function ModifyPage() {
           )}
 
           <div className={cn("inputGroup")}>
-            <label>전화번호 <span className={cn("required")}>*</span></label>
+            <label>전화번호</label>
             <input 
               type="text" 
               value={phoneNumber} 
@@ -273,14 +358,33 @@ export default function ModifyPage() {
           </div>
 
           <div className={cn("inputGroup")}>
-            <label>방문 주소 <span className={cn("required")}>*</span></label>
-            <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} className={showErrors && !address ? cn("error") : undefined} />
-            {showErrors && !address && <p className={cn("errorMsg")}>주소를 입력해주세요.</p>}
+            <label>방문 주소</label>
+            <input
+              type="text"
+              value={address}
+              readOnly
+              onClick={openAddressSearchModal}
+              className={`${cn("addressReadonlyInput")} ${
+                showErrors && !address ? cn("error") : ""
+              }`}
+            />
+            {showErrors && !address && (
+              <p className={cn("errorMsg")}>주소를 입력해주세요.</p>
+            )}
+          </div>
+
+          <div className={cn("inputGroup")}>
+            <label>상세 주소</label>
+            <input
+              type="text"
+              value={detailAddress}
+              onChange={(e) => setDetailAddress(e.target.value)}
+            />
           </div>
 
           {/* 도움 요청 내용 */}
           <div className={cn("inputGroup")}>
-            <label>도움 요청 내용 <span className={cn("required")}>*</span></label>
+            <label>도움 요청 내용</label>
             <input 
               type="text" 
               value={requirement} 
@@ -316,14 +420,30 @@ export default function ModifyPage() {
 
           {/* 사람 수 */}
           <div className={cn("inputGroup")}>
-            <label>도움 받는 사람 수 <span className={cn("required")}>*</span></label>
-            <input 
-              type="text" 
-              value={recipientNumber} 
-              onChange={(e) => handleNumberOnlyChange(e.target.value, setRecipientNumber)} 
-              className={showErrors && !recipientNumber ? cn("error") : undefined} 
-            />
-            {showErrors && !recipientNumber && <p className={cn("errorMsg")}>도움 받는 사람 수를 입력해주세요.</p>}
+            <label>도움 받는 사람 수</label>
+            <div className={cn("recipientCountControl")}>
+              <button
+                type="button"
+                className={cn("countButton")}
+                onClick={() => handleRecipientCountChange("increase")}
+                aria-label="도움 받는 사람 수 증가"
+              >
+                +
+              </button>
+              <span className={cn("countValue")} aria-live="polite">
+                {recipientNumber}
+              </span>
+              <button
+                type="button"
+                className={cn("countButton")}
+                onClick={() => handleRecipientCountChange("decrease")}
+                disabled={recipientNumber <= 1}
+                aria-label="도움 받는 사람 수 감소"
+              >
+                -
+              </button>
+            </div>
+            {showErrors && recipientNumber < 1 && <p className={cn("errorMsg")}>도움 받는 사람 수를 입력해주세요.</p>}
           </div>
 
           {/* 특이사항 */}
@@ -341,6 +461,96 @@ export default function ModifyPage() {
           </button>
         </form>
       </main>
+
+      {addressModalOpen && (
+        <div
+          className={cn("modalOverlay")}
+          role="presentation"
+          onClick={() => setAddressModalOpen(false)}
+        >
+          <div
+            className={cn("addressSearchModal")}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="addressSearchTitle"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={cn("addressSearchHeader")}>
+              <h3 id="addressSearchTitle" className={cn("addressSearchTitle")}>
+                주소 검색
+              </h3>
+              <button
+                type="button"
+                className={cn("addressSearchClose")}
+                onClick={() => setAddressModalOpen(false)}
+                aria-label="닫기"
+              >
+                ×
+              </button>
+            </div>
+            <div className={cn("addressSearchBody")}>
+              <p className={cn("addressSearchHint")}>
+                도로명·지번을 입력 후 검색하세요. (예: 김포한강4로 564)
+              </p>
+              <form
+                className={cn("addressSearchForm")}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void runAddressSearch();
+                }}
+              >
+                <input
+                  type="search"
+                  className={cn("addressSearchInput")}
+                  value={addressSearchQuery}
+                  onChange={(e) => setAddressSearchQuery(e.target.value)}
+                  placeholder="주소 검색"
+                  autoComplete="off"
+                />
+                <button
+                  type="submit"
+                  className={cn("addressSearchSubmit")}
+                  disabled={addressSearchLoading || !addressSearchQuery.trim()}
+                >
+                  {addressSearchLoading ? "검색 중…" : "검색"}
+                </button>
+              </form>
+              {addressSearchError && (
+                <p className={cn("addressSearchError")} role="alert">
+                  {addressSearchError}
+                </p>
+              )}
+              <div className={cn("addressSearchResults")}>
+                {!addressSearchLoading &&
+                  addressSearchResults.length === 0 &&
+                  !addressSearchError && (
+                    <p className={cn("addressSearchEmpty")}>
+                      검색어를 입력한 뒤 검색 버튼을 눌러주세요.
+                    </p>
+                  )}
+                {addressSearchResults.map((doc, idx) => {
+                  const main = formatKakaoAddressLabel(doc);
+                  const jibun = doc.address?.address_name?.trim();
+                  const showJibun = Boolean(doc.road_address && jibun);
+                  return (
+                    <button
+                      key={`${doc.address_name}-${idx}`}
+                      type="button"
+                      className={cn("addressSearchItem")}
+                      onClick={() => selectAddressFromSearch(doc)}
+                    >
+                      <span>{main}</span>
+                      {showJibun && (
+                        <span className={cn("addressSearchSub")}>{jibun}</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

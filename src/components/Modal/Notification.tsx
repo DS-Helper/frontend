@@ -32,13 +32,13 @@ export default function NotificationModal({ onRequest, onLater }: NotificationMo
               className={cn("requestButton")} 
               onClick={onRequest}
             >
-              요청하기
+              허용하기
             </button>
             <button 
               className={cn("laterButton")} 
               onClick={onLater}
             >
-              나중에 할래요
+              거절하기
             </button>
           </div>
         </div>

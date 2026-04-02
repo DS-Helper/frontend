@@ -24,10 +24,6 @@ export default function AccountPage() {
     }
   };
 
-  const handleVerify = () => {
-    setIsVerifyModalOpen(true);
-  };
-
   const handleRequestCode = (phone: string) => {
     // 인증번호 발송 API 연동 (추후 구현)
     console.log("인증번호 요청:", phone);
@@ -90,13 +86,6 @@ export default function AccountPage() {
             </p>
             <div className={cn("userPhoneRow")}>
               <span>010-5250-9548</span>
-              <button
-                type="button"
-                className={cn("verifyButton")}
-                onClick={handleVerify}
-              >
-                인증하기
-              </button>
             </div>
           </div>
         </section>

@@ -30,6 +30,7 @@
   .homePage1Title {
     font-size: 78px;
     font-weight: 700;
+    color: var(--color-semantic-text-primary);
 
     @media (max-width: 1000px) {
       font-size: 60px;
@@ -92,24 +93,19 @@
 
   .homePage1Button {
     padding: 1.7rem 3.5rem;
-    background-color: var(--primary-color);
+    background-color: var(--color-semantic-bg-brand);
     border-radius: 10rem;
-    color: #fff;
+    color: var(--color-semantic-text-inverse);
     font-size: 2.2rem;
     font-weight: 700;
     transition: all 0.3s ease;
-
-    &:hover {
-      background-color: var(--primary-color-soft);
-      color: var(--primary-color);
-    }
   }
 }
 
 .homePage2 {
   width: 100%;
   min-height: 100vh;
-  background-color: var(--grey-100);
+  background-color: var(--color-primitive-gray-100);
   padding: 10rem 20rem;
   text-align: center;
 
@@ -126,7 +122,7 @@
     flex-direction: column;
     gap: 10rem;
 
-    @media (max-width: 1200px) {
+    @media (max-width: 611px) {
       gap: 2rem;
     }
   }
@@ -164,24 +160,20 @@
       button {
         width: 100%;
         padding: 0.8rem 1.4rem;
-        border: 1px solid var(--grey-300);
-        color: var(--grey-500);
+        border: 1px solid var(--color-semantic-border-default);
+        color: var(--color-semantic-text-tertiary);
+        background-color: var(--color-semantic-text-inverse);
         font-weight: 600;
         font-size: 1.5rem;
         border-radius: 10rem;
         white-space: nowrap;
         transition: all 0.3s ease;
 
-        &:hover {
-          background-color: var(--grey-100);
-          color: var(--grey-700);
-        }
-
         &.active {
-          background-color: var(--primary-color);
-          border: 1px solid var(--primary-color);
+          background-color: var(--color-semantic-bg-brand);
+          border: 1px solid var(--color-semantic-bg-brand);
           font-weight: 700;
-          color: #fff;
+          color: var(--color-semantic-text-inverse);
         }
       }
     }
@@ -214,16 +206,16 @@
 
         p {
           font-weight: 600;
-          font-size: 1.9rem;
-          color: var(--grey-800);
+          font-size: 2rem;
+          color: var(--color-primitive-gray-800);
           margin: 2rem 0 0.8rem;
           white-space: nowrap;
         }
 
         span {
           font-weight: 500;
-          font-size: 1.3rem;
-          color: var(--grey-600);
+          font-size: 1.4rem;
+          color: var(--color-primitive-gray-600);
         }
       }
     }
@@ -242,7 +234,7 @@
         justify-content: center;
         align-items: flex-start;
         padding: 2.5rem 3rem;
-        border-bottom: 1px solid var(--grey-300);
+        border-bottom: 1px solid var(--color-semantic-border-default);
         font-weight: 600;
         font-size: 2.2rem;
       }
@@ -293,7 +285,7 @@
           span {
             font-weight: 500;
             font-size: 1.7rem;
-            color: var(--grey-700);
+            color: var(--color-semantic-text-secondary);
 
             @media (max-width: 611px) {
               font-size: 1.5rem;
@@ -350,7 +342,7 @@
         span {
           font-weight: 600;
           font-size: 2.2rem;
-          color: var(--grey-600);
+          color: var(--color-semantic-text-secondary);
 
           @media (max-width: 611px) {
             font-size: 1.5rem;
@@ -392,21 +384,14 @@
 
     li {
       display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
       gap: 5rem;
       cursor: pointer;
-      transition: opacity 0.2s ease;
-
-      &:hover {
-        opacity: 0.8;
-      }
 
       .storyImage {
         flex-shrink: 0;
         width: 24rem;
         height: 18rem;
-        background-color: var(--grey-200);
+        background-color: var(--color-semantic-bg-neutral-soft);
         border-radius: 1.2rem;
         overflow: hidden;
 
@@ -426,55 +411,55 @@
       .placeholderImage {
         width: 100%;
         height: 100%;
-        background-color: var(--grey-200);
+        background-color: var(--color-semantic-bg-neutral-soft);
         border-radius: 1.2rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--grey-500);
+        color: var(--color-semantic-text-secondary);
         font-size: 1.5rem;
       }
 
-      div {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
+      .storyTitle {
+        font-weight: var(--title-L-weight);
+        font-size: var(--title-L-size);
+        color: var(--color-semantic-text-primary);
         text-align: left;
 
-        p {
-          font-weight: 600;
-          font-size: 2.4rem;
-          color: var(--grey-800);
-
-          @media (max-width: 611px) {
-            font-size: 1.9rem;
-          }
+        @media (max-width: 611px) {
+          font-size: 1.9rem;
         }
+      }
 
-        .storyContent {
-          font-weight: 500;
-          font-size: 1.7rem;
-          color: var(--grey-600);
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          line-height: 1.5;
+      .storyTextBox {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+        min-height: 100%;
+      }
 
-          @media (max-width: 611px) {
-            display: none;
-          }
-        }
+      .storyContent {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: left;
+        margin-top: auto;
 
         .storyDate {
-          font-weight: 500;
-          font-size: 1.5rem;
-          color: var(--grey-500);
+          font-weight: var(--caption-weight);
+          font-size: var(--caption-size);
+          color: var(--color-semantic-text-tertiary);
 
           @media (max-width: 611px) {
             font-size: 1.3rem;
           }
+        }
+
+        .storyView {
+          font-weight: var(--caption-weight);
+          font-size: var(--caption-size);
+          color: var(--color-semantic-text-tertiary);
         }
       }
     }
@@ -489,7 +474,7 @@
     p {
       font-weight: 500;
       font-size: 1.8rem;
-      color: var(--grey-600);
+      color: var(--color-semantic-text-secondary);
       
       @media (max-width: 611px) {
         font-size: 1.5rem;
@@ -506,7 +491,7 @@
     p {
       font-weight: 500;
       font-size: 1.8rem;
-      color: var(--grey-600);
+      color: var(--color-semantic-text-secondary);
       
       @media (max-width: 611px) {
         font-size: 1.5rem;
@@ -523,14 +508,14 @@
     padding: 0;
     background: none;
     border: none;
-    color: var(--grey-500);
+    color: var(--color-semantic-text-secondary);
     font-size: 1.7rem;
     font-weight: 400;
     cursor: pointer;
     transition: color 0.2s ease;
 
     &:hover {
-      color: var(--grey-700);
+      color: var(--color-semantic-text-secondary);
     }
 
     @media (max-width: 611px) {
@@ -545,9 +530,9 @@
 }
 
 .title {
-  font-weight: 700;
-  font-size: 5rem;
-  color: #222222;
+  font-weight: var(--Display-weight);
+  font-size: var(--Display-size);
+  color: black;
   display: inline-block;
 
   @media (max-width: 611px) {

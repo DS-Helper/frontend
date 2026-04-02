@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import { getPosts } from "@/lib/apis/helpStory";
 import classNames from "classnames/bind";
 import styles from "@/styles/HelpStory.module.scss";
 import Image from "next/image";
+
+type SortType = "latest" | "popular";
 
 const cn = classNames.bind(styles);
 
@@ -14,6 +16,7 @@ interface Post {
   writerName: string;
   imageUrls: string[];
   createdAt: string;
+  viewCount?: number;
 }
 
 export default function HelpStoryPage() {
@@ -22,6 +25,8 @@ export default function HelpStoryPage() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortType, setSortType] = useState<SortType>("latest");
 
   useEffect(() => {
     fetchPosts();
@@ -88,6 +93,26 @@ export default function HelpStoryPage() {
     router.push(`/helpStory/${postId}`);
   };
 
+  const displayedPosts = useMemo(() => {
+    let list = [...posts];
+    const q = searchQuery.trim().toLowerCase();
+    if (q) {
+      list = list.filter((p) => p.title.toLowerCase().includes(q));
+    }
+    if (sortType === "latest") {
+      list.sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    } else {
+      list.sort((a, b) => {
+        const views = (b.viewCount ?? 0) - (a.viewCount ?? 0);
+        if (views !== 0) return views;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+    }
+    return list;
+  }, [posts, searchQuery, sortType]);
+
   const renderPagination = () => {
     const pages = [];
     const maxVisiblePages = 5;
@@ -146,18 +171,75 @@ export default function HelpStoryPage() {
     <div className={cn("container")}>
       <main className={cn("main")}>
         <h1 className={cn("title")}>도와드린 이야기</h1>
-        
-        <div className={cn("storyList")}>
-          {posts.length > 0 ? (
-            posts.map((post) => (
-              <div 
+
+        <div className={cn("listToolbar")}>
+          <form
+            className={cn("searchForm")}
+            onSubmit={(e) => e.preventDefault()}
+            aria-label="게시물 제목 검색"
+          >
+            <input
+              type="search"
+              className={cn("searchInput")}
+              placeholder="게시물의 제목을 입력해보세요."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              enterKeyHint="search"
+            />
+            <span className={cn("searchIconWrap")} aria-hidden>
+              <svg
+                className={cn("searchIcon")}
+                viewBox="0 0 30 30"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                focusable="false"
+              >
+                <circle
+                  cx="14"
+                  cy="14"
+                  r="7"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+                <path
+                  d="M22.2929 23.7071C22.6834 24.0976 23.3166 24.0976 23.7071 23.7071C24.0976 23.3166 24.0976 22.6834 23.7071 22.2929L23 23L22.2929 23.7071ZM19 19L18.2929 19.7071L22.2929 23.7071L23 23L23.7071 22.2929L19.7071 18.2929L19 19Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </span>
+          </form>
+          <div className={cn("sortRow")} role="group" aria-label="정렬">
+            <button
+              type="button"
+              className={cn("sortButton", { sortButtonActive: sortType === "latest" })}
+              onClick={() => setSortType("latest")}
+            >
+              최신순
+            </button>
+            <button
+              type="button"
+              className={cn("sortButton", { sortButtonActive: sortType === "popular" })}
+              onClick={() => setSortType("popular")}
+            >
+              인기순
+            </button>
+          </div>
+        </div>
+
+        <ul className={cn("storyList")}>
+          {displayedPosts.length > 0 ? (
+            displayedPosts.map((post) => (
+              <li
                 key={post.postId} 
                 className={cn("storyItem")}
                 onClick={() => handleStoryClick(post.postId)}
               >
-                <div className={cn("storyContent")}>
-                  <h3 className={cn("storyTitle")}>{post.title}</h3>
-                  <span className={cn("storyDate")}>{formatDate(post.createdAt)}</span>
+                <div className={cn("storyTextBox")}>
+                  <p className={cn("storyTitle")}>{post.title}</p>
+                  <div className={cn("storyContent")}>
+                    <span className={cn("storyDate")}>{formatDate(post.createdAt)}</span>
+                    <span className={cn("storyView")}>조회 {post.viewCount ?? 0}</span>
+                  </div>
                 </div>
                 <div className={cn("storyImage")}>
                   {post.imageUrls && post.imageUrls.length > 0 && isValidImageUrl(post.imageUrls[0]) ? (
@@ -174,14 +256,18 @@ export default function HelpStoryPage() {
                     </div>
                   )}
                 </div>
-              </div>
+              </li>
             ))
+          ) : posts.length > 0 ? (
+            <div className={cn("emptyState")}>
+              <p>검색 결과가 없습니다.</p>
+            </div>
           ) : (
             <div className={cn("emptyState")}>
               <p>아직 도와드린 이야기가 없습니다.</p>
             </div>
           )}
-        </div>
+        </ul>
 
         {totalPages > 1 && renderPagination()}
       </main>

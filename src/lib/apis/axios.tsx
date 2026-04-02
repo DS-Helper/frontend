@@ -5,7 +5,7 @@ const baseURL = process.env.NEXT_PUBLIC_API_URL;
 const testURL = process.env.NEXT_PUBLIC_TEST_API_URL;
 
 export const instance: AxiosInstance = axios.create({
-  baseURL: process.env.NODE_ENV === 'test' ? testURL : baseURL,
+  baseURL: baseURL,
   withCredentials: true,
 });
 
@@ -26,15 +26,25 @@ instance.interceptors.response.use(
   (error) => {
     // 401 에러 (인증 실패) 시 자동 로그아웃
     if (error.response?.status === 401) {
+      const url = error.config?.url || "";
+      const isAuthCheckEndpoint = url.includes("/auth/check-logged-in");
+
+      // 인증 체크(check-logged-in) 요청은 userStore의 checkAuthStatus가
+      // 실패 케이스를 “로그아웃 상태”로 정리할 책임이 있으므로,
+      // 여기서 상태 초기화/리다이렉트까지 하면 렌더/리다이렉트 루프가 생길 수 있음.
+      if (isAuthCheckEndpoint) {
+        return Promise.reject(error);
+      }
+
       // 스토어에서 사용자 상태 초기화 (Zustand persist로 자동 저장됨)
       const { setIsVerified, setUser, setUserType } = useUserStore.getState();
       setIsVerified(false);
       setUser(null);
       setUserType(null);
-      
-      // 로그인 페이지로 리다이렉트
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+
+      // 로그인 페이지로 리다이렉트 (이미 /login 위면 중복 이동 방지)
+      if (typeof window !== "undefined" && window.location.pathname !== "/login") {
+        window.location.href = "/login";
       }
     }
     
