@@ -7,25 +7,45 @@ import { getCheckAuth as getOrgCheckAuth } from "../apis/authOrganization";
 interface UserState {
   user: User | null;
   isVerified: boolean;
-  userType: 'individual' | 'organization' | null;
+  userType: "individual" | "organization" | null;
+  kakaoOauthActiveCode: string | null;
+  /** 백엔드가 code로 발급·반환한 카카오 accessToken (persist 제외) */
+  kakaoAccessToken: string | null;
   setUser: (user: User | null) => void;
   setIsVerified: (isVerified: boolean) => void;
-  setUserType: (userType: 'individual' | 'organization' | null) => void;
+  setUserType: (userType: "individual" | "organization" | null) => void;
+  claimKakaoOAuthCode: (code: string) => boolean;
+  releaseKakaoOAuthCode: (code: string) => void;
+  setKakaoAccessToken: (token: string | null) => void;
   checkAuthStatus: () => void;
 }
 
+type UserPersistedSlice = Pick<
+  UserState,
+  "user" | "isVerified" | "userType"
+>;
+
 export const useUserStore = create(
-  persist<UserState>(
+  persist<UserState, [], [], UserPersistedSlice>(
     (set, get) => ({
       user: null,
       isVerified: false,
       userType: null,
+      kakaoOauthActiveCode: null,
+      kakaoAccessToken: null,
       setUser: (user) => set({ user }),
       setIsVerified: (isVerified) => set({ isVerified }),
-      setUserType: (userType) => {
-        console.log('userStore - setUserType 호출됨:', userType);
-        set({ userType });
+      setUserType: (userType) => set({ userType }),
+      claimKakaoOAuthCode: (code) => {
+        if (get().kakaoOauthActiveCode === code) return false;
+        set({ kakaoOauthActiveCode: code });
+        return true;
       },
+      releaseKakaoOAuthCode: (code) => {
+        if (get().kakaoOauthActiveCode !== code) return;
+        set({ kakaoOauthActiveCode: null });
+      },
+      setKakaoAccessToken: (token) => set({ kakaoAccessToken: token }),
       checkAuthStatus: () => {
         const { userType, isVerified } = get();
         
@@ -46,19 +66,34 @@ export const useUserStore = create(
               set({ isVerified: true });
             } else {
               // 서버에서 로그아웃 상태 확인됨 (false = 로그아웃)
-              set({ isVerified: false, user: null, userType: null });
+              set({
+                isVerified: false,
+                user: null,
+                userType: null,
+                kakaoAccessToken: null,
+              });
               localStorage.removeItem('user-store');
             }
           })
           .catch(() => {
             // API 호출 실패 시 로그아웃 상태로 처리
-            set({ isVerified: false, user: null, userType: null });
+            set({
+              isVerified: false,
+              user: null,
+              userType: null,
+              kakaoAccessToken: null,
+            });
             localStorage.removeItem('user-store');
           });
       },
     }),
-    { 
-      name: "user-store"
+    {
+      name: "user-store",
+      partialize: (state) => ({
+        user: state.user,
+        isVerified: state.isVerified,
+        userType: state.userType,
+      }),
     }
   )
 );
