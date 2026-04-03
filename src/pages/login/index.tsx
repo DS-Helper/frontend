@@ -8,7 +8,9 @@ import { MdHome } from "react-icons/md";
 import { FaPhoneAlt } from "react-icons/fa";
 import classNames from "classnames/bind";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { getLoginUrl, naverLoginUrl, googleLoginUrl } from "@/lib/apis/authUser";
+import { extractOAuthCodeAsAccessToken } from "@/lib/oauth/extractOAuthCode";
 
 const cn = classNames.bind(styles);
 
@@ -33,6 +35,18 @@ const normalizeUrl = (url: string): string => {
 
 export default function LoginPage() {
   const router = useRouter();
+
+  /** redirect_uri가 /login 인 경우 — query의 code를 그대로 accessToken으로 쓰는 콜백 경로로 넘김 */
+  useEffect(() => {
+    if (!router.isReady || typeof window === "undefined") return;
+    if (router.pathname !== "/login") return;
+    const code = extractOAuthCodeAsAccessToken(window.location.href);
+    if (!code) return;
+    void router.replace(
+      { pathname: "/oauth/kakao/login", query: { code } },
+      `/oauth/kakao/login?code=${encodeURIComponent(code)}`
+    );
+  }, [router.isReady, router.pathname, router.asPath, router]);
 
   const handleKakaoLogin = async () => {
     try {

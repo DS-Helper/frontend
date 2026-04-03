@@ -10,9 +10,12 @@ export const getLoginUrl = async () => {
   }
 };
 
-export const getLogin = async (data: any) => {
+export const getLogin = async (code: string) => {
   try {
-    const res = await instance.get("/oauth/kakao/login", { params: data });
+    const res = await instance.post("/oauth/kakao/login", {
+      code: code,
+    });
+    alert(res.data);
     return res;
   } catch (e) {
     console.error(e);

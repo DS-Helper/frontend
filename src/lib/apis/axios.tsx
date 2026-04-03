@@ -5,7 +5,7 @@ const baseURL = process.env.NEXT_PUBLIC_API_URL;
 const testURL = process.env.NEXT_PUBLIC_TEST_API_URL;
 
 export const instance: AxiosInstance = axios.create({
-  baseURL: baseURL,
+  baseURL: testURL,
   withCredentials: true,
 });
 
@@ -37,10 +37,12 @@ instance.interceptors.response.use(
       }
 
       // 스토어에서 사용자 상태 초기화 (Zustand persist로 자동 저장됨)
-      const { setIsVerified, setUser, setUserType } = useUserStore.getState();
+      const { setIsVerified, setUser, setUserType, setKakaoAccessToken } =
+        useUserStore.getState();
       setIsVerified(false);
       setUser(null);
       setUserType(null);
+      setKakaoAccessToken(null);
 
       // 로그인 페이지로 리다이렉트 (이미 /login 위면 중복 이동 방지)
       if (typeof window !== "undefined" && window.location.pathname !== "/login") {
