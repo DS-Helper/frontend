@@ -29,10 +29,10 @@ export function getKakaoOAuthCallbackPathname(): string {
 }
 
 export function buildKakaoAuthorizeUrl(): string {
-  const clientId = process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY?.trim();
+  const clientId = process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY_TEST?.trim();
   if (!clientId) {
     throw new Error(
-      ".env에 NEXT_PUBLIC_KAKAO_REST_API_KEY(카카오 REST API 키)를 설정하세요."
+      ".env에 NEXT_PUBLIC_KAKAO_REST_API_KEY_TEST(카카오 REST API 키)를 설정하세요."
     );
   }
   const redirectUri = getKakaoOAuthRedirectUri();
