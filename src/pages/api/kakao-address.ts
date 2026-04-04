@@ -57,9 +57,9 @@ export default async function handler(
     return res.status(400).json({ error: "검색어(q)가 필요합니다." });
   }
 
-  const apiKey = process.env.KAKAO_REST_API_KEY?.trim();
+  const apiKey = process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY?.trim();
   if (!apiKey) {
-    return res.status(500).json({ error: "KAKAO_REST_API_KEY가 설정되지 않았습니다." });
+    return res.status(500).json({ error: "NEXT_PUBLIC_KAKAO_REST_API_KEY가 설정되지 않았습니다." });
   }
 
   const url = new URL("https://dapi.kakao.com/v2/local/search/address.json");

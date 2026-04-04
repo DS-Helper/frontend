@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
-import { useUserStore } from "@/lib/store/userStore";
+import { useUserStore, applyLoginResponseTokens } from "@/lib/store/userStore";
 import { googleLogin } from "@/lib/apis/authUser";
 
 export default function GoogleLoginPage() {
@@ -11,28 +11,24 @@ export default function GoogleLoginPage() {
 
   const handleGoogleLogin = useCallback(async (code: string) => {
     try {
-      // getLogin API 호출 (code를 파라미터로 전달)
       const response = await googleLogin({ code });
       
       if (response && response.data) {
         const data = response.data;
         
-        if (data.token) {
-          // 사용자 정보 저장
-          if (data.user) {
-            const { setUser, setUserType } = useUserStore.getState();
-            setUser(data.user);
-            setUserType('individual');
-          }
-          
-          // 인증 상태 업데이트 (Zustand persist로 자동 저장됨)
-          setIsVerified(true);
-          
-          alert('구글 로그인 성공!');
-          router.push('/');
-        } else {
-          throw new Error(data.message || '로그인에 실패했습니다.');
+        applyLoginResponseTokens(data);
+        const { accessToken, refreshToken } = useUserStore.getState();
+        if (!accessToken && !refreshToken) {
+          throw new Error(data.message || "로그인에 실패했습니다.");
         }
+        if (data.user) {
+          const { setUser, setUserType } = useUserStore.getState();
+          setUser(data.user);
+          setUserType("individual");
+        }
+        setIsVerified(true);
+        alert("구글 로그인 성공!");
+        router.push("/");
       } else {
         throw new Error('로그인 요청에 실패했습니다.');
       }
@@ -56,9 +52,10 @@ export default function GoogleLoginPage() {
     }
 
     if (code) {
+      alert(`code: ${code}`);
       handleGoogleLogin(code);
     } else {
-      // code가 없으면 로그인 페이지로 리다이렉트
+      alert('인가 코드(code)가 없습니다.');
       router.push('/login');
     }
   }, [router, handleGoogleLogin]);

@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
-import { useUserStore } from "@/lib/store/userStore";
+import { useUserStore, applyLoginResponseTokens } from "@/lib/store/userStore";
 import { naverLogin } from "@/lib/apis/authUser";
 
 export default function NaverLoginPage() {
@@ -17,22 +17,19 @@ export default function NaverLoginPage() {
       if (response && response.data) {
         const data = response.data;
         
-        if (data.token) {
-          // 사용자 정보 저장
-          if (data.user) {
-            const { setUser, setUserType } = useUserStore.getState();
-            setUser(data.user);
-            setUserType('individual');
-          }
-          
-          // 인증 상태 업데이트 (Zustand persist로 자동 저장됨)
-          setIsVerified(true);
-          
-          alert('네이버 로그인 성공!');
-          router.push('/');
-        } else {
-          throw new Error(data.message || '로그인에 실패했습니다.');
+        applyLoginResponseTokens(data);
+        const { accessToken, refreshToken } = useUserStore.getState();
+        if (!accessToken && !refreshToken) {
+          throw new Error(data.message || "로그인에 실패했습니다.");
         }
+        if (data.user) {
+          const { setUser, setUserType } = useUserStore.getState();
+          setUser(data.user);
+          setUserType("individual");
+        }
+        setIsVerified(true);
+        alert("네이버 로그인 성공!");
+        router.push("/");
       } else {
         throw new Error('로그인 요청에 실패했습니다.');
       }

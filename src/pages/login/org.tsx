@@ -4,6 +4,7 @@ import styles from "@/styles/Login.module.scss";
 import classNames from "classnames/bind";
 import { useState } from "react";
 import { postLogin } from "../../lib/apis/authOrganization";
+import { applyLoginResponseTokens } from "../../lib/store/userStore";
 import { useUserStore } from "../../lib/store/userStore";
 import { useRouter } from "next/router";
 
@@ -30,7 +31,7 @@ export default function OrgLoginPage() {
       const isSuccess = res && res.status >= 200 && res.status < 300;
       
       if (isSuccess) {
-        // 사용자 정보 저장 (기관 로그인 응답에 사용자 정보가 있다면)
+        applyLoginResponseTokens(res.data);
         if (res.data?.user) {
           setUser(res.data.user);
         }
