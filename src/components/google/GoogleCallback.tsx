@@ -2,20 +2,20 @@
 
 import { useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
-import { getLogin } from "@/lib/apis/authUser";
+import { googleLogin } from "@/lib/apis/authUser";
 import { parseOAuthCallbackUrl } from "@/lib/oauth/parseOAuthCallbackUrl";
 import { completeIndividualSnsLogin } from "@/lib/oauth/completeIndividualSnsLogin";
 import styles from "@/components/oauth/OAuthCallbackLayout.module.scss";
 
-const kakaoOAuthAttempted = new Set<string>();
+const googleOAuthAttempted = new Set<string>();
 
-export default function KakaoCallback() {
+export default function GoogleCallback() {
   const router = useRouter();
 
   const completeLogin = useCallback(
     async (code: string) => {
       try {
-        const response = await getLogin(code);
+        const response = await googleLogin({ code });
         if (!response?.data) {
           throw new Error("로그인 요청에 실패했습니다.");
         }
@@ -43,8 +43,8 @@ export default function KakaoCallback() {
     if (error) {
       alert(
         errorDescription?.trim()
-          ? `카카오 로그인 실패: ${errorDescription}`
-          : "카카오 로그인에 실패했습니다."
+          ? `구글 로그인 실패: ${errorDescription}`
+          : "구글 로그인에 실패했습니다."
       );
       void router.replace("/login");
       return;
@@ -56,14 +56,14 @@ export default function KakaoCallback() {
       return;
     }
 
-    if (kakaoOAuthAttempted.has(code)) return;
-    kakaoOAuthAttempted.add(code);
+    if (googleOAuthAttempted.has(code)) return;
+    googleOAuthAttempted.add(code);
     void completeLogin(code);
   }, [router.isReady, router, completeLogin]);
 
   return (
     <div className={styles.wrap}>
-      <p className={styles.message}>카카오 로그인 처리 중…</p>
+      <p className={styles.message}>구글 로그인 처리 중…</p>
     </div>
   );
 }

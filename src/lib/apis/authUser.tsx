@@ -6,14 +6,46 @@ export const KAKAO_OAUTH_AUTHORIZE_ENDPOINT =
 /** 카카오 개발자 콘솔에 등록할 redirect 경로(프론트 콜백) */
 export const KAKAO_OAUTH_REDIRECT_PATH = "/kakao/callback";
 
-export function getKakaoOAuthRedirectUri(): string {
-  const fromEnv = process.env.NEXT_PUBLIC_KAKAO_OAUTH_REDIRECT_URI?.trim();
+export const GOOGLE_OAUTH_REDIRECT_PATH = "/google/callback";
+export const NAVER_OAUTH_REDIRECT_PATH = "/naver/callback";
+
+function getAppOrigin(): string {
+  if (typeof window === "undefined") return "";
+  return (
+    (process.env.NEXT_PUBLIC_APP_ORIGIN ?? "").replace(/\/$/, "") ||
+    window.location.origin
+  );
+}
+
+function resolveOAuthRedirectUri(
+  envFullUrl: string | undefined,
+  pathname: string
+): string {
+  const fromEnv = envFullUrl?.trim();
   if (fromEnv) return fromEnv;
   if (typeof window === "undefined") return "";
-  const origin =
-    (process.env.NEXT_PUBLIC_APP_ORIGIN ?? "").replace(/\/$/, "") ||
-    window.location.origin;
-  return `${origin}${KAKAO_OAUTH_REDIRECT_PATH}`;
+  return `${getAppOrigin()}${pathname}`;
+}
+
+export function getKakaoOAuthRedirectUri(): string {
+  return resolveOAuthRedirectUri(
+    process.env.NEXT_PUBLIC_KAKAO_OAUTH_REDIRECT_URI,
+    KAKAO_OAUTH_REDIRECT_PATH
+  );
+}
+
+export function getGoogleOAuthRedirectUri(): string {
+  return resolveOAuthRedirectUri(
+    process.env.NEXT_PUBLIC_GOOGLE_OAUTH_REDIRECT_URI,
+    GOOGLE_OAUTH_REDIRECT_PATH
+  );
+}
+
+export function getNaverOAuthRedirectUri(): string {
+  return resolveOAuthRedirectUri(
+    process.env.NEXT_PUBLIC_NAVER_OAUTH_REDIRECT_URI,
+    NAVER_OAUTH_REDIRECT_PATH
+  );
 }
 
 export function getKakaoOAuthCallbackPathname(): string {
@@ -66,16 +98,6 @@ export const naverLoginUrl = async () => {
   }
 };
 
-export const naverLogin = async (data: any) => {
-  try {
-    const res = await instance.get("/oauth/naver/login", { params: data });
-    return res;
-  } catch (e) {
-    console.error(e);
-    return null;
-  }
-};
-
 export const googleLoginUrl = async () => {
   try {
     const res = await instance.get("/oauth/google/login-url");
@@ -86,9 +108,83 @@ export const googleLoginUrl = async () => {
   }
 };
 
-export const googleLogin = async (data: any) => {
+export function pickOAuthLoginUrl(data: unknown): string | null {
+  if (data == null) return null;
+  if (typeof data === "string") {
+    const s = data.trim();
+    return s || null;
+  }
+  if (typeof data !== "object") return null;
+  const o = data as Record<string, unknown>;
+  for (const key of ["url", "loginUrl", "redirectUrl"] as const) {
+    const v = o[key];
+    if (typeof v === "string" && v.trim()) return v.trim();
+  }
+  return null;
+}
+
+function normalizeOAuthAuthorizeUrl(url: string): string {
+  const u = url.trim();
+  if (u.startsWith("http://") || u.startsWith("https://")) return u;
+  if (u.startsWith("/")) {
+    const base = (process.env.NEXT_PUBLIC_TEST_API_URL ?? "").replace(
+      /\/$/,
+      ""
+    );
+    return base ? `${base}${u}` : u;
+  }
+  return u;
+}
+
+/** 백엔드가 내려준 authorize URL의 redirect_uri를 프론트 콜백으로 맞춥니다. */
+export function replaceOAuthAuthorizeRedirectUri(
+  authorizeUrl: string,
+  redirectUri: string
+): string {
   try {
-    const res = await instance.get("/oauth/google/login", { params: data });
+    const u = new URL(authorizeUrl);
+    u.searchParams.set("redirect_uri", redirectUri);
+    return u.toString();
+  } catch {
+    return authorizeUrl;
+  }
+}
+
+export async function getGoogleOAuthStartUrl(): Promise<string> {
+  const res = await googleLoginUrl();
+  const raw = pickOAuthLoginUrl(res?.data);
+  if (!raw) throw new Error("구글 로그인 URL을 받아오지 못했습니다.");
+  const absolute = normalizeOAuthAuthorizeUrl(raw);
+  return replaceOAuthAuthorizeRedirectUri(
+    absolute,
+    getGoogleOAuthRedirectUri()
+  );
+}
+
+export async function getNaverOAuthStartUrl(): Promise<string> {
+  const res = await naverLoginUrl();
+  const raw = pickOAuthLoginUrl(res?.data);
+  if (!raw) throw new Error("네이버 로그인 URL을 받아오지 못했습니다.");
+  const absolute = normalizeOAuthAuthorizeUrl(raw);
+  return replaceOAuthAuthorizeRedirectUri(
+    absolute,
+    getNaverOAuthRedirectUri()
+  );
+}
+
+export const naverLogin = async (body: { code: string; state: string }) => {
+  try {
+    const res = await instance.post("/oauth/naver/login", body);
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+export const googleLogin = async (body: { code: string }) => {
+  try {
+    const res = await instance.post("/oauth/google/login", body);
     return res;
   } catch (e) {
     console.error(e);

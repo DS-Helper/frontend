@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import styles from "@/components/kakao/KakaoCallback.module.scss";
+import styles from "@/components/oauth/OAuthCallbackLayout.module.scss";
 
 /**
  * 예전 redirect URI(`/oauth/kakao/login`)로 돌아오는 요청을 `/kakao/callback`으로 넘깁니다.
