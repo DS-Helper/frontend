@@ -336,10 +336,10 @@ export default function Customer(){
                         <Image 
                         src={item.image}
                         alt="문의 이미지"
-                        width={200}
-                        height={200}
                         className={cn("inquiryImage")}
-                        style={{ height: 'auto' }}/>
+                        width={426}
+                        height={213}
+                        />
                     </div>
                 )}
 
@@ -507,36 +507,33 @@ export default function Customer(){
                             <div className={cn("formGroup")}>
                                 <label>관련 이미지</label>
                                 <div className={cn("imageUploadArea")}>
-                                    {/* 이미지 업로드 슬롯 1 (index0) */}
-                                    {[0,1].map((index) => (
-                                        <div key={index} className={cn("imageSlot")}>
-                                            {images[index] ? (
-                                                // 이미지가 있을 경우 미리보기와 삭제 버튼 표시
-                                                <div className={cn("imagePreview")}>
-                                                    <Image src={images[index]} alt={`문의 이미지 ${index+1}`} width={100} height={100} />
-                                                    <button 
-                                                        type="button" 
-                                                        className={cn("removeImageBtn")}
-                                                        onClick={() => handleImageRemove(index)}
-                                                    >
-                                                        &times;
-                                                    </button>
-                                                </div>
-                                            ):(
-                                                <label htmlFor={`image-upload-${index}`} className={cn("uploadLabel")}>
-                                                    <span className={cn("uploadPlusCircle")}>
-                                                        <span className={cn("plusIcon")}>+</span>
-                                                    </span>
-                                                    <input id={`image-upload-${index}`}
+                                    <div className={cn("imageSlot")}>
+                                        {images[0] ? (
+                                            <div className={cn("imagePreview")}>
+                                                <Image src={images[0]} alt="문의 이미지" width={100} height={100} />
+                                                <button
+                                                    type="button"
+                                                    className={cn("removeImageBtn")}
+                                                    onClick={() => handleImageRemove(0)}
+                                                >
+                                                    &times;
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <label htmlFor="image-upload-0" className={cn("uploadLabel")}>
+                                                <span className={cn("uploadPlusCircle")}>
+                                                    <span className={cn("plusIcon")}>+</span>
+                                                </span>
+                                                <input
+                                                    id="image-upload-0"
                                                     type="file"
                                                     accept="image/*"
                                                     className={cn("hiddenFileInput")}
-                                                    onChange={(e) => handleImageUpload(e, index)}
-                                                    />
-                                                </label>
-                                            )}
-                                        </div>
-                                    ))}
+                                                    onChange={(e) => handleImageUpload(e, 0)}
+                                                />
+                                            </label>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                             {/* 등록 버튼 추가 */}

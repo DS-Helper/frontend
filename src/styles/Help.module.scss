@@ -54,11 +54,11 @@
 .title {
   font-size: var(--Display-size);
   font-weight: var(--Display-weight);
-  color: var(--color-semantic-text-primary);
   text-align: center;
 
   @media (max-width: 611px) {
-    font-size: 3.2rem;
+    font-size: var(--title-L-size);
+    font-weight: var(--title-L-weight);
     text-align: left;
     padding: 0 2rem;
   }
@@ -73,7 +73,7 @@
 
   @media (max-width: 611px) {
     align-items: flex-start;
-    padding: 0 2rem;
+    padding: 0 1.6rem;
   }
 }
 
@@ -150,7 +150,8 @@
 }
 
 .nextButton {
-  padding: 1.4rem 17rem;
+  width: 100%;
+  padding: 1.4rem 0;
   background-color: var(--color-semantic-bg-brand);
   border-radius: 1rem;
   color: var(--color-semantic-text-inverse);

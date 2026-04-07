@@ -149,6 +149,11 @@ a {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
+  align-items: center;
+
+  @media (max-width: 611px) {
+    padding: 2.6rem 1.6rem;
+  }
 }
 
 button {
@@ -232,6 +237,11 @@ input {
   font-weight: 600 !important;
   font-size: 1.4rem !important;
   text-decoration: none !important;
+  padding: 1.6rem 3.6rem !important;
+
+  @media (max-width: 611px) {
+    padding: 1.5rem 2.1rem !important;
+  }
 }
 
 /* 날짜 타일 정렬 - CSS Grid 사용 */
@@ -370,7 +380,7 @@ input {
 
   /* 모바일에서 요일 헤더 크기 조정 */
   .react-calendar__month-view__weekdays__weekday abbr {
-    font-size: 1.2rem !important;
+    font-size: 1.5rem !important;
   }
 
   /* 모바일에서 달력 그리드 간격 조정 */

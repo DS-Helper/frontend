@@ -195,6 +195,18 @@ export default function ModifyPage() {
     
   };
 
+  const isFormValid =
+    name.trim() !== "" &&
+    phoneNumber.trim() !== "" &&
+    validatePhoneNumber(phoneNumber) &&
+    address.trim() !== "" &&
+    requirement.trim() !== "" &&
+    validateRecipientNumber(recipientNumber) &&
+    visitDate.trim() !== "" &&
+    startTime.trim() !== "" &&
+    endTime.trim() !== "" &&
+    (type !== "org" || organizationName.trim() !== "");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -214,7 +226,7 @@ export default function ModifyPage() {
     setShowErrors(true);
 
     // 필수 필드 검증 (특이사항은 선택 필드)
-    const hasErrors = !name || !phoneNumber || !address || !requirement || !validateRecipientNumber(recipientNumber) || (type === 'org' && !organizationName);
+    const hasErrors = !isFormValid;
 
     if (!hasErrors) {
       try {
@@ -293,40 +305,40 @@ export default function ModifyPage() {
       <main className={cn("main")}>
         <h2 className={cn("title")}>정보 입력</h2>
 
+        {/* 개인/기관 선택 */}
+        <div className={cn("toggleGroup")}>
+          <button
+            type="button"
+            onClick={() => setType("personal")}
+            disabled={userType === 'organization'}
+            className={`${cn("toggleButton")} ${
+              type === "personal" ? cn("active") : ""} 
+              ${userType === 'organization' ? cn("disabled") : ""}`}
+          >
+            <Image src={people} width={80} height={80} alt='개인 회원' className={cn("buttonImage")} />
+            <p className={cn("toggleLabel")}>개인</p>
+            <span className={cn("toggleDescription")}>당사자가 아닌, 보호자도 신청 가능!</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setType("org")}
+            disabled={userType === 'individual'}
+            className={`${cn("toggleButton")} ${
+              type === "org" ? cn("active") : ""} 
+              ${userType === 'individual' ? cn("disabled") : ""}`}
+          >
+            <Image src={house} width={80} height={80} alt="기관 회원" className={cn("buttonImage")} />
+            <p className={cn("toggleLabel")}>기관</p>
+          </button>
+        </div>
+
         {/* 달력 자리 - form 밖으로 이동 */}
         <DateTimeSelector onChange={handleDateTimeChange} />
 
         <form onSubmit={handleSubmit} className={cn("form")}>
-          {/* 개인/기관 선택 */}
-          <div className={cn("toggleGroup")}>
-            <button
-              type="button"
-              onClick={() => setType("personal")}
-              disabled={userType === 'organization'}
-              className={`${cn("toggleButton")} ${
-                type === "personal" ? cn("active") : ""} 
-                ${userType === 'organization' ? cn("disabled") : ""}`}
-            >
-              <Image src={people} width={80} height={80} alt='개인 회원' className={cn("buttonImage")} />
-              <p className={cn("toggleLabel")}>개인</p>
-              <span className={cn("toggleDescription")}>당사자가 아닌, 보호자도 신청 가능!</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setType("org")}
-              disabled={userType === 'individual'}
-              className={`${cn("toggleButton")} ${
-                type === "org" ? cn("active") : ""} 
-                ${userType === 'individual' ? cn("disabled") : ""}`}
-            >
-              <Image src={house} width={80} height={80} alt="기관 회원" className={cn("buttonImage")} />
-              <p className={cn("toggleLabel")}>기관</p>
-            </button>
-          </div>
-
           {/* 입력 필드 */}
           <div className={cn("inputGroup")}>
-            <label>이름</label>
+            <label>이름 <span className={cn("required")}>*</span></label>
             <input type="text" value={name} onChange={(e) => setName(e.target.value)} className={showErrors && !name ? cn("error") : undefined}  />
             {showErrors && !name && <p className={cn("errorMsg")}>이름을 입력해주세요.</p>}
           </div>
@@ -334,7 +346,7 @@ export default function ModifyPage() {
           {/* 기관 이름 필드 (기관 사용자만 표시) */}
           {type === 'org' && (
             <div className={cn("inputGroup")}>
-              <label>기관 이름</label>
+              <label>기관 이름 <span className={cn("required")}>*</span></label>
               <input 
                 type="text"
                 value={organizationName} 
@@ -346,7 +358,7 @@ export default function ModifyPage() {
           )}
 
           <div className={cn("inputGroup")}>
-            <label>전화번호</label>
+            <label>전화번호 <span className={cn("required")}>*</span></label>
             <input 
               type="text" 
               value={phoneNumber} 
@@ -358,7 +370,7 @@ export default function ModifyPage() {
           </div>
 
           <div className={cn("inputGroup")}>
-            <label>방문 주소</label>
+            <label>방문 주소 <span className={cn("required")}>*</span></label>
             <input
               type="text"
               value={address}
@@ -384,7 +396,7 @@ export default function ModifyPage() {
 
           {/* 도움 요청 내용 */}
           <div className={cn("inputGroup")}>
-            <label>도움 요청 내용</label>
+            <label>도움 요청 내용 <span className={cn("required")}>*</span></label>
             <input 
               type="text" 
               value={requirement} 
@@ -420,7 +432,7 @@ export default function ModifyPage() {
 
           {/* 사람 수 */}
           <div className={cn("inputGroup")}>
-            <label>도움 받는 사람 수</label>
+            <label>도움 받는 사람 수 <span className={cn("required")}>*</span></label>
             <div className={cn("recipientCountControl")}>
               <button
                 type="button"
@@ -456,9 +468,13 @@ export default function ModifyPage() {
             />
           </div>
 
-          <button type="submit" className={cn("submitBtn")}>
+          <button
+            type="submit"
+            className={cn("submitBtn", { disabled: !isFormValid })}
+            disabled={!isFormValid}
+          >
             예약하기
-            </button>
+          </button>
         </form>
       </main>
 

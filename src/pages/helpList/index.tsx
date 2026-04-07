@@ -396,7 +396,7 @@ export default function HelpListPage() {
           {/* 데이터가 없을 때 */}
           {!isApiLoading && filteredRequests.length === 0 && (
             <div className={cn("emptyState")}>
-              <p>해당 상태의 예약이 없습니다.</p>
+              <p>예약이 없습니다.</p>
             </div>
           )}
           
@@ -525,7 +525,6 @@ export default function HelpListPage() {
 
                   {/* 메인 콘텐츠 */}
                   <div className={detailCn("mainContent")}>
-                    {/* 날짜 및 시간 */}
                     <section className={detailCn("infoSection", "infoDate")}>
                       <h3 className={detailCn("sectionTitle")}>날짜 및 시간</h3>
                       <div className={detailCn("infoRow")}>

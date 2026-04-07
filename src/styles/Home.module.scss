@@ -157,7 +157,7 @@
     gap: 10rem;
 
     @media (max-width: 611px) {
-      gap: 2rem;
+      gap: 4rem;
     }
   }
 
@@ -186,9 +186,15 @@
       @media (max-width: 611px) {
         flex-direction: row;
         overflow-x: scroll;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
         gap: 0.8rem;
         align-self: flex-start;
         width: 100%;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
       }
 
       button {
@@ -228,6 +234,7 @@
       flex-wrap: wrap;
 
       @media (max-width: 611px) {
+        justify-content: center;
         gap: 10rem;
       }
 
@@ -241,15 +248,22 @@
         p {
           font-weight: 600;
           font-size: 2rem;
-          color: var(--color-primitive-gray-800);
           margin: 2rem 0 0.8rem;
           white-space: nowrap;
+
+          @media (max-width: 611px) {
+            font-size: 1.6rem;
+          }
         }
 
         span {
           font-weight: 500;
           font-size: 1.4rem;
-          color: var(--color-primitive-gray-600);
+          color: var(--color-semantic-text-secondary);
+
+          @media (max-width: 611px) {
+            font-size: 1.2rem;
+          }
         }
       }
     }
@@ -408,7 +422,15 @@
   .homePageWrapper {
     display: flex;
     flex-direction: column;
-    gap: 10rem;
+    gap: 8rem;
+
+    .title {
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 611px) {
+      gap: 4rem;
+    }
   }
 
   .storyList {
@@ -420,6 +442,10 @@
       display: flex;
       gap: 5rem;
       cursor: pointer;
+
+      @media (max-width: 611px) {
+        gap: 1.7rem;
+      }
 
       .storyImage {
         flex-shrink: 0;
@@ -446,7 +472,7 @@
         width: 100%;
         height: 100%;
         background-color: var(--color-semantic-bg-neutral-soft);
-        border-radius: 1.2rem;
+        border-radius: 0.4rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -461,7 +487,8 @@
         text-align: left;
 
         @media (max-width: 611px) {
-          font-size: 1.9rem;
+          font-size: var(--title-S-size);
+          font-weight: var(--title-S-weight);
         }
       }
 
@@ -484,10 +511,6 @@
           font-weight: var(--caption-weight);
           font-size: var(--caption-size);
           color: var(--color-semantic-text-tertiary);
-
-          @media (max-width: 611px) {
-            font-size: 1.3rem;
-          }
         }
 
         .storyView {
@@ -537,24 +560,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem;
-    margin: 4rem auto 0;
+    gap: 1.5rem;
+    margin: 0 auto;
     padding: 0;
     background: none;
     border: none;
-    color: var(--color-semantic-text-secondary);
+    color: #737272;
     font-size: 1.7rem;
-    font-weight: 400;
+    font-weight: 500;
     cursor: pointer;
     transition: color 0.2s ease;
 
-    &:hover {
-      color: var(--color-semantic-text-secondary);
-    }
-
     @media (max-width: 611px) {
       font-size: 1.5rem;
-      margin-top: 3rem;
 
       &::after {
         font-size: 1.5rem;
@@ -570,6 +588,7 @@
   display: inline-block;
 
   @media (max-width: 611px) {
-    font-size: 3.2rem;
+    font-size: var(--title-XL-size);
+    font-weight: var(--title-XL-weight);
   }
 }

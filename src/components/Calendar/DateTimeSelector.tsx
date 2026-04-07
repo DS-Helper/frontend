@@ -229,10 +229,6 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
 
   return (
     <div className={cn("dateTimeSelector")}>
-      <label className={cn("dateTimeLabel")}>
-        날짜 및 시간 <span className={cn("required")}>(필수)</span>
-      </label>
-      
       <div className={cn("calendarContainer")}>
         <Calendar
           locale="ko-KR"
