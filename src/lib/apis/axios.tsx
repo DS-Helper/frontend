@@ -68,13 +68,6 @@ instance.interceptors.response.use(
       }
 
       resetUserSession();
-
-      if (
-        typeof window !== "undefined" &&
-        window.location.pathname !== "/login"
-      ) {
-        window.location.href = "/login";
-      }
     }
 
     if (error.response?.status === 403) {

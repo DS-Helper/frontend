@@ -225,16 +225,21 @@ export default function Home() {
       <div className={cn("container")}>
         {/* 1페이지 */}
         <div className={cn("homePage")}>
-          <div className={cn("homePage1Hero")}>
-            <p className={cn("homePage1Title")}>
-              <span className={cn("homePage1TitleLine1")}>
-                달성군 생활밀착형 플랫폼
-                <br /> 
-                디에스헬퍼
-              </span>
-              
-            </p>
-          </div>
+          <div className={cn("homePage1Hero")} />
+          <p className={cn("homePage1Title")}>
+            <span className={cn("homePage1TitleLine1", "homePage1TitleDesktop")}>
+              달성군 생활밀착형 플랫폼
+              <br />
+              디에스헬퍼
+            </span>
+            <span className={cn("homePage1TitleLine1", "homePage1TitleCompact")}>
+              달성군 생활밀착형
+              <br />
+              플랫폼
+              <br />
+              디에스헬퍼
+            </span>
+          </p>
         </div>
 
         {/* 2페이지 */}
