@@ -5,11 +5,14 @@
   justify-content: center;
   min-height: 100vh;
   background: #fff;
+  padding: 0 1.6rem;
 }
 
 .buttonGroup {
+  width: 100%;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 2.4rem;
   margin-bottom: 2rem;
 }
@@ -19,7 +22,8 @@
   align-items: center;
   justify-content: center;
   gap: 1.2rem;
-  width: 37rem;
+  width: 100%;
+  max-width: 37rem;
   height: 6rem;
   border: none;
   border-radius: 1rem;

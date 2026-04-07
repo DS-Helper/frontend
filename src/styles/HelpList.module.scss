@@ -1,5 +1,6 @@
 .helpListPage {
   min-height: 100vh;
+  position: relative;
 }
 
 // 탭 네비게이션
@@ -176,15 +177,15 @@
   justify-content: center;
   padding: 3rem 0;
   gap: 1.6rem;
-  color: var(--grey-600);
+  color: var(--color-semantic-text-tertiary);
   font-size: 1.5rem;
 }
 
 .spinner {
   width: 3rem;
   height: 3rem;
-  border: 0.3rem solid var(--grey-200);
-  border-top: 0.3rem solid var(--primary-color);
+  border: 0.3rem solid var(--color-semantic-border-default);
+  border-top: 0.3rem solid var(--color-semantic-bg-brand);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -203,7 +204,7 @@
 .endMessage {
   text-align: center;
   padding: 3rem 0;
-  color: var(--grey-500);
+  color: var(--color-semantic-text-tertiary);
   font-size: 1.5rem;
   font-weight: 500;
   margin-top: 1rem;
@@ -217,7 +218,7 @@
 }
 
 .organizationTag {
-  background-color: var(--primary-color);
+  background-color: var(--color-semantic-bg-brand);
   color: white;
   padding: 0.4rem 0.8rem;
   border-radius: 0.6rem;
@@ -235,7 +236,7 @@
   
   p {
     font-size: 1.8rem;
-    color: var(--grey-600);
+    color: var(--color-semantic-text-tertiary);
     font-weight: 500;
   }
 }
@@ -243,7 +244,11 @@
 .emptyState {
   font-size: 1.8rem;
   text-align: center;
-  color: var(--grey-300);
+  color: var(--color-semantic-text-tertiary);
   font-weight: 500;
   margin-top: 2rem;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 10rem;
 }

@@ -1,6 +1,7 @@
 .customer {
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
+    height: auto;
     max-width: 57rem;
     margin: 0 auto;
     padding-top: 7rem;
@@ -51,7 +52,8 @@
 
 .tabContent {
     width: 100%;
-    max-width: 80rem; // 탭 컨텐츠 폭 제한
+    max-width: 80rem;
+    margin-bottom: 12rem;
 }
 
 .emptyBox {
@@ -532,10 +534,12 @@ textarea.customSelect {
 }
 
 .imageWrapper {
-    margin-top: 0.8rem;
+    margin-top: 1rem;
+    width: min(100%, 426px);
 
     .inquiryImage {
-        width: 200px;
+        width: 100%;
+        max-width: 426px;
         height: auto;
         object-fit: contain;
     }
@@ -654,13 +658,4 @@ textarea.customSelect {
     background-color: var(--color-semantic-bg-brand);
     border-radius: 1rem;
     margin-top: 5.6rem;
-
-    &:hover:not(.disabled) {
-        background-color: var(--color-semantic-bg-brand-hover);
-    }
-
-    &.disabled {
-        background-color: var(--color-semantic-bg-disabled);
-        color: var(--color-semantic-text-disabled);
-    }
 }

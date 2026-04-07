@@ -396,7 +396,7 @@ export default function HelpListPage() {
           {/* 데이터가 없을 때 */}
           {!isApiLoading && filteredRequests.length === 0 && (
             <div className={cn("emptyState")}>
-              <p>해당 상태의 예약이 없습니다.</p>
+              <p>예약이 없습니다.</p>
             </div>
           )}
           
