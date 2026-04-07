@@ -31,6 +31,10 @@
   transform: translateY(100%);
   transition: transform 0.3s ease;
 
+  @media (max-width: 611px) {
+    border-radius: 0;
+  }
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -66,6 +70,10 @@
   right: 0;
   bottom: 0;
   z-index: 1001;
+
+  @media (max-width: 611px) {
+    padding: 0 1.6rem;
+  }
 
   &.scheduled {
     background-color: var(--color-semantic-bg-brand);
@@ -124,6 +132,10 @@
   flex-direction: column;
   margin: 0 auto;
   padding-top: 1.6rem;
+
+  @media (max-width: 611px) {
+    padding: 1.6rem;
+  }
 }
 
 .infoSection {
@@ -195,6 +207,10 @@
 .actionSection {
   max-width: 57rem;
   margin: 5.6rem auto;
+
+  @media (max-width: 611px) {
+    padding: 0 1.6rem;
+  }
 }
 
 .cancelButton {
@@ -208,41 +224,4 @@
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s ease;
-}
-
-// 반응형 디자인
-@media (max-width: 768px) {
-  .modalContent {
-    margin: 5rem 0 0 0;
-    border-radius: 2rem 2rem 0 0;
-    width: 100%;
-  }
-
-  .header {
-    padding: 1.6rem 2rem;
-  }
-
-  .mainContent {
-    padding: 2rem;
-  }
-
-  .actionSection {
-    padding: 2rem;
-  }
-
-  .sectionTitle {
-    font-size: 1.7rem;
-  }
-
-  .infoText,
-  .label,
-  .value,
-  .contentText {
-    font-size: 1.5rem;
-  }
-
-  .icon {
-    font-size: 1.6rem;
-    min-width: 2rem;
-  }
 }

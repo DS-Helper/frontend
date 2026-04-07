@@ -1,6 +1,10 @@
 .helpListPage {
   min-height: 100vh;
   position: relative;
+
+  @media (max-width: 611px) {
+    padding: 0 1.6rem;
+  }
 }
 
 // 탭 네비게이션

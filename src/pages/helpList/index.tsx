@@ -525,7 +525,6 @@ export default function HelpListPage() {
 
                   {/* 메인 콘텐츠 */}
                   <div className={detailCn("mainContent")}>
-                    {/* 날짜 및 시간 */}
                     <section className={detailCn("infoSection", "infoDate")}>
                       <h3 className={detailCn("sectionTitle")}>날짜 및 시간</h3>
                       <div className={detailCn("infoRow")}>

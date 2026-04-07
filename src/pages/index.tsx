@@ -293,9 +293,7 @@ export default function Home() {
                             className={cn("image")}
                           />
                         ) : (
-                          <div className={cn("placeholderImage")}>
-                            <span>이미지 없음</span>
-                          </div>
+                          <div className={cn("placeholderImage")}></div>
                         )}
                       </div>
                     </li>
