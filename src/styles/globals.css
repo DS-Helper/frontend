@@ -25,7 +25,7 @@
   --color-semantic-text-disabled: var(--color-primitive-gray-400);
   --color-semantic-text-inverse: var(--color-primitive-white);
   --color-semantic-text-brand: var(--color-primitive-primary-500);
-  --color-semantic-text-error: var(--color-primitive-red-500);
+  --color-semantic-text-danger: var(--color-primitive-red-500);
 
   /* background */
   --color-semantic-bg-page: var(--color-primitive-white);
@@ -60,6 +60,8 @@
   --title-M-weight: 600;
   --title-S-size: 1.6rem;
   --title-S-weight: 600;
+  --title-XS-size: 1.4rem;
+  --title-XS-weight: 700;
   --body-L-size: 1.8rem;
   --body-L-weight: 600;
   --body-M-size: 1.6rem;

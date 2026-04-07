@@ -134,7 +134,7 @@
 
 .errorMsg {
   font-size: 1.7rem;
-  color: var(--color-semantic-text-error);
+  color: var(--color-semantic-text-danger);
   margin-top: 0.6rem;
 }
 
@@ -739,7 +739,7 @@
 
 .laterButton {
   flex: 1;
-  color: var(--color-semantic-text-error);
+  color: var(--color-semantic-text-danger);
   background: var(--color-semantic-bg-danger-soft);
   padding: 1.4rem 2rem;
   border-radius: 0.8rem;
@@ -893,7 +893,7 @@
 .addressSearchError {
   margin: 0;
   font-size: 1.4rem;
-  color: var(--color-semantic-text-error);
+  color: var(--color-semantic-text-danger);
   white-space: pre-line;
   line-height: 1.5;
 }

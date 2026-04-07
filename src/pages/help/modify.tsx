@@ -458,7 +458,7 @@ export default function ModifyPage() {
 
           <button type="submit" className={cn("submitBtn")}>
             예약하기
-          </button>
+            </button>
         </form>
       </main>
 
@@ -490,7 +490,7 @@ export default function ModifyPage() {
             </div>
             <div className={cn("addressSearchBody")}>
               <p className={cn("addressSearchHint")}>
-                도로명·지번을 입력 후 검색하세요. (예: 김포한강4로 564)
+                도로명·지번을 입력 후 검색하세요.
               </p>
               <form
                 className={cn("addressSearchForm")}
