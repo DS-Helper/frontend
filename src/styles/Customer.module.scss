@@ -107,10 +107,9 @@
     flex-direction: column;
     gap: 0.8rem;
 
-    label {
-        font-weight: 500;
-        font-size: 1.7rem;
-        color: #525151;
+    label:not(.inquiryFormLabel) {
+        font-weight: var(--label-M-weight);
+        font-size: var(--label-M-size);
     }
 }
 
@@ -128,10 +127,11 @@
     appearance: none;
     width: 100%;
     padding: 1.4rem 4rem 1.4rem 1.2rem; // 오른쪽 패딩 추가하여 아이콘 공간 확보
+    font-family: inherit;
     font-size: 1.7rem;
     font-weight: 400;
     line-height: 1.5;
-    border: 1px solid #d1d1d1;
+    border: 1px solid var(--color-semantic-border-default);
     border-radius: 1rem;
     background: #fff;
     color: #222222;
@@ -143,51 +143,147 @@
         border-color: #999;
     }
 
+    &.customSelectPlaceholder {
+        color: transparent;
+    }
+
     option {
         font-size: 1.7rem;
         color: #222222;
         padding: 1.2rem;
     }
 
-    // textarea에 대한 스타일
-    &[type="textarea"],
-    &textarea {
-        font-size: 1.7rem;
-        font-weight: 400;
-        line-height: 1.5;
-        resize: vertical;
-        min-height: 10rem;
-    }
 }
 
-// textarea 전용 스타일
+// 문의 내용: 문의 유형 선택과 같은 1행 높이로 시작, 입력 줄 수만큼 자동 확장
 textarea.customSelect {
     font-size: 1.7rem;
     font-weight: 400;
     line-height: 1.5;
-    padding: 1.4rem 1.2rem; // textarea는 아이콘이 없으므로 오른쪽 패딩 조정
-    resize: vertical;
-    min-height: 10rem;
-
-    &::placeholder {
-        font-size: 1.7rem;
-        font-weight: 400;
-        color: #999;
-    }
+    padding: 1.4rem 1.2rem;
+    min-height: calc(1.4rem * 2 + 1.7rem * 1.5);
+    max-height: 70vh;
+    resize: none;
+    overflow-y: hidden;
 }
 
 .selectIcon {
     position: absolute;
     top: 50%;
-    right: 1.2rem;
+    right: 1.9rem;
     transform: translateY(-50%);
-    width: 3rem;
-    height: 3rem;
-    color: var(--grey-400);
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--color-semantic-icon-secondary);
     pointer-events: none;
     z-index: 1;
 }
 
+.inquiryFormLabel {
+    position: relative;
+    display: inline-block;
+    padding-right: 0.8rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #5c5c5c;
+    line-height: 1.3;
+}
+
+.inquiryRequiredMark {
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(90%, -0.15em);
+    font-size: 1.1rem;
+    line-height: 1;
+    font-weight: 600;
+}
+
+.inquiryTypeField {
+    position: relative;
+    z-index: 3;
+}
+
+.inquiryTypeTrigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 5.2rem;
+    padding: 1.4rem 1.4rem 1.4rem 1.6rem;
+    font-family: inherit;
+    font-size: 1.7rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #222222;
+    background: #fff;
+    border: 1px solid #d1d1d1;
+    border-radius: 1rem;
+    box-sizing: border-box;
+    cursor: pointer;
+    text-align: left;
+}
+
+.inquiryTypeTriggerPlaceholder .inquiryTypeTriggerText {
+    color: transparent;
+}
+
+.inquiryTypeTriggerText {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.inquiryTypeChevron {
+    flex-shrink: 0;
+    width: 2.4rem;
+    height: 2.4rem;
+    margin-left: 0.6rem;
+    color: var(--color-semantic-icon-secondary);
+    transition: transform 0.2s ease;
+}
+
+.inquiryTypeChevronOpen {
+    transform: rotate(180deg);
+}
+
+.inquiryTypeList {
+    position: absolute;
+    top: calc(100% + 0.35rem);
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0.8rem 0.4rem;
+    list-style: none;
+    background: #fff;
+    border: 1px solid #d1d1d1;
+    border-radius: 0.8rem;
+    box-shadow: 0 0.4rem 2rem rgba(0, 0, 0, 0.07);
+    box-sizing: border-box;
+    z-index: 20;
+}
+
+.inquiryTypeOption {
+    display: block;
+    width: 100%;
+    padding: 0.8rem 1.2rem;
+    font-family: inherit;
+    font-size: 1.7rem;
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: left;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--color-semantic-text-primary);
+}
+
+.inquiryTypeOptionActive {
+    background: #f3f3f3;
+    font-weight: 500;
+}
 
 .inquiryList {
     list-style: none;
@@ -468,18 +564,16 @@ textarea.customSelect {
 
 .imageUploadArea {
     display: flex;
-    gap: 1.6rem; // 이미지 슬롯 사이 간격
-    margin-top: 1.6rem; // 폼 그룹 내 간격
+    gap: 1.2rem;
 }
 
 .imageSlot {
-    border-radius: 1.6rem;
+    border-radius: 1rem;
     width: 16.3rem;
     height: 12rem;
-    background-color: #f7f7f7;
     overflow: hidden;
     position: relative;
-    border: 1px solid #e1e1e1;
+    border: 1px solid #D5D5D5;
 }
 
 .uploadLabel {
@@ -489,11 +583,46 @@ textarea.customSelect {
     width: 100%;
     height: 100%;
     cursor: pointer;
+}
 
-    .plusIcon {
-        font-size: 3rem;
-        color: #aeaeae;
+.uploadPlusCircle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 3.5rem;
+    height: 3.5rem;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: center / 100% 100% no-repeat;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='none' stroke='%23D5D5D5' stroke-width='2' stroke-dasharray='10 12' stroke-linecap='round'/%3E%3C/svg%3E");
+        pointer-events: none;
     }
+}
+
+.plusIcon {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 4rem;
+    font-weight: 50;
+    line-height: 0;
+    color: #D5D5D5;
+    transform: translateY(-0.06em);
 }
 
 .hiddenFileInput {
@@ -518,19 +647,20 @@ textarea.customSelect {
 
 .submitBtn {
     width: 100%;
-    padding: 1.6rem;
-    font-size: 1.7rem;
-    font-weight: bold;
-    color: white;
-    background-color: #0dba53;
-    border-radius: 1.6rem;
+    padding: 1.35rem;
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--color-semantic-text-inverse);
+    background-color: var(--color-semantic-bg-brand);
+    border-radius: 1rem;
+    margin-top: 5.6rem;
 
     &:hover:not(.disabled) {
-        background-color: #09a347;
+        background-color: var(--color-semantic-bg-brand-hover);
     }
 
     &.disabled {
-        background-color: #e1e1e1;
-        color: #999;
+        background-color: var(--color-semantic-bg-disabled);
+        color: var(--color-semantic-text-disabled);
     }
 }

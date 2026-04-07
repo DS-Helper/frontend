@@ -12,6 +12,7 @@
   align-items: center;
   justify-content: flex-end;
   overflow-x: clip;
+  padding-bottom: clamp(2.4rem, 5vh, 6.4rem);
 
   @media (max-width: 611px) {
     height: auto;
@@ -25,10 +26,6 @@
     left: 50%;
     transform: translateX(-50%);
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
     box-sizing: border-box;
     text-align: center;
 
@@ -39,9 +36,9 @@
       z-index: 0;
       background-image: url("/Hero-image.svg");
       background-repeat: no-repeat;
-      background-position: center center;
+      background-position: center 52%;
       background-size: contain;
-      transform: scale(1.10);
+      transform: scale(1.5);
       transform-origin: center center;
     }
 
@@ -56,11 +53,16 @@
   }
 
   .homePage1Title {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 2;
     margin: 0;
+    width: min(96%, 56rem);
     font-size: 6.6rem;
     font-weight: 700;
+    pointer-events: none;
 
     // @media (max-width: 1000px) {
     //   font-size: 60px;
