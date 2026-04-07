@@ -71,10 +71,10 @@
         transform-origin: center center;
       }
 
-      @media (max-width: 375px) {
+      @media (max-width: 376px) {
         &::before {
           background-position: center 60%;
-          transform: scale(1.8) translateY(8%);
+          transform: scale(1.8) translateY(-8%);
         }
       }
     }
