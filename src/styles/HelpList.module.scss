@@ -11,7 +11,6 @@
 .tabContainer {
   max-width: 57rem;
   margin: 0 auto;
-  padding: 0 2rem;
   display: flex;
   gap: 0;
 
@@ -24,21 +23,17 @@
   background: none;
   border: none;
   padding: 1.6rem 2.4rem;
-  font-size: 1.7rem;
-  font-weight: 600;
-  color: #6c757d;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--color-semantic-text-tertiary);
   cursor: pointer;
   position: relative;
   transition: color 0.2s ease;
   flex: 1;
   
-  &:hover {
-    color: #495057;
-  }
-  
   &.active {
-    color: #222;
     font-weight: 600;
+    color: var(--color-semantic-text-primary);
     
     &::after {
       content: '';
@@ -47,7 +42,7 @@
       left: 0;
       right: 0;
       height: 0.1rem;
-      background-color: #222;
+      background-color: var(--color-semantic-border-focus);
       border-radius: 0.2rem 0.2rem 0 0;
     }
   }
@@ -57,7 +52,6 @@
 .mainContent {
   max-width: 57rem;
   margin: 0 auto;
-  padding: 2.4rem 2rem;
 
   @media (max-width: 611px) {
     max-width: 100%;
@@ -73,13 +67,9 @@
 .helpCard {
   background: #fff;
   border-radius: 1.2rem;
-  padding: 3.2rem 2.4rem;
+  padding: 3.2rem 0;
   border-bottom: 1px solid #e9ecef;
   transition: box-shadow 0.2s ease;
-  
-  &:hover {
-    box-shadow: 0 0.4rem 1.2rem rgba(0, 0, 0, 0.08);
-  }
 }
 
 .cardHeader {
@@ -95,60 +85,58 @@
 }
 
 .date {
-  font-size: 1.7rem;
+  font-size: 1.6rem;
   font-weight: 900;
-  color: #222;
 }
 
 .dayOfWeek {
-  font-size: 1.7rem;
-  color: var(--grey-500);
+  font-size: 1.6rem;
+  color: var(--color-semantic-text-tertiary);
 }
 
 .statusTag {
-  padding: 0.2rem 1.2rem;
-  border-radius: 2rem;
-  font-size: 1.4rem;
-  font-weight: 500;
-  color: #fff;
+  padding: 0.2rem 0.8rem;
+  border-radius: 50rem;
+  font-size: var(--label-S-size);
+  font-weight: var(--label-S-weight);
+  color: var(--color-semantic-text-inverse);
   
   &.scheduled {
-    background-color: var(--primary-color);
+    background-color: var(--color-semantic-bg-brand);
   }
   
   &.completed {
-    background-color: var(--grey-500);
+    background-color: var(--color-semantic-bg-neutral-strong);
   }
   
   &.cancelled {
-    background-color: var(--grey-200);
-    color: var(--grey-500);
+    background-color: var(--color-semantic-bg-neutral-soft);
+    color: var(--color-semantic-text-tertiary);
   }
 }
 
 .contentText {
-  font-size: 1.7rem;
-  color: var(--grey-800);
+  font-size: 1.6rem;
   margin: 0;
   word-break: keep-all;
 }
 
 .timeInfo {
   display: flex;
-  align-items: center;
-  gap: 0.8rem;
+  align-items: flex-end;
+  gap: 0.4rem;
   padding: 1rem 0;
   border-radius: 0.8rem;
 }
 
 .clockIcon {
-  font-size: 1.6rem;
-  color: #6c757d;
+  width: 2.4rem;
+  height: 2.4rem;
 }
 
 .timeRange {
   font-size: 1.5rem;
-  color: #495057;
+  color: var(--color-semantic-text-secondary);
   font-weight: 500;
 }
 
@@ -161,7 +149,7 @@
 .viewDetailsButton,
 .cancelButton {
   padding: 0.8rem 2.2rem;
-  border-radius: 1rem;
+  border-radius: 0.8rem;
   font-size: 1.5rem;
   font-weight: 500;
   cursor: pointer;
@@ -170,15 +158,14 @@
 }
 
 .viewDetailsButton {
-  background-color: #fff;
-  border-color: var(--grey-300);
-  color: #222;
+  background-color: var(--color-semantic-bg-page);
+  border-color: var(--color-semantic-border-default);
 }
 
 .cancelButton {
-  background-color: #FFEBED;
+  background-color: var(--color-semantic-bg-danger-soft);
   border: none;
-  color: var(--red-color);
+  color: var(--color-semantic-text-danger);
 }
 
 // 무한 스크롤 관련 스타일

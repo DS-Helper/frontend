@@ -294,7 +294,7 @@ export default function Customer(){
 
                 <div className={cn("dateTime")}>
                     <span className={cn("date")}>{item.date}</span>
-                    <span className={cn("time")}>{item.time}</span>
+                    <span className={cn("time")}>({item.time})</span>
                 </div>
             </li>
         );
@@ -324,12 +324,7 @@ export default function Customer(){
                     {activeTab === "history" && (
                         loading ? (
                             <div className={cn("loadingBox")}>
-                                <p className={cn("loadingMessage")}>문의 내역을 불러오는 중...</p>
-                            </div>
-                        ) : error ? (
-                            <div className={cn("errorBox")}>
-                                <p className={cn("errorMessage")}>{error}</p>
-                                <button onClick={fetchInquiries} className={cn("retryBtn")}>다시 시도</button>
+                                <p className={cn("emptyMessage")}>문의 내역을 불러오는 중...</p>
                             </div>
                         ) : inquiries.length === 0 ? (
                             <div className={cn("emptyBox")}>
@@ -382,13 +377,15 @@ export default function Customer(){
                     {activeTab === "register" && (
                         <form className={cn("registerForm")} onSubmit={handleSubmit}>
                             <div className={cn("formGroup")}>
-                                <label>문의 유형</label>
+                                <div className={cn("formGroupLabel")}>
+                                    <label>문의 유형</label>
+                                    <span className={cn("requiredIcon")}>*</span>
+                                </div>
                                 <div className={cn("customSelectWrapper")}>
                                     <select 
                                         className={cn("customSelect")}
                                         value={inquiryType}
                                         onChange={(e) => setInquiryType(e.target.value)}>
-                                        <option value="" disabled>문의 유형을 선택하세요</option>
                                         <option value="help">도움 요청</option>
                                         <option value="uncomfortable">서비스 이용 불편</option>
                                         <option value="proposal">서비스 개선 제안</option>
@@ -398,12 +395,14 @@ export default function Customer(){
                                 </div>
                             </div>
                             <div className={cn("formGroup")}>
-                                <label>문의 내용</label>
+                                <div className={cn("formGroupLabel")}>
+                                    <label>문의 내용</label>
+                                    <span className={cn("requiredIcon")}>*</span>
+                                </div>
                                 <textarea 
                                 className={cn("customSelect")} // 동일한 폼으로 맞추기 위해 클래스 재사용
                                 value={content}
                                 onChange={handleContentChange}
-                                placeholder='문의 내용을 작성해주세요.'
                                 />
                             </div>
 

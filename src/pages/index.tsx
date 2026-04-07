@@ -8,7 +8,6 @@ import { IoIosArrowForward } from "react-icons/io";
 import { isAuthenticated } from "@/lib/utils/auth";
 
 // 이미지들
-import mainImage from "@/public/Hero-image.svg";
 import home1 from "@/public/home1.svg";
 import home2 from "@/public/home2.svg";
 import home3 from "@/public/home3.svg";
@@ -226,15 +225,16 @@ export default function Home() {
       <div className={cn("container")}>
         {/* 1페이지 */}
         <div className={cn("homePage")}>
-          <div className={cn("homePage1Content")}>
+          <div className={cn("homePage1Hero")}>
             <p className={cn("homePage1Title")}>
-              달성군 이웃을 위한 <br /> 무료 방문 서비스
+              <span className={cn("homePage1TitleLine1")}>
+                달성군 생활밀착형 플랫폼
+                <br /> 
+                디에스헬퍼
+              </span>
+              
             </p>
-            <Image src={mainImage} className={cn("homePage1Image")} alt="메인 이미지" width={250} height={329} />
           </div>
-          <button className={cn("homePage1Button")} onClick={handleHelp}>
-            도움 요청하기
-          </button>
         </div>
 
         {/* 2페이지 */}
