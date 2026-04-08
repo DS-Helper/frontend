@@ -7,7 +7,7 @@ export function mapItemToBoardPost(item: Record<string, unknown>): BoardPost {
     id: String(item.id ?? item.boardId ?? ""),
     title: String(item.title ?? ""),
     content: String(item.content ?? ""),
-    category: (item.category as BoardCategory) ?? "기타",
+    category: (item.category as BoardCategory) ?? "자유",
     likeCount: Number(item.likeCount ?? item.like_count ?? 0),
     commentCount: Number(item.commentCount ?? item.comment_count ?? 0),
     imageUrl:
