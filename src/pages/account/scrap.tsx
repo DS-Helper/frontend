@@ -11,6 +11,7 @@ import { mapItemToBoardPost } from "@/lib/board/mapBoardPost";
 import { readScrapIds } from "@/lib/board/scrapStorage";
 import heartIcon from "@/public/boardLikeGrey.svg";
 import commentIcon from "@/public/boardCommentGrey.svg";
+import AccountSideBar from "@/components/AccountSideBar";
 
 const cn = classNames.bind(styles);
 const scrapCn = classNames.bind(scrapStyles);
@@ -101,37 +102,7 @@ export default function ScrapPage() {
 
   return (
     <div className={cn("wrapper")}>
-      <aside className={cn("sidebar")}>
-        <ul className={cn("navList")}>
-          <li
-            className={cn("navItem")}
-            onClick={() => router.push("/account")}
-            onKeyDown={(e) => e.key === "Enter" && router.push("/account")}
-            role="button"
-            tabIndex={0}
-          >
-            프로필
-          </li>
-          <li
-            className={cn("navItem", "navItemActive")}
-            onClick={() => {}}
-            onKeyDown={(e) => e.key === "Enter" && (() => {})()}
-            role="button"
-            tabIndex={0}
-          >
-            스크랩
-          </li>
-          <li
-            className={cn("navItem")}
-            onClick={handleLogoutClick}
-            onKeyDown={(e) => e.key === "Enter" && handleLogoutClick()}
-            role="button"
-            tabIndex={0}
-          >
-            로그아웃
-          </li>
-        </ul>
-      </aside>
+      <AccountSideBar activeTab="scrap" onLogout={handleLogoutClick} />
 
       <main className={cn("main", scrapCn("scrapMain"))}>
         <div className={scrapCn("postList")}>
