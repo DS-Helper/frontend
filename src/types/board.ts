@@ -1,5 +1,6 @@
 // 게시판 카테고리 타입
 export type BoardCategory =
+  | '수다'
   | '생활정보'
   | '모임'
   | '병원'
@@ -81,6 +82,7 @@ export interface BoardComment {
 
 // 카테고리 목록
 export const boardCategories: BoardCategory[] = [
+  '수다',
   '생활정보',
   '모임',
   '병원',
@@ -91,4 +93,17 @@ export const boardCategories: BoardCategory[] = [
   '시장',
   '관광지',
   '기타',
+];
+
+/** 글쓰기 화면 드롭다운 순서(시안과 동일, 9개) */
+export const boardWriteCategories: BoardCategory[] = [
+  '수다',
+  '모임',
+  '병원',
+  '노인시설',
+  '학원',
+  '어린이집',
+  '문화시설',
+  '시장',
+  '관광지',
 ];

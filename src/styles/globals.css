@@ -156,6 +156,17 @@ a {
   }
 }
 
+/* 메인(/) 풀폭 레이아웃 — .home 안의 전역 .container는 패딩·센터 플렉스를 적용하지 않음 */
+.home .container {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  display: block;
+  flex-direction: unset;
+  align-items: unset;
+}
+
 button {
   outline: none;
   cursor: pointer;

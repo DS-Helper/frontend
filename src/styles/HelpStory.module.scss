@@ -3,6 +3,10 @@
   margin: 0 auto;
   padding: 9rem 0;
   background-color: #ffffff;
+
+  @media (max-width: 911px) {
+    padding: 3.2rem 1.6rem;
+  }
 }
 
 .main {
@@ -11,9 +15,15 @@
 
 .title {
   text-align: center;
-  font-size: 3rem;
+  font-size: 4.6rem;
   font-weight: 700;
   margin-bottom: 5.6rem;
+
+  @media (max-width: 611px) {
+    font-size: var(--title-L-size);
+    font-weight: var(--title-L-weight);
+    margin-bottom: 4rem;
+  }
 }
 
 .listToolbar {
@@ -21,6 +31,11 @@
   flex-direction: column;
   gap: 2.4rem;
   margin-bottom: 2.4rem;
+
+  @media (max-width: 611px) {
+    gap: 1.5rem;
+    margin-bottom: 1.8rem;
+  }
 }
 
 .searchForm {
@@ -37,6 +52,10 @@
   background-color: var(--color-semantic-bg-neutral-soft);
   font-size: 1.6rem;
   outline: none;
+
+  @media (max-width: 611px) {
+    font-size: 1.5rem;
+  }
 
   &::placeholder {
     font-weight: 400;
@@ -74,6 +93,13 @@
   flex-wrap: wrap;
 }
 
+.listMeta {
+  margin: 0 0 1.6rem;
+  font-size: 1.4rem;
+  color: var(--color-semantic-text-tertiary);
+  line-height: 1.5;
+}
+
 .sortButton {
   padding: 0.85rem 1.8rem;
   border-radius: 10rem;
@@ -104,6 +130,10 @@
   flex-direction: column;
   gap: 3.2rem;
   margin-bottom: 9rem;
+
+  @media (max-width: 611px) {
+    gap: 3.6rem;
+  }
 }
 
 .storyItem {
@@ -116,6 +146,11 @@
   background-color: #fff;
   cursor: pointer;
   transition: all 0.2s ease;
+
+  @media (max-width: 611px) {
+    gap: 2.4rem;
+    padding: 0;
+  }
 }
 
 .storyTextBox {
@@ -123,11 +158,6 @@
   flex-direction: column;
   justify-content: space-between;
   width: 100%;
-  min-height: 18rem;
-
-  @media (max-width: 611px) {
-    min-height: 10rem;
-  }
 }
 
 .storyContent {
@@ -141,10 +171,6 @@
     font-weight: var(--caption-weight);
     font-size: var(--caption-size);
     color: var(--color-semantic-text-tertiary);
-
-    @media (max-width: 611px) {
-      font-size: 1.3rem;
-    }
   }
 
   .storyView {
@@ -155,27 +181,36 @@
 }
 
 .storyTitle {
-  font-size: 2.4rem;
-  font-weight: 600;
-  color: var(--grey-800);
+  font-size: var(--title-L-size);
+  font-weight: var(--title-L-weight);
+
+  @media (max-width: 611px) {
+    font-size: var(--title-S-size);
+    font-weight: var(--title-S-weight);
+  }
 }
 
 .storyImage {
   flex-shrink: 0;
   width: 24rem;
   height: 18rem;
-  background-color: var(--grey-200);
-  border-radius: 1.2rem;
+  background-color: var(--color-semantic-bg-neutral-soft);
+  border-radius: 0.4rem;
   
   @media (max-width: 611px) {
     width: 13rem;
     height: 10rem;
   }
+
+  @media (max-width: 376px) {
+    width: 10rem;
+    height: 7.5rem;
+  }
 }
 
 .storyWriter {
-  font-size: 0.9rem;
-  color: #999;
+  font-size: var(--caption-size);
+  color: var(--color-semantic-text-tertiary);
   margin-top: auto;
 }
 

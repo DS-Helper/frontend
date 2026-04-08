@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
-import { getPosts } from "@/lib/apis/helpStory";
+import { getPosts, parsePostsListResponse } from "@/lib/apis/helpStory";
+import type { PostListItem } from "@/types/helpStory";
+import Pagination from "@/components/Pagination";
 import classNames from "classnames/bind";
 import styles from "@/styles/HelpStory.module.scss";
 import Image from "next/image";
@@ -9,14 +11,16 @@ type SortType = "latest" | "popular";
 
 const cn = classNames.bind(styles);
 
-interface Post {
-  postId: string;
-  title: string;
-  content: string;
-  writerName: string;
-  imageUrls: string[];
-  createdAt: string;
-  viewCount?: number;
+type Post = PostListItem;
+
+const POST_PAGE_SIZE = 10;
+
+/** 백엔드 sort / sortBy 규약에 맞춤 (필요 시 값만 조정) */
+function sortParamsForType(sortType: SortType): { sort: string; sortBy: string } {
+  if (sortType === "latest") {
+    return { sort: "DESC", sortBy: "createdAt" };
+  }
+  return { sort: "DESC", sortBy: "viewCount" };
 }
 
 export default function HelpStoryPage() {
@@ -25,39 +29,66 @@ export default function HelpStoryPage() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortType, setSortType] = useState<SortType>("latest");
 
   useEffect(() => {
-    fetchPosts();
-  }, [currentPage]);
+    let cancelled = false;
 
-  const fetchPosts = async () => {
-    try {
-      setLoading(true);
-      const response = await getPosts();
-      
-      console.log('API 응답:', response); // 디버깅용
-      
-      if (response && response.data) {
-        // API 응답 구조: response.data.posts 배열
-        const postsData = response.data.posts || [];
-        const totalPagesCount = response.data.totalPages || 1;
-        
-        console.log('포스트 데이터:', postsData); // 디버깅용
-        
-        setPosts(postsData);
-        setTotalPages(totalPagesCount);
-      } else {
-        setPosts([]);
-        setTotalPages(1);
+    const run = async () => {
+      try {
+        setLoading(true);
+        const { sort, sortBy } = sortParamsForType(sortType);
+        const response = await getPosts({
+          page: currentPage - 1,
+          size: POST_PAGE_SIZE,
+          sort,
+          sortBy,
+        });
+
+        if (cancelled) return;
+
+        if (response?.data) {
+          const { posts: postsData, page } = parsePostsListResponse(response.data);
+          setPosts(postsData);
+
+          if (page) {
+            setTotalPages(page.totalPages >= 1 ? page.totalPages : 0);
+            setTotalElements(page.totalElements);
+            setCurrentPage(page.page + 1);
+          } else {
+            setTotalPages(1);
+            setTotalElements(postsData.length);
+          }
+        } else {
+          setPosts([]);
+          setTotalPages(1);
+          setTotalElements(0);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error("도와드린 이야기 조회 실패:", error);
+          setPosts([]);
+          setTotalPages(1);
+          setTotalElements(0);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    } catch (error) {
-      console.error('도와드린 이야기 조회 실패:', error);
-      setPosts([]);
-    } finally {
-      setLoading(false);
+    };
+
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [currentPage, sortType]);
+
+  const applySortType = (next: SortType) => {
+    if (next !== sortType) {
+      setCurrentPage(1);
     }
+    setSortType(next);
   };
 
   const formatDate = (dateString: string) => {
@@ -93,69 +124,12 @@ export default function HelpStoryPage() {
     router.push(`/helpStory/${postId}`);
   };
 
+  /** 정렬은 API(page 요청의 sort/sortBy) 기준 — 여기서는 현재 페이지 내 검색만 */
   const displayedPosts = useMemo(() => {
-    let list = [...posts];
     const q = searchQuery.trim().toLowerCase();
-    if (q) {
-      list = list.filter((p) => p.title.toLowerCase().includes(q));
-    }
-    if (sortType === "latest") {
-      list.sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-    } else {
-      list.sort((a, b) => {
-        const views = (b.viewCount ?? 0) - (a.viewCount ?? 0);
-        if (views !== 0) return views;
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      });
-    }
-    return list;
-  }, [posts, searchQuery, sortType]);
-
-  const renderPagination = () => {
-    const pages = [];
-    const maxVisiblePages = 5;
-    
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(
-        <button
-          key={i}
-          onClick={() => handlePageChange(i)}
-          className={cn("pageButton", { active: i === currentPage })}
-        >
-          {i}
-        </button>
-      );
-    }
-
-    return (
-      <div className={cn("pagination")}>
-        <button 
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className={cn("pageButton", "navButton")}
-        >
-          &lt;
-        </button>
-        {pages}
-        <button 
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className={cn("pageButton", "navButton")}
-        >
-          &gt;
-        </button>
-      </div>
-    );
-  };
+    if (!q) return posts;
+    return posts.filter((p) => p.title.toLowerCase().includes(q));
+  }, [posts, searchQuery]);
 
   if (loading) {
     return (
@@ -212,14 +186,14 @@ export default function HelpStoryPage() {
             <button
               type="button"
               className={cn("sortButton", { sortButtonActive: sortType === "latest" })}
-              onClick={() => setSortType("latest")}
+              onClick={() => applySortType("latest")}
             >
               최신순
             </button>
             <button
               type="button"
               className={cn("sortButton", { sortButtonActive: sortType === "popular" })}
-              onClick={() => setSortType("popular")}
+              onClick={() => applySortType("popular")}
             >
               인기순
             </button>
@@ -251,9 +225,7 @@ export default function HelpStoryPage() {
                       className={cn("image")}
                     />
                   ) : (
-                    <div className={cn("placeholderImage")}>
-                      <span>이미지 없음</span>
-                    </div>
+                    <div className={cn("placeholderImage")}></div>
                   )}
                 </div>
               </li>
@@ -269,7 +241,11 @@ export default function HelpStoryPage() {
           )}
         </ul>
 
-        {totalPages > 1 && renderPagination()}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </main>
     </div>
   );

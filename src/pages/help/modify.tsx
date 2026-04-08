@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import styles from "@/styles/Modify.module.scss";
 import Image from "next/image"
@@ -6,7 +6,8 @@ import classNames from "classnames/bind";
 import DateTimeSelector from "@/components/Calendar/DateTimeSelector";
 import { postPersonalReservation } from "@/lib/apis/reservationUser";
 import { postOrganizationReservation } from "@/lib/apis/reservationOrg";
-import { useUserStore } from "@/lib/store/userStore"; 
+import { useUserStore } from "@/lib/store/userStore";
+import { loadDaumPostcodeScript } from "@/lib/daum/loadPostcodeScript";
 
 const cn = classNames.bind(styles);
 
@@ -16,24 +17,15 @@ import male from "@/public/reservate_male.svg"
 import female from "@/public/reservate_female.svg"
 import both from "@/public/reservate_both.svg"
 
-type KakaoRoadAddress = {
-  address_name: string;
-  building_name?: string;
-};
-
-type KakaoAddressDoc = {
-  address_name: string;
-  road_address: KakaoRoadAddress | null;
-  address?: { address_name: string };
-};
-
-function formatKakaoAddressLabel(doc: KakaoAddressDoc): string {
-  const rd = doc.road_address;
-  if (rd?.address_name) {
-    const building = rd.building_name?.trim();
-    return building ? `${rd.address_name} ${building}` : rd.address_name;
-  }
-  return doc.address?.address_name ?? doc.address_name;
+function formatAddressFromDaumPostcode(data: {
+  userSelectedType: "R" | "J";
+  roadAddress: string;
+  jibunAddress: string;
+  buildingName: string;
+}): string {
+  const line = data.userSelectedType === "R" ? data.roadAddress : data.jibunAddress;
+  const building = data.buildingName?.trim();
+  return building ? `${line} ${building}` : line;
 }
 
 export default function ModifyPage() {
@@ -55,11 +47,9 @@ export default function ModifyPage() {
   const [endTime, setEndTime] = useState("");
   const [showErrors, setShowErrors] = useState(false);
 
-  const [addressModalOpen, setAddressModalOpen] = useState(false);
-  const [addressSearchQuery, setAddressSearchQuery] = useState("");
-  const [addressSearchResults, setAddressSearchResults] = useState<KakaoAddressDoc[]>([]);
-  const [addressSearchLoading, setAddressSearchLoading] = useState(false);
-  const [addressSearchError, setAddressSearchError] = useState<string | null>(null);
+  const [postcodeOpenError, setPostcodeOpenError] = useState<string | null>(null);
+  const [postcodeLayerOpen, setPostcodeLayerOpen] = useState(false);
+  const postcodeEmbedRef = useRef<HTMLDivElement | null>(null);
 
   // 사용자 타입에 따라 자동으로 개인/기관 선택
   useEffect(() => {
@@ -71,54 +61,63 @@ export default function ModifyPage() {
   }, [userType]);
 
   useEffect(() => {
-    if (!addressModalOpen) return;
+    if (!postcodeLayerOpen) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setAddressModalOpen(false);
+      if (e.key === "Escape") setPostcodeLayerOpen(false);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [addressModalOpen]);
+  }, [postcodeLayerOpen]);
 
-  const openAddressSearchModal = () => {
-    setAddressSearchQuery(address);
-    setAddressSearchResults([]);
-    setAddressSearchError(null);
-    setAddressModalOpen(true);
-  };
+  useEffect(() => {
+    if (!postcodeLayerOpen) return;
+    const host = postcodeEmbedRef.current;
+    if (!host) return;
 
-  const runAddressSearch = async () => {
-    const q = addressSearchQuery.trim();
-    if (!q) return;
-    setAddressSearchLoading(true);
-    setAddressSearchError(null);
-    try {
-      const res = await fetch(
-        `/api/kakao-address?q=${encodeURIComponent(q)}`,
-      );
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        const errMsg =
-          typeof data.error === "string" ? data.error : "주소 검색에 실패했습니다.";
-        const detail =
-          typeof (data as { detail?: string }).detail === "string"
-            ? (data as { detail: string }).detail.trim()
-            : "";
-        throw new Error(detail ? `${errMsg}\n\n${detail}` : errMsg);
+    let cancelled = false;
+    host.innerHTML = "";
+
+    void (async () => {
+      try {
+        setPostcodeOpenError(null);
+        await loadDaumPostcodeScript();
+        if (cancelled || !host) return;
+        const Postcode = window.daum?.Postcode;
+        if (!Postcode) {
+          throw new Error("우편번호 서비스를 불러오지 못했습니다.");
+        }
+        new Postcode({
+          oncomplete: (data) => {
+            setPostcodeOpenError(null);
+            setAddress(formatAddressFromDaumPostcode(data));
+            setPostcodeLayerOpen(false);
+          },
+          onclose: () => {
+            if (!cancelled) setPostcodeLayerOpen(false);
+          },
+          width: "100%",
+          height: 480,
+          animation: false,
+        }).embed(host);
+      } catch (e) {
+        if (!cancelled) {
+          setPostcodeOpenError(
+            e instanceof Error ? e.message : "우편번호 창을 열 수 없습니다.",
+          );
+          setPostcodeLayerOpen(false);
+        }
       }
-      setAddressSearchResults((data.documents as KakaoAddressDoc[]) ?? []);
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "주소 검색에 실패했습니다.";
-      setAddressSearchError(message);
-      setAddressSearchResults([]);
-    } finally {
-      setAddressSearchLoading(false);
-    }
-  };
+    })();
 
-  const selectAddressFromSearch = (doc: KakaoAddressDoc) => {
-    setAddress(formatKakaoAddressLabel(doc));
-    setAddressModalOpen(false);
+    return () => {
+      cancelled = true;
+      host.innerHTML = "";
+    };
+  }, [postcodeLayerOpen]);
+
+  const openDaumPostcode = () => {
+    setPostcodeOpenError(null);
+    setPostcodeLayerOpen(true);
   };
 
   // 휴대폰 번호 포맷팅 함수
@@ -375,13 +374,21 @@ export default function ModifyPage() {
               type="text"
               value={address}
               readOnly
-              onClick={openAddressSearchModal}
+              onClick={openDaumPostcode}
+              placeholder="주소 검색"
+              title="우편번호 검색"
+              aria-label="우편번호 검색 열기"
               className={`${cn("addressReadonlyInput")} ${
                 showErrors && !address ? cn("error") : ""
               }`}
             />
             {showErrors && !address && (
               <p className={cn("errorMsg")}>주소를 입력해주세요.</p>
+            )}
+            {postcodeOpenError && (
+              <p className={cn("errorMsg")} role="alert">
+                {postcodeOpenError}
+              </p>
             )}
           </div>
 
@@ -478,92 +485,37 @@ export default function ModifyPage() {
         </form>
       </main>
 
-      {addressModalOpen && (
+      {postcodeLayerOpen && (
         <div
-          className={cn("modalOverlay")}
+          className={cn("postcodeLayerBackdrop")}
           role="presentation"
-          onClick={() => setAddressModalOpen(false)}
+          onClick={() => setPostcodeLayerOpen(false)}
         >
           <div
-            className={cn("addressSearchModal")}
+            className={cn("postcodeLayerPanel")}
             role="dialog"
             aria-modal="true"
-            aria-labelledby="addressSearchTitle"
+            aria-labelledby="postcodeLayerTitle"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className={cn("addressSearchHeader")}>
-              <h3 id="addressSearchTitle" className={cn("addressSearchTitle")}>
+            <div className={cn("postcodeLayerHeader")}>
+              <h3 id="postcodeLayerTitle" className={cn("postcodeLayerTitle")}>
                 주소 검색
               </h3>
               <button
                 type="button"
-                className={cn("addressSearchClose")}
-                onClick={() => setAddressModalOpen(false)}
+                className={cn("postcodeLayerClose")}
+                onClick={() => setPostcodeLayerOpen(false)}
                 aria-label="닫기"
               >
                 ×
               </button>
             </div>
-            <div className={cn("addressSearchBody")}>
-              <p className={cn("addressSearchHint")}>
-                도로명·지번을 입력 후 검색하세요.
-              </p>
-              <form
-                className={cn("addressSearchForm")}
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  void runAddressSearch();
-                }}
-              >
-                <input
-                  type="search"
-                  className={cn("addressSearchInput")}
-                  value={addressSearchQuery}
-                  onChange={(e) => setAddressSearchQuery(e.target.value)}
-                  placeholder="주소 검색"
-                  autoComplete="off"
-                />
-                <button
-                  type="submit"
-                  className={cn("addressSearchSubmit")}
-                  disabled={addressSearchLoading || !addressSearchQuery.trim()}
-                >
-                  {addressSearchLoading ? "검색 중…" : "검색"}
-                </button>
-              </form>
-              {addressSearchError && (
-                <p className={cn("addressSearchError")} role="alert">
-                  {addressSearchError}
-                </p>
-              )}
-              <div className={cn("addressSearchResults")}>
-                {!addressSearchLoading &&
-                  addressSearchResults.length === 0 &&
-                  !addressSearchError && (
-                    <p className={cn("addressSearchEmpty")}>
-                      검색어를 입력한 뒤 검색 버튼을 눌러주세요.
-                    </p>
-                  )}
-                {addressSearchResults.map((doc, idx) => {
-                  const main = formatKakaoAddressLabel(doc);
-                  const jibun = doc.address?.address_name?.trim();
-                  const showJibun = Boolean(doc.road_address && jibun);
-                  return (
-                    <button
-                      key={`${doc.address_name}-${idx}`}
-                      type="button"
-                      className={cn("addressSearchItem")}
-                      onClick={() => selectAddressFromSearch(doc)}
-                    >
-                      <span>{main}</span>
-                      {showJibun && (
-                        <span className={cn("addressSearchSub")}>{jibun}</span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            <div
+              ref={postcodeEmbedRef}
+              className={cn("postcodeEmbedHost")}
+              aria-label="우편번호 검색"
+            />
           </div>
         </div>
       )}

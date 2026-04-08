@@ -800,36 +800,49 @@
   cursor: pointer;
 }
 
-.addressSearchModal {
-  background: #fff;
-  border-radius: 1.6rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  max-width: 52rem;
+/* 우편번호 embed — fixed 뒷판 + flex 중앙 정렬 (open()은 레이아웃에 따라 모서리로 붙을 수 있음) */
+.postcodeLayerBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.6rem;
+  background: rgba(0, 0, 0, 0.45);
+  box-sizing: border-box;
+}
+
+.postcodeLayerPanel {
   width: 100%;
-  max-height: min(85vh, 64rem);
+  max-width: 52rem;
+  max-height: min(90vh, 56rem);
   display: flex;
   flex-direction: column;
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
 
-.addressSearchHeader {
+.postcodeLayerHeader {
+  flex-shrink: 0;
   display: flex;
-  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   gap: 1.2rem;
-  padding: 1.6rem 2rem;
+  padding: 1.4rem 1.6rem;
   border-bottom: 1px solid var(--color-semantic-border-default);
 }
 
-.addressSearchTitle {
-  font-size: 1.8rem;
+.postcodeLayerTitle {
+  margin: 0;
+  font-size: 1.7rem;
   font-weight: 600;
   color: var(--color-primitive-gray-800);
-  margin: 0;
 }
 
-.addressSearchClose {
+.postcodeLayerClose {
   flex-shrink: 0;
   width: 3.6rem;
   height: 3.6rem;
@@ -847,109 +860,15 @@
   }
 }
 
-.addressSearchBody {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.6rem;
+.postcodeEmbedHost {
   flex: 1;
-  min-height: 0;
-}
-
-.addressSearchForm {
-  display: flex;
-  flex-direction: row;
-  gap: 0.8rem;
-  align-items: stretch;
-}
-
-.addressSearchInput {
-  flex: 1;
-  min-width: 0;
-  padding: 1.2rem;
-  border: 1px solid var(--color-semantic-border-default);
-  border-radius: 1rem;
-  outline: none;
-  font-size: var(--value-M-size);
-  font-weight: var(--value-M-weight);
-  color: var(--color-primitive-gray-800);
-}
-
-.addressSearchSubmit {
-  flex-shrink: 0;
-  padding: 0 1.6rem;
-  border: none;
-  border-radius: 1rem;
-  background: var(--color-semantic-bg-brand);
-  color: var(--color-semantic-text-inverse);
-  font-size: var(--value-M-size);
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-}
-
-.addressSearchResults {
-  flex: 1;
-  min-height: 12rem;
-  max-height: 40rem;
-  overflow-y: auto;
-  border: 1px solid var(--color-semantic-border-default);
-  border-radius: 1rem;
-  background: #fafafa;
-}
-
-.addressSearchItem {
-  display: block;
+  min-height: 30rem;
   width: 100%;
-  padding: 1.2rem 1.4rem;
-  border: none;
-  border-bottom: 1px solid var(--color-semantic-border-default);
-  background: #fff;
-  text-align: left;
-  font-size: 1.5rem;
-  line-height: 1.45;
-  color: var(--color-primitive-gray-800);
-  cursor: pointer;
-  transition: background 0.15s ease;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: #fafafa;
 
-  &:last-child {
-    border-bottom: none;
+  @media (max-width: 611px) {
+    min-height: min(62vh, 30rem);
   }
-
-  &:hover {
-    background: #f3f6ff;
-  }
-}
-
-.addressSearchSub {
-  display: block;
-  margin-top: 0.4rem;
-  font-size: 1.3rem;
-  color: var(--color-semantic-text-secondary);
-}
-
-.addressSearchHint {
-  margin: 0;
-  font-size: 1.3rem;
-  color: var(--color-semantic-text-tertiary);
-}
-
-.addressSearchError {
-  margin: 0;
-  font-size: 1.4rem;
-  color: var(--color-semantic-text-danger);
-  white-space: pre-line;
-  line-height: 1.5;
-}
-
-.addressSearchEmpty {
-  padding: 2rem;
-  text-align: center;
-  font-size: 1.4rem;
-  color: var(--color-semantic-text-tertiary);
 }
