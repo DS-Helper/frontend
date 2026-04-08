@@ -36,7 +36,8 @@
   word-break: keep-all;
 
   @media (max-width: 611px) {
-    font-size: 3.2rem;
+    font-size: var(--title-XL-size);
+    font-weight: var(--title-XL-weight);
   }
 }
 
@@ -44,6 +45,11 @@
   display: block;
   font-size: 1.7rem;
   font-weight: 400;
+
+  @media (max-width: 611px) {
+    font-size: var(--caption-size);
+    font-weight: var(--caption-weight);
+  }
 }
 
 .imageWrapper {
@@ -75,8 +81,8 @@
   word-wrap: break-word;
 
   @media (max-width: 611px) {
-    font-size: 1.5rem;
-    line-height: 1.7;
+    font-size: var(--body-M-size);
+    font-weight: var(--body-M-weight);
   }
 }
 
