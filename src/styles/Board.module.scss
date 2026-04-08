@@ -17,14 +17,15 @@
 
 .searchInput {
 	width: 100%;
-	padding: 1rem 5rem 1rem 1.6rem;
-	border: 1px solid var(--grey-300);
+	padding: 1.4rem 2rem;
+	border: 1px solid var(--color-semantic-border-default);
 	border-radius: 50rem;
-	font-size: 1.6rem;
+	font-size: 1.5rem;
+	font-weight: 400;
 	outline: none;
 
 	&::placeholder {
-		color: var(--grey-500);
+		color: var(--color-semantic-text-tertiary);
 	}
 }
 
@@ -40,7 +41,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: var(--grey-500);
+	color: var(--color-semantic-icon-tertiary);
 	transition: color 0.2s ease;
 }
 
@@ -69,7 +70,13 @@
 .mainContent {
 	flex: 1;
 	min-width: 0;
+
+	@media (max-width: 611px) {
+		display: flex;
+		flex-direction: column;
+	}
 }
+
 
 .postList {
 	display: flex;
@@ -190,6 +197,23 @@
 	padding: 6rem 2rem;
 	color: #6c757d;
 	font-size: 1.6rem;
+}
+
+
+.mobileInfiniteFooter {
+	width: 100%;
+}
+
+.mobileInfiniteText {
+	margin: 1.2rem 0 0;
+	text-align: center;
+	font-size: 1.4rem;
+	color: var(--color-semantic-text-secondary);
+}
+
+.mobileInfiniteTrigger {
+	width: 100%;
+	height: 1px;
 }
 
 .writePage {
@@ -560,4 +584,25 @@
 		opacity: 0.65;
 		cursor: not-allowed;
 	}
+}
+
+@media (max-width: 768px) {
+	.boardContainer {
+		display: block;
+		padding: 0 1.6rem;
+		box-sizing: border-box;
+	}
+
+	.sidebar {
+		display: none;
+	}
+
+	.postList {
+		gap: 2.4rem;
+	}
+
+	.postItem {
+		padding: 0;
+	}
+
 }
