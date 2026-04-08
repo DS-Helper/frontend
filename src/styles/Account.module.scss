@@ -4,6 +4,10 @@
   min-height: calc(100vh - 6rem);
   display: flex;
   background-color: var(--background);
+
+  @media (max-width: 1024px) {
+    padding: 0 2rem;
+  }
 }
 
 .sidebar {
@@ -16,23 +20,19 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 2.4rem;
+  gap: 3.6rem;
 }
 
 .navItem {
   padding: 0.6rem 1.2rem;
   font-size: 1.7rem;
-  color: var(--grey-400);
   cursor: pointer;
   transition: color 0.2s;
-
-  &:hover {
-    color: var(--grey-800);
-  }
+  color: var(--color-semantic-text-tertiary);
 }
 
 .navItemActive {
-  color: var(--grey-800);
+  color: var(--color-semantic-text-primary);
   font-weight: 500;
 }
 
@@ -47,19 +47,65 @@
   padding: 4.4rem 3.9rem;
 }
 
+.profileSectionMobile {
+  display: none;
+}
+
 .avatarWrap {
+  position: relative;
   flex-shrink: 0;
   width: 9.4rem;
   height: 9.4rem;
-  border-radius: 50%;
-  overflow: hidden;
   background-color: var(--grey-200);
+}
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.profileImageInput {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.avatarCameraButtonWrap {
+  width: 2.8rem;
+  height: 2.8rem;
+  position: absolute;
+  right: 0;
+  bottom: -0.4rem;
+  background-color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatarCameraButton {
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-primitive-gray-200);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.avatarCameraIcon {
+  width: 1.2rem;
+  height: 1.2rem;
+  color: var(--color-primitive-gray-400);
 }
 
 .userInfo {
@@ -68,74 +114,147 @@
   gap: 0.8rem;
 }
 
+.userNameWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
 .userName {
   font-size: 3.2rem;
   font-weight: 600;
-  color: var(--grey-800);
+  color: var(--color-semantic-text-primary);
   line-height: 1.4;
+}
+
+.editButton {
+  width: 2.4rem;
+  height: 2.4rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  filter: grayscale(100%) brightness(68%) contrast(92%);
 }
 
 .userEmail,
 .userBirthGender,
 .userPhoneRow {
   font-size: 1.7rem;
-  color: var(--grey-800);
+  color: var(--color-semantic-text-primary);
   line-height: 1.4;
-}
-
-.userPhoneRow {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  color: var(--grey-400);
-}
-
-.verifyButton {
-  padding: 0.3rem 0.7rem;
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: var(--grey-800);
-  background-color: var(--grey-300);
-  border-radius: 0.5rem;
-  border: none;
-  cursor: pointer;
 }
 
 @media (max-width: 611px) {
   .wrapper {
     flex-direction: column;
+    margin-top: 0;
   }
 
   .sidebar {
     width: 100%;
     min-height: auto;
-    padding: 2rem;
     border-right: none;
-    border-bottom: 1px solid var(--grey-200);
+    border-bottom: 1px solid var(--color-semantic-border-subtle);
   }
 
   .navList {
+    width: 100%;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 0.4rem;
+    justify-content: space-between;
+    gap: 0;
   }
 
   .navItem {
-    padding: 0.8rem 1.6rem;
+    padding: 1.2rem 1.8rem;
     font-size: 1.5rem;
   }
 
+  .navItemActive {
+    border-bottom: 1px solid var(--color-semantic-border-focus);
+  }
+
   .profileSection {
+    display: none;
+  }
+
+  .profileSectionMobile {
+    display: flex;
     flex-direction: column;
-    text-align: center;
-  }
-
-  .userInfo {
     align-items: center;
+    width: 100%;
+    padding-top: 1.8rem;
+    box-sizing: border-box;
   }
 
-  .userPhoneRow {
-    flex-wrap: wrap;
+  .avatarWrapMobile {
+    width: 8.8rem;
+    height: 8.8rem;
+  }
+
+  .avatarCameraButtonWrap {
+    width: 2.8rem;
+    height: 2.8rem;
+  }
+
+  .avatarCameraButton {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .mobileInfoList {
+    width: 100%;
+    margin-top: 3.7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3.6rem;
+  }
+
+  .mobileInfoRow {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.6rem;
+  }
+
+  .mobileInfoLabel {
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--color-semantic-text-primary);
+  }
+
+  .mobileInfoValueWrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 2.7rem;
+    min-width: 0;
+  }
+
+  .mobileInfoValue {
+    font-size: 1.8rem;
+    font-weight: 400;
+    color: var(--color-semantic-text-primary);
+    text-align: right;
+    word-break: break-all;
+  }
+
+  .mobileInfoArrow {
+    width: 1.8rem;
+    height: 1.8rem;
+    color: var(--color-semantic-icon-secondary);
+    flex-shrink: 0;
+  }
+
+  .mobileInfoArrowButton {
+    width: 1.8rem;
+    height: 1.8rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
+    cursor: pointer;
   }
 }
