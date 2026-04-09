@@ -29,6 +29,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'dshelper-s3.s3.ap-northeast-2.amazonaws.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
     ],
     // 개발 환경에서 unoptimized 이미지 허용 (필요시)
     unoptimized: false,

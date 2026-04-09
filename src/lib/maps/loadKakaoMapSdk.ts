@@ -1,6 +1,6 @@
 /**
  * 카카오 지도 SDK 스크립트 로드 (`autoload=false` 후 `kakao.maps.load`).
- * `.env`에 `NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY`(JavaScript 키)를 넣습니다. REST API 키는 사용할 수 없습니다.
+ * 호출부에서 전달하는 appKey는 보통 `kakaoMapEnv.getKakaoMapJavaScriptKeyForHost(호스트)` 결과입니다. REST API 키는 사용할 수 없습니다.
  */
 
 export const KAKAO_MAP_SDK_UNAUTHORIZED = "KAKAO_MAP_SDK_UNAUTHORIZED";
@@ -43,7 +43,9 @@ export async function loadKakaoMapSdk(appKey: string): Promise<void> {
   const key = appKey.trim();
   if (!key) {
     return Promise.reject(
-      new Error("NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY 환경 변수가 없습니다.")
+      new Error(
+        "현재 도메인에 맞는 카카오 지도 JavaScript 키(NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY / _TEST)가 없습니다."
+      )
     );
   }
 
@@ -97,7 +99,7 @@ export async function loadKakaoMapSdk(appKey: string): Promise<void> {
     script.async = true;
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(
       key
-    )}&autoload=false`;
+    )}&autoload=false&libraries=services`;
     script.onload = onReady;
     script.onerror = () => {
       void rejectLoadFailure().catch(reject);
