@@ -20,12 +20,17 @@ export async function completeIndividualSnsLogin(
   }
 
   const data = responseData as LoginResponseData;
-  applyLoginResponseTokens(data);
+  const tokenState = applyLoginResponseTokens(data);
 
   const { accessToken, refreshToken } = useUserStore.getState();
   if (!accessToken && !refreshToken) {
     throw new Error(
       data.message || "응답에 accessToken·refreshToken이 없습니다."
+    );
+  }
+  if (!tokenState.hasRefreshToken) {
+    throw new Error(
+      data.message || "로그인 응답에 refreshToken이 없어 인증 검증을 진행할 수 없습니다."
     );
   }
 
