@@ -18,12 +18,16 @@ export default function AccountPage() {
   const router = useRouter();
   const [myInfo, setMyInfo] = useState<AccountMyInfoData | null>(null);
   const [myInfoLoading, setMyInfoLoading] = useState(true);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [nameEditOpen, setNameEditOpen] = useState(false);
+  const [profileImageMenuOpen, setProfileImageMenuOpen] = useState(false);
   const [nameDraft, setNameDraft] = useState("");
   const [nameEditSubmitting, setNameEditSubmitting] = useState(false);
   const [profileImageUploading, setProfileImageUploading] = useState(false);
   const profileImageInputRef = useRef<HTMLInputElement>(null);
   const nameEditInputRef = useRef<HTMLInputElement>(null);
+  const desktopAvatarWrapRef = useRef<HTMLDivElement>(null);
+  const mobileAvatarWrapRef = useRef<HTMLDivElement>(null);
 
   const handleLogoutClick = async () => {
     try {
@@ -35,9 +39,57 @@ export default function AccountPage() {
     }
   };
 
-  const openProfileImagePicker = () => {
+  useEffect(() => {
+    const syncViewport = () => setIsMobileViewport(window.innerWidth <= 611);
+    syncViewport();
+    window.addEventListener("resize", syncViewport);
+    return () => window.removeEventListener("resize", syncViewport);
+  }, []);
+
+  const openProfileImageMenu = () => {
     if (profileImageUploading || !myInfo) return;
+    setProfileImageMenuOpen((prev) => !prev);
+  };
+
+  const handlePickProfileImageFromComputer = () => {
+    if (profileImageUploading || !myInfo) return;
+    setProfileImageMenuOpen(false);
     profileImageInputRef.current?.click();
+  };
+
+  const handleApplyDefaultProfileImage = async () => {
+    if (!myInfo || profileImageUploading) return;
+    setProfileImageUploading(true);
+    try {
+      const res = await patchMyInfo({
+        dto: {
+          name: myInfo.name,
+          email: myInfo.email ?? "",
+          birthyear: myInfo.birthyear,
+          gender: myInfo.gender,
+          phoneNumber: myInfo.phoneNumber,
+          removeProfileImage: true,
+        },
+      });
+      if (!res?.data) {
+        alert("기본 이미지 적용에 실패했습니다. 다시 시도해 주세요.");
+        return;
+      }
+      const envelope = res.data as { success?: boolean; message?: string };
+      const parsed = parseAccountMyInfoResponse(res.data);
+      if (envelope.success === false || !parsed) {
+        alert(
+          typeof envelope.message === "string" && envelope.message
+            ? envelope.message
+            : "기본 이미지 적용에 실패했습니다."
+        );
+        return;
+      }
+      setMyInfo(parsed);
+      setProfileImageMenuOpen(false);
+    } finally {
+      setProfileImageUploading(false);
+    }
   };
 
   const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,6 +131,29 @@ export default function AccountPage() {
       e.target.value = "";
     }
   };
+
+  useEffect(() => {
+    if (!profileImageMenuOpen) return;
+    const onPointerDown = (ev: MouseEvent | TouchEvent) => {
+      const targetNode = ev.target as Node | null;
+      if (!targetNode) return;
+      const insideDesktop = desktopAvatarWrapRef.current?.contains(targetNode) ?? false;
+      const insideMobile = mobileAvatarWrapRef.current?.contains(targetNode) ?? false;
+      if (insideDesktop || insideMobile) return;
+      setProfileImageMenuOpen(false);
+    };
+    const onKeyDown = (ev: KeyboardEvent) => {
+      if (ev.key === "Escape") setProfileImageMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("touchstart", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("touchstart", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [profileImageMenuOpen]);
 
   useEffect(() => {
     let cancelled = false;
@@ -211,7 +286,7 @@ export default function AccountPage() {
         ) : (
           <>
         <section className={cn("profileSection")}>
-          <div className={cn("avatarWrap")}>
+          <div className={cn("avatarWrap")} ref={desktopAvatarWrapRef}>
             <Image
               src={profileImageSrc}
               alt="프로필"
@@ -224,7 +299,7 @@ export default function AccountPage() {
               <button
                 type="button"
                 className={cn("avatarCameraButton")}
-                onClick={openProfileImagePicker}
+                onClick={openProfileImageMenu}
                 aria-label="프로필 이미지 변경"
                 disabled={profileImageUploading}
                 aria-busy={profileImageUploading}
@@ -232,6 +307,28 @@ export default function AccountPage() {
                 <TiCamera className={cn("avatarCameraIcon")} aria-hidden />
               </button>
             </div>
+            {profileImageMenuOpen && (
+              <div className={cn("profileImageMenu")} role="menu" aria-label="프로필 이미지 메뉴">
+                <button
+                  type="button"
+                  className={cn("profileImageMenuItem")}
+                  onClick={handlePickProfileImageFromComputer}
+                  role="menuitem"
+                  disabled={profileImageUploading}
+                >
+                  {isMobileViewport ? "갤러리에서 가져오기" : "내 컴퓨터에서 가져오기"}
+                </button>
+                <button
+                  type="button"
+                  className={cn("profileImageMenuItem", "profileImageMenuItemBorder")}
+                  onClick={handleApplyDefaultProfileImage}
+                  role="menuitem"
+                  disabled={profileImageUploading}
+                >
+                  기본 이미지로 적용
+                </button>
+              </div>
+            )}
           </div>
           <div className={cn("userInfo")}>
             <div className={cn("userNameWrap")}>
@@ -260,7 +357,7 @@ export default function AccountPage() {
         </section>
 
         <section className={cn("profileSectionMobile")}>
-          <div className={cn("avatarWrap", "avatarWrapMobile")}>
+          <div className={cn("avatarWrap", "avatarWrapMobile")} ref={mobileAvatarWrapRef}>
             <Image
               src={profileImageSrc}
               alt="프로필"
@@ -273,7 +370,7 @@ export default function AccountPage() {
               <button
                 type="button"
                 className={cn("avatarCameraButton")}
-                onClick={openProfileImagePicker}
+                onClick={openProfileImageMenu}
                 aria-label="프로필 이미지 변경"
                 disabled={profileImageUploading}
                 aria-busy={profileImageUploading}
@@ -281,6 +378,28 @@ export default function AccountPage() {
                 <TiCamera className={cn("avatarCameraIcon")} aria-hidden />
               </button>
             </div>
+            {profileImageMenuOpen && (
+              <div className={cn("profileImageMenu")} role="menu" aria-label="프로필 이미지 메뉴">
+                <button
+                  type="button"
+                  className={cn("profileImageMenuItem")}
+                  onClick={handlePickProfileImageFromComputer}
+                  role="menuitem"
+                  disabled={profileImageUploading}
+                >
+                  {isMobileViewport ? "갤러리에서 가져오기" : "내 컴퓨터에서 가져오기"}
+                </button>
+                <button
+                  type="button"
+                  className={cn("profileImageMenuItem", "profileImageMenuItemBorder")}
+                  onClick={handleApplyDefaultProfileImage}
+                  role="menuitem"
+                  disabled={profileImageUploading}
+                >
+                  기본 이미지로 적용
+                </button>
+              </div>
+            )}
           </div>
 
           <div className={cn("mobileInfoList")}>

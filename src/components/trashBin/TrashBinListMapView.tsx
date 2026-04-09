@@ -104,6 +104,8 @@ export default function TrashBinListMapView() {
   const markersRef = useRef<KakaoMaps.Marker[]>([]);
   const userLocationMarkerRef = useRef<KakaoMaps.Marker | null>(null);
   const mapTapMarkerRef = useRef<KakaoMaps.Marker | null>(null);
+  const isMapDraggingRef = useRef(false);
+  const ignoreMapClickUntilRef = useRef(0);
   const [mapError, setMapError] = useState<string | null>(null);
   const [selectedPlace, setSelectedPlace] = useState<TrashBinPlace | null>(null);
   const [selectedMapTap, setSelectedMapTap] = useState<MapTapInfo | null>(null);
@@ -165,6 +167,16 @@ export default function TrashBinListMapView() {
       );
       const map = new maps.Map(mapElRef.current, { center, level: 5 });
       mapInstanceRef.current = map;
+      maps.event.addListener(map, "dragstart", () => {
+        isMapDraggingRef.current = true;
+        // 터치/마우스 드래그 시작 시 click 처리 유예
+        ignoreMapClickUntilRef.current = Date.now() + 120;
+      });
+      maps.event.addListener(map, "dragend", () => {
+        isMapDraggingRef.current = false;
+        // 드래그 종료 직후 발생할 수 있는 click을 무시
+        ignoreMapClickUntilRef.current = Date.now() + 220;
+      });
 
       const markerSize = new maps.Size(PIN_SIZE.width, PIN_SIZE.height);
       const markerOffset = new maps.Point(PIN_ANCHOR.x, PIN_ANCHOR.y);
@@ -194,6 +206,9 @@ export default function TrashBinListMapView() {
       });
 
       maps.event.addListener(map, "click", (mouseEvent: { latLng: KakaoMaps.LatLng }) => {
+        if (isMapDraggingRef.current || Date.now() < ignoreMapClickUntilRef.current) {
+          return;
+        }
         if (blockMapDeselect) return;
         setSelectedPlace(null);
         setIsImagePreviewOpen(false);

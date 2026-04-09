@@ -46,7 +46,10 @@ $pageMinHeight: calc(100vh - 6rem);
 
 .bottomSheetBackdrop {
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
   z-index: 20;
   margin: 0;
   padding: 0;
@@ -245,7 +248,7 @@ $pageMinHeight: calc(100vh - 6rem);
   background: var(--color-primitive-gray-800);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 612px) {
   .pageRoot {
     display: flex;
     align-items: center;

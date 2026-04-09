@@ -41,10 +41,14 @@ export const getMyInfo = async () => {
 
 export const patchMyInfo = async ({ dto, profileImage }: PatchMyInfoRequest) => {
   try {
+    const normalizedDto = {
+      ...dto,
+      removeProfileImage: dto.removeProfileImage ?? false,
+    };
     const formData = new FormData();
     formData.append(
       "dto",
-      new Blob([JSON.stringify(dto)], { type: "application/json" })
+      new Blob([JSON.stringify(normalizedDto)], { type: "application/json" })
     );
     if (profileImage) {
       formData.append("profileImage", profileImage);
