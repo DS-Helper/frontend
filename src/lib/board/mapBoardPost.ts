@@ -52,6 +52,15 @@ export function mapGetBoardsItemToBoardPost(item: GetBoardsBoardItem): BoardPost
 
   const thumb = item.thumbNailUrl;
   const profile = item.writerProfileImageUrl;
+  const likedRaw = item.liked ?? item.isLiked;
+  const liked =
+    typeof likedRaw === "boolean"
+      ? likedRaw
+      : likedRaw === "true"
+        ? true
+        : likedRaw === "false"
+          ? false
+          : undefined;
 
   return {
     id: String(item.id ?? ""),
@@ -59,6 +68,7 @@ export function mapGetBoardsItemToBoardPost(item: GetBoardsBoardItem): BoardPost
     content: String(item.content ?? ""),
     category,
     likeCount: Number(item.likeCount ?? 0),
+    liked,
     commentCount: Number(item.commentCount ?? 0),
     imageUrl: thumb != null && String(thumb).trim() !== "" ? String(thumb) : undefined,
     createdAt: String(item.createdAt ?? ""),
@@ -77,8 +87,17 @@ export function mapItemToBoardPost(item: Record<string, unknown>): BoardPost {
   const writerAvatar =
     item.writerProfileImageUrl ?? item.writer_profile_image_url ?? null;
   const thumb = item.thumbNailUrl ?? item.thumb_nail_url ?? null;
+  const imageUrlsRaw = item.imageUrls ?? item.image_urls;
+  const imageUrls = Array.isArray(imageUrlsRaw)
+    ? imageUrlsRaw
+        .map((v) => (v == null ? "" : String(v).trim()))
+        .filter((v) => v.length > 0)
+    : [];
+  const firstImageUrlFromArray = imageUrls[0];
   const primaryImage =
-    item.imageUrl != null && String(item.imageUrl).trim() !== ""
+    firstImageUrlFromArray != null && firstImageUrlFromArray !== ""
+      ? firstImageUrlFromArray
+      : item.imageUrl != null && String(item.imageUrl).trim() !== ""
       ? String(item.imageUrl)
       : item.image_url != null && String(item.image_url).trim() !== ""
         ? String(item.image_url)
@@ -91,6 +110,15 @@ export function mapItemToBoardPost(item: Record<string, unknown>): BoardPost {
       : writerAvatar != null && String(writerAvatar).trim() !== ""
         ? String(writerAvatar)
         : undefined;
+  const likedRaw = item.liked ?? item.isLiked ?? item.is_liked;
+  const liked =
+    typeof likedRaw === "boolean"
+      ? likedRaw
+      : likedRaw === "true"
+        ? true
+        : likedRaw === "false"
+          ? false
+          : undefined;
   return {
     id: String(item.id ?? item.boardId ?? ""),
     title: String(item.title ?? ""),
@@ -101,6 +129,7 @@ export function mapItemToBoardPost(item: Record<string, unknown>): BoardPost {
         ? (item.category as BoardPostCategory)
         : "기타",
     likeCount: Number(item.likeCount ?? item.like_count ?? 0),
+    liked,
     commentCount: Number(item.commentCount ?? item.comment_count ?? 0),
     imageUrl: primaryImage,
     createdAt: String(item.createdAt ?? item.created_at ?? ""),
@@ -132,6 +161,24 @@ export function parseLikeToggleResponse(body: unknown): {
   else if (likedRaw === "true") liked = true;
   else if (likedRaw === "false") liked = false;
   return { likeCount, liked };
+}
+
+/** POST 스크랩 토글 응답에서 `isScrapped` 추출 (`data` 래핑 대응) */
+export function parseScrapToggleResponse(body: unknown): {
+  isScrapped?: boolean;
+} {
+  if (body == null || typeof body !== "object") return {};
+  const root = body as Record<string, unknown>;
+  const inner =
+    root.data != null && typeof root.data === "object" && !Array.isArray(root.data)
+      ? (root.data as Record<string, unknown>)
+      : root;
+  const raw = inner.isScrapped ?? inner.scrapped ?? inner.isScrap;
+  let isScrapped: boolean | undefined;
+  if (typeof raw === "boolean") isScrapped = raw;
+  else if (raw === "true") isScrapped = true;
+  else if (raw === "false") isScrapped = false;
+  return { isScrapped };
 }
 
 /** GET /board/:id/like/count 등 — 응답에서 좋아요 개수만 추출 */

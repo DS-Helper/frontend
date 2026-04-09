@@ -3,6 +3,10 @@
   max-width: 102.4rem;
   margin: 0 auto;
   padding: 3.2rem 0;
+
+  @media (max-width: 1024px) {
+    padding: 3.2rem 1.6rem;
+  }
 }
 
 .loading {
@@ -12,21 +16,19 @@
   font-size: 1.6rem;
 }
 
-// 게시글 영역
 .postSection {
   background-color: #fff;
   border-radius: 0.8rem;
+  border-bottom: 1px solid var(--color-primitive-gray-200);
 }
 
 .postTitle {
   font-size: 2.8rem;
   font-weight: 600;
-  color: #222;
-  margin: 0 0 1.8rem 0;
+  color: var(--color-primitive-primary-dark);
+  margin-bottom: 1.8rem;
   word-break: keep-all;
   line-height: 1;
-  font-style: semi-bold;
-  vertical-align: middle;
 }
 
 .postMetaRow {
@@ -75,11 +77,11 @@
 .authorName {
   font-size: 1.8rem;
   font-weight: 500;
-  color: var(--primary-color-dark);
+  color: var(--color-primitive-primary-dark);
 }
 
 .authorMetaDot {
-  color: var(--grey-500);
+  color: var(--color-primitive-gray-500);
   font-size: 1.6rem;
   line-height: 1;
 }
@@ -87,7 +89,7 @@
 .postTime {
   font-size: 1.6rem;
   font-weight: 400;
-  color: var(--grey-500);
+  color: var(--color-primitive-gray-500);
 }
 
 .postActions {
@@ -101,14 +103,10 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--grey-600);
+  color: var(--color-primitive-gray-400);
   display: flex;
   align-items: center;
   justify-content: center;
-
-  &:hover {
-    color: var(--grey-800);
-  }
 }
 
 .moreMenuWrapper {
@@ -150,22 +148,24 @@
 .postContent {
   font-size: 1.8rem;
   font-weight: 400;
-  color: var(--primary-color-dark);
-  line-height: 1.6;
-  margin-bottom: 2.4rem;
+  color: var(--color-primitive-primary-dark);
+  line-height: 1.4;
+  margin-bottom: 1.8rem;
   word-break: keep-all;
 }
 
 .postImageWrap {
-  position: relative;
-  width: 56.2rem;
-  height: 72.3rem;
-  margin-bottom: 4.8rem;
-  overflow: hidden;
+  width: 58rem;
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 2.4rem;
 }
 
 .postImage {
-  object-fit: cover;
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 .engagementRow {
@@ -229,132 +229,64 @@
 .viewCount {
   font-size: 1.6rem;
   font-weight: 400;
-  color: var(--primary-color-dark);
-}
-
-// 댓글 섹션
-.commentsSection {
-  background-color: #fff;
-  border-radius: 0.8rem;
-  margin-top: 1.8rem;
-}
-
-.commentsTitle {
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: var(--grey-600);
-  margin-bottom: 2.4rem;
-}
-
-.commentList {
-  display: flex;
-  flex-direction: column;
-  gap: 4.8rem;
-}
-
-.commentThread {
-  display: flex;
-  flex-direction: column;
-  gap: 1.8rem;
-}
-
-.commentItem {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-
-  &.isReply {
-    position: relative;
-    margin-left: 1.2rem;
-    padding-left: 2.8rem; // 1.2rem(선 좌측 간격) + 1.6rem(선 우측 간격)
-  }
-
-  &.isReply::before {
-    content: "";
-    position: absolute;
-    left: 1.2rem;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background-color: var(--grey-200, #e0e0e0);
-  }
-}
-
-.commentAvatar {
-  width: 3.8rem;
-  height: 3.8rem;
-  border-radius: 50%;
-  background-color: #d9d9d9;
-  flex-shrink: 0;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-.commentBody {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-  min-width: 0;
-}
-
-.commentMeta {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-}
-
-.commentAuthor {
-  font-size: 1.8rem;
-  font-weight: 500;
-  color: var(--primary-color-dark);
-}
-
-.commentMetaDot {
-  color: var(--grey-500);
-  font-size: 1.6rem;
-  line-height: 1;
-}
-
-.commentTime {
-  font-size: 1.6rem;
-  color: var(--grey-500);
-}
-
-.commentContent {
-  font-size: 1.8rem;
-  font-weight: 400;
-  color: var(--primary-color-dark);
-  line-height: 1.4;
-  word-break: keep-all;
+  color: var(--color-primitive-primary-dark);
 }
 
 // 반응형
 @media (max-width: 611px) {
   .boardDetailPage {
-    padding: 1.6rem;
-  }
-
-  .postSection,
-  .commentsSection {
-    padding: 1.6rem;
+    padding: 3.4rem 1.6rem;
   }
 
   .postTitle {
-    font-size: 1.8rem;
+    font-size: var(--title-M-size);
+    font-weight: var(--title-M-weight);
+    color: var(--color-semantic-text-primary);
+    line-height: 1.2;
   }
 
-  .commentItem.isReply {
-    margin-left: 3.6rem;
+  .postMetaRow {
+    margin-bottom: 1.8rem;
   }
+
+  .authorAvatar {
+    width: 3rem;
+    height:  3rem;
+  }
+
+  .authorName {
+    font-size: 1.6rem;
+  }
+
+  .postTime {
+    font-size: 1.4rem;
+  }
+
+  .postContent {
+    font-size: var(--body-M-size);
+    font-weight: var(--body-M-weight);
+    color: var(--color-semantic-text-primary);
+    margin-bottom: 0.8rem;
+  }
+
+  .postImageWrap {
+    width: 100%;
+    margin-bottom: 1.8rem;
+  }
+
+  .viewCount {
+    font-size: 1.4rem;
+  }
+
+  .engagementRow {
+    padding-bottom: 1.8rem;
+  }
+
+  .engagementItem {
+    gap: 0.2rem
+  }
+  
+  
 }
 
 // 공유 토스트

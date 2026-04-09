@@ -5,18 +5,20 @@ import { useState, useEffect, useRef } from "react";
 import classNames from "classnames/bind";
 import styles from "@/styles/BoardDetail.module.scss";
 import Image from "next/image";
-import { BoardPostDetail, BoardComment } from "@/types/board";
-import { isScrapId, toggleScrapId } from "@/lib/board/scrapStorage";
-import { getBoardById, likeBoard, likeCount } from "@/lib/apis/board";
+import { BoardPostDetail } from "@/types/board";
+import { getBoardById, likeBoard, likeCount, scrapBoard } from "@/lib/apis/board";
 import {
   mapItemToBoardPostDetail,
   parseBoardRecordFromApi,
   parseLikeCountResponse,
+  parseScrapToggleResponse,
   parseLikeToggleResponse,
 } from "@/lib/board/mapBoardPost";
 import { useUserStore } from "@/lib/store/userStore";
+import BoardCommentSection from "@/components/board/BoardCommentSection";
 import shareIcon from "@/public/boardShareIcon.svg";
 import { HiOutlineEllipsisVertical } from "react-icons/hi2";
+
 import heartIcon from "@/public/boardLikeIcon.svg";
 import commentIcon from "@/public/boardCommentIcon.svg";
 import bookmarkIcon from "@/public/boardBookmarkIcon.svg";
@@ -27,18 +29,43 @@ const DEFAULT_AVATAR = "/userIcon.svg";
 
 const cn = classNames.bind(styles);
 
+function formatRelativeTime(dateLike: string): string {
+  const raw = dateLike?.trim();
+  if (!raw) return "—";
+  const time = new Date(raw).getTime();
+  if (!Number.isFinite(time)) return raw;
+
+  const diffMs = Date.now() - time;
+  if (diffMs < 0) return "방금 전";
+
+  const minuteMs = 60 * 1000;
+  const hourMs = 60 * minuteMs;
+  const dayMs = 24 * hourMs;
+
+  if (diffMs < minuteMs) return "방금 전";
+  if (diffMs < hourMs) return `${Math.floor(diffMs / minuteMs)}분 전`;
+  if (diffMs < dayMs) return `${Math.floor(diffMs / hourMs)}시간 전`;
+  if (diffMs < 7 * dayMs) return `${Math.floor(diffMs / dayMs)}일 전`;
+
+  const d = new Date(time);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}.${mm}.${dd}`;
+}
+
 export default function BoardDetailPage() {
   const router = useRouter();
   const { id } = router.query;
   const { user } = useUserStore();
   const [post, setPost] = useState<BoardPostDetail | null>(null);
-  const [comments, setComments] = useState<BoardComment[]>([]);
   const [showToast, setShowToast] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
   const likeInFlightRef = useRef(false);
+  const scrapInFlightRef = useRef(false);
 
   // 작성자와 로그인 사용자 동일인물 여부 (id 또는 name으로 비교)
   const isAuthor = Boolean(
@@ -75,11 +102,23 @@ export default function BoardDetailPage() {
         return;
       }
       setPost(detail);
-      setComments([]);
-      setIsBookmarked(isScrapId(id));
+      const scrapRaw = record.isScrapped ?? record.scrapped ?? record.isScrap;
+      if (typeof scrapRaw === "boolean") {
+        setIsBookmarked(scrapRaw);
+      } else if (scrapRaw === "true") {
+        setIsBookmarked(true);
+      } else if (scrapRaw === "false") {
+        setIsBookmarked(false);
+      } else {
+        setIsBookmarked(false);
+      }
       const likedRaw = record.liked ?? record.isLiked;
       if (typeof likedRaw === "boolean") {
         setIsLiked(likedRaw);
+      } else if (likedRaw === "true") {
+        setIsLiked(true);
+      } else if (likedRaw === "false") {
+        setIsLiked(false);
       }
     })();
     return () => {
@@ -185,9 +224,14 @@ export default function BoardDetailPage() {
   const handleLikeClick = async () => {
     if (typeof id !== "string" || !post || likeInFlightRef.current) return;
     likeInFlightRef.current = true;
+    const prevLiked = isLiked;
+    setIsLiked((prev) => !prev);
     try {
       const toggleRes = await likeBoard(id);
-      if (toggleRes == null) return;
+      if (toggleRes == null) {
+        setIsLiked(prevLiked);
+        return;
+      }
       const { liked } = parseLikeToggleResponse(toggleRes.data);
       if (typeof liked === "boolean") setIsLiked(liked);
       const countRes = await likeCount(id);
@@ -195,8 +239,29 @@ export default function BoardDetailPage() {
       if (nextCount != null) {
         setPost((p) => (p ? { ...p, likeCount: nextCount } : null));
       }
+    } catch (e) {
+      console.error(e);
+      setIsLiked(prevLiked);
     } finally {
       likeInFlightRef.current = false;
+    }
+  };
+
+  const handleScrapClick = async () => {
+    if (typeof id !== "string" || scrapInFlightRef.current) return;
+    scrapInFlightRef.current = true;
+    try {
+      const res = await scrapBoard(id);
+      if (res == null) return;
+      const { isScrapped } = parseScrapToggleResponse(res.data ?? null);
+      if (typeof isScrapped === "boolean") {
+        setIsBookmarked(isScrapped);
+      } else {
+        // 응답에 상태 필드가 없는 경우에도 토글 UX 유지
+        setIsBookmarked((prev) => !prev);
+      }
+    } finally {
+      scrapInFlightRef.current = false;
     }
   };
 
@@ -208,38 +273,6 @@ export default function BoardDetailPage() {
     );
   }
 
-  const renderComment = (comment: BoardComment, isReply?: boolean) => (
-    <div
-      key={comment.id}
-      className={cn("commentItem", { isReply })}
-    >
-      <div className={cn("commentBody")}>
-        <div className={cn("commentAvatar")}>
-          <Image
-            src={comment.author.avatar ?? DEFAULT_AVATAR}
-            alt={`${comment.author.name} 프로필`}
-            width={38}
-            height={38}
-          />
-        </div>
-        <div className={cn("commentMeta")}>
-          <span className={cn("commentAuthor")}>{comment.author.name}</span>
-          <span className={cn("commentMetaDot")}>·</span>
-          <span className={cn("commentTime")}>{comment.createdAt}</span>
-        </div>
-      </div>
-      <p className={cn("commentContent")}>{comment.content}</p>
-    </div>
-  );
-
-  const topLevelComments = comments.filter((c) => !c.parentId);
-  const replyMap = comments.reduce<Record<string, BoardComment[]>>((acc, c) => {
-    if (!c.parentId) return acc;
-    if (!acc[c.parentId]) acc[c.parentId] = [];
-    acc[c.parentId].push(c);
-    return acc;
-  }, {});
-
   return (
     <div className={cn("boardDetailPage")}>
       <article className={cn("postSection")}>
@@ -250,14 +283,14 @@ export default function BoardDetailPage() {
               <Image
                 src={post.author.avatar ?? DEFAULT_AVATAR}
                 alt="작성자 아바타"
-                width={40}
-                height={40}
+                width={38}
+                height={38}
               />
             </div>
             <div className={cn("authorMeta")}>
               <span className={cn("authorName")}>{post.author.name}</span>
               <span className={cn("authorMetaDot")}>·</span>
-              <span className={cn("postTime")}>{post.createdAt || "—"}</span>
+              <span className={cn("postTime")}>{formatRelativeTime(post.createdAt)}</span>
             </div>
           </div>
           <div className={cn("postActions")}>
@@ -267,7 +300,7 @@ export default function BoardDetailPage() {
             <div className={cn("moreMenuWrapper")} ref={moreMenuRef}>
               <button
                 type="button"
-                className={cn("iconButton")}
+                className={cn("iconButton", "settingButton")}
                 aria-label="더보기"
                 aria-expanded={showMoreMenu}
                 onClick={() => setShowMoreMenu((prev) => !prev)}
@@ -298,14 +331,7 @@ export default function BoardDetailPage() {
         <p className={cn("postContent")}>{post.contentFull}</p>
         {post.imageUrl && (
           <div className={cn("postImageWrap")}>
-            <Image
-              src={post.imageUrl}
-              alt=""
-              fill
-              className={cn("postImage")}
-              sizes="56.2rem"
-              unoptimized={post.imageUrl.startsWith("http")}
-            />
+            <img src={post.imageUrl} alt="" className={cn("postImage")} />
           </div>
         )}
         <div className={cn("engagementRow")}>
@@ -329,11 +355,7 @@ export default function BoardDetailPage() {
               type="button"
               className={cn("iconButton", { active: isBookmarked })}
               aria-label={isBookmarked ? "북마크 취소" : "북마크"}
-              onClick={() => {
-                if (typeof id !== "string") return;
-                toggleScrapId(id);
-                setIsBookmarked(isScrapId(id));
-              }}
+              onClick={() => void handleScrapClick()}
             >
               <Image src={isBookmarked ? bookmarkActiveIcon : bookmarkIcon} alt="북마크" width={24} height={24} className={cn("bookmarkIcon", { active: isBookmarked })} />
             </button>
@@ -342,19 +364,7 @@ export default function BoardDetailPage() {
         </div>
       </article>
 
-      <section className={cn("commentsSection")}>
-        <h2 className={cn("commentsTitle")}>댓글</h2>
-        <div className={cn("commentList")}>
-          {topLevelComments.map((comment) => (
-            <div key={comment.id} className={cn("commentThread")}>
-              {renderComment(comment)}
-              {(replyMap[comment.id] || []).map((reply) =>
-                renderComment(reply, true)
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
+      {typeof id === "string" && <BoardCommentSection boardId={id} />}
 
       {showToast && (
         <div className={cn("toast")}>
