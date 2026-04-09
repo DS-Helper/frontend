@@ -27,6 +27,8 @@ export interface GetBoardsBoardItem {
   writerName: string;
   commentCount: number;
   likeCount: number;
+  liked?: boolean;
+  isLiked?: boolean;
   thumbNailUrl?: string | null;
   writerProfileImageUrl?: string | null;
   category?: BoardPostCategory | string;
@@ -65,6 +67,7 @@ export interface GetBoardByIdData extends GetBoardsBoardItem {
   contentFull?: string;
   /** 본문 상단/대표 이미지 URL (있으면 썸네일보다 우선) */
   imageUrl?: string | null;
+  imageUrls?: string[] | null;
   liked?: boolean;
   isLiked?: boolean;
 }
@@ -108,6 +111,7 @@ export interface BoardPost {
   content: string;
   category: BoardPostCategory;
   likeCount: number;
+  liked?: boolean;
   commentCount: number;
   imageUrl?: string;
   createdAt: string;

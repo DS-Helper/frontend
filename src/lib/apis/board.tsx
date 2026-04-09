@@ -68,6 +68,26 @@ export const deleteBoard = async (boardId: string) => {
   }
 };
 
+export const getSearchBoards = async (
+  keyword: string,
+  page?: number,
+  size?: number
+): Promise<AxiosResponse<GetBoardsApiResponse> | null> => {
+  try {
+    const res = await instance.get<GetBoardsApiResponse>("/boards/search", {
+      params: {
+        keyword,
+        page,
+        size,
+      },
+    });
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
 export const likeBoard = async (boardId: string) => {
   try {
     const res = await instance.post(`/board/${boardId}/like`);
@@ -81,6 +101,16 @@ export const likeBoard = async (boardId: string) => {
 export const likeCount = async (boardId: string) => {
   try {
     const res = await instance.get(`/${boardId}/like/count`);
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+export const scrapBoard = async (boardId: string) => {
+  try {
+    const res = await instance.post(`/board/${boardId}/scrap`);
     return res;
   } catch (e) {
     console.error(e);

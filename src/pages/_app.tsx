@@ -52,6 +52,37 @@ export default function App({ Component, pageProps }: AppProps) {
     };
   }, []);
 
+  useEffect(() => {
+    const applyNoHistoryAttrs = (root: ParentNode) => {
+      root.querySelectorAll("form").forEach((el) => {
+        el.setAttribute("autocomplete", "off");
+      });
+      root.querySelectorAll("input, textarea").forEach((el) => {
+        const node = el as HTMLInputElement | HTMLTextAreaElement;
+        node.setAttribute("autocomplete", "off");
+        node.setAttribute("autocapitalize", "off");
+        node.setAttribute("autocorrect", "off");
+        node.setAttribute("spellcheck", "false");
+      });
+    };
+
+    applyNoHistoryAttrs(document);
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        mutation.addedNodes.forEach((added) => {
+          if (!(added instanceof HTMLElement)) return;
+          if (added.matches("form, input, textarea")) {
+            applyNoHistoryAttrs(added.parentElement ?? document);
+          } else {
+            applyNoHistoryAttrs(added);
+          }
+        });
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
+
   // 알림 모달 닫기 핸들러
   const handleCloseNotificationModal = () => {
     setIsNotificationModalClosing(true);

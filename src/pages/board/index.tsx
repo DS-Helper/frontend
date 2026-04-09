@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/router";
 import classNames from "classnames/bind";
 import styles from "@/styles/Board.module.scss";
@@ -9,15 +9,15 @@ import searchIcon from "@/public/searchIcon.svg";
 import BoardCategoryFilter from "@/components/BoardCategoryFilter";
 import { BoardPost, BoardPostCategory, boardPostCategories } from "@/types/board";
 import Image from "next/image";
-import { getBoards, likeBoard, likeCount } from "@/lib/apis/board";
+import { getBoards, getSearchBoards } from "@/lib/apis/board";
 import {
   mapGetBoardsItemToBoardPost,
   parseGetBoardsPayload,
-  parseLikeCountResponse,
 } from "@/lib/board/mapBoardPost";
 import { PiSquaresFourFill } from "react-icons/pi";
 
 import heartIcon from "@/public/boardLikeIcon.svg";
+import heartFilledIcon from "@/public/boardLikeFilledIcon.svg";
 import commentIcon from "@/public/boardCommentIcon.svg";
 import boardPencilIcon from "@/public/boardPencilIcon.svg";
 import Pagination from "@/components/Pagination";
@@ -35,6 +35,13 @@ function getCategoryFromQuery(
   return boardPostCategories.includes(c as BoardPostCategory) ? (c as BoardPostCategory) : null;
 }
 
+function getKeywordFromQuery(
+  query: Record<string, string | string[] | undefined>
+): string {
+  const keyword = query.keyword;
+  return typeof keyword === "string" ? keyword : "";
+}
+
 export default function BoardPage() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<BoardPostCategory | null>(null);
@@ -42,6 +49,8 @@ export default function BoardPage() {
   const [isCategorySynced, setIsCategorySynced] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [boardPosts, setBoardPosts] = useState<BoardPost[]>([]);
+  const [activeSearchKeyword, setActiveSearchKeyword] = useState("");
+  const [searchRequestTick, setSearchRequestTick] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -50,13 +59,32 @@ export default function BoardPage() {
   const [isMobileCategoryOpen, setIsMobileCategoryOpen] = useState(false);
   const [mobileCategoryDraft, setMobileCategoryDraft] = useState<BoardPostCategory | null>(null);
   const loadMoreTriggerRef = useRef<HTMLDivElement | null>(null);
-  const likeInFlightRef = useRef<Set<string>>(new Set());
+  const isSearchMode = activeSearchKeyword.trim().length > 0;
 
-  // URL 쿼리에서 카테고리 복원 (상세에서 돌아왔을 때)
+  const syncBoardQuery = useCallback(
+    (category: BoardPostCategory | null, keyword: string) => {
+      const nextQuery: Record<string, string> = {};
+      if (category) nextQuery.category = category;
+      if (keyword.trim()) nextQuery.keyword = keyword.trim();
+      const currentCategory = typeof router.query.category === "string" ? router.query.category : "";
+      const currentKeyword = typeof router.query.keyword === "string" ? router.query.keyword : "";
+      const nextCategory = nextQuery.category ?? "";
+      const nextKeyword = nextQuery.keyword ?? "";
+      if (currentCategory === nextCategory && currentKeyword === nextKeyword) return;
+      void router.replace({ pathname: "/board", query: nextQuery }, undefined, { shallow: true });
+    },
+    [router]
+  );
+
+  // URL 쿼리에서 카테고리/검색어 복원 (상세에서 돌아왔을 때)
   useEffect(() => {
     if (!router.isReady) return;
-    const fromQuery = getCategoryFromQuery(router.query);
-    setSelectedCategory(fromQuery);
+    const categoryFromQuery = getCategoryFromQuery(router.query);
+    const keywordFromQuery = getKeywordFromQuery(router.query).trim();
+    setSelectedCategory(categoryFromQuery);
+    setSearchQuery(keywordFromQuery);
+    setActiveSearchKeyword(keywordFromQuery);
+    setCurrentPage(1);
     setIsCategorySynced(true);
   }, [router.isReady, router.query]);
 
@@ -66,8 +94,7 @@ export default function BoardPage() {
     setBoardPosts([]);
     setHasMore(true);
     setCurrentPage(1);
-    const query = category ? { category } : {};
-    router.replace({ pathname: "/board", query }, undefined, { shallow: true });
+    syncBoardQuery(category, activeSearchKeyword);
   };
 
   const categoryForFetch = isCategorySynced ? selectedCategory : null;
@@ -85,7 +112,7 @@ export default function BoardPage() {
     setCurrentPage(1);
   }, [isMobile]);
 
-  // API로 게시글 목록 조회
+  // API로 게시글 목록 조회 (일반/검색 공통)
   useEffect(() => {
     if (!isCategorySynced) return;
 
@@ -95,11 +122,14 @@ export default function BoardPage() {
       } else {
         setIsLoading(true);
       }
-      const res = await getBoards({
-        category: categoryForFetch ?? undefined,
-        page: Math.max(0, currentPage - 1),
-        size: POSTS_PER_PAGE,
-      });
+      const pageParam = Math.max(0, currentPage - 1);
+      const res = isSearchMode
+        ? await getSearchBoards(activeSearchKeyword, pageParam, POSTS_PER_PAGE)
+        : await getBoards({
+            category: categoryForFetch ?? undefined,
+            page: pageParam,
+            size: POSTS_PER_PAGE,
+          });
 
       setIsLoading(false);
       setIsFetchingMore(false);
@@ -135,19 +165,17 @@ export default function BoardPage() {
     };
 
     fetchBoards();
-  }, [isCategorySynced, categoryForFetch, currentPage, isMobile]);
+  }, [
+    isCategorySynced,
+    categoryForFetch,
+    currentPage,
+    isMobile,
+    isSearchMode,
+    activeSearchKeyword,
+    searchRequestTick,
+  ]);
 
-  // 검색어로 현재 페이지 목록만 클라이언트 필터 (서버 검색은 API 지원 시 연동)
-  const filteredPosts = useMemo(() => {
-    if (!searchQuery.trim()) return boardPosts;
-    const q = searchQuery.toLowerCase();
-    return boardPosts.filter(
-      (post) =>
-        post.title.toLowerCase().includes(q) || post.content.toLowerCase().includes(q)
-    );
-  }, [boardPosts, searchQuery]);
-
-  const paginatedPosts = filteredPosts;
+  const paginatedPosts = boardPosts;
 
   useEffect(() => {
     if (isMobile) return;
@@ -156,26 +184,46 @@ export default function BoardPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // 검색은 이미 filteredPosts에서 처리됨
+    const keyword = searchQuery.trim();
+    if (!keyword) {
+      setActiveSearchKeyword("");
+      setBoardPosts([]);
+      setHasMore(true);
+      setCurrentPage(1);
+      syncBoardQuery(selectedCategory, "");
+      return;
+    }
+    setBoardPosts([]);
+    setHasMore(true);
+    setCurrentPage(1);
+    setActiveSearchKeyword(keyword);
+    setSearchRequestTick((prev) => prev + 1);
+    syncBoardQuery(selectedCategory, keyword);
   };
+
+  useEffect(() => {
+    if (searchQuery.trim()) return;
+    setActiveSearchKeyword("");
+    setBoardPosts([]);
+    setHasMore(true);
+    setCurrentPage(1);
+    syncBoardQuery(selectedCategory, "");
+  }, [searchQuery, selectedCategory, syncBoardQuery]);
 
   const handleLikeClick = useCallback(async (e: React.MouseEvent, postId: string) => {
     e.preventDefault();
     e.stopPropagation();
-    if (likeInFlightRef.current.has(postId)) return;
-    likeInFlightRef.current.add(postId);
-    try {
-      const toggleRes = await likeBoard(postId);
-      if (toggleRes == null) return;
-      const countRes = await likeCount(postId);
-      const nextCount = parseLikeCountResponse(countRes?.data ?? null);
-      if (nextCount == null) return;
-      setBoardPosts((prev) =>
-        prev.map((p) => (p.id === postId ? { ...p, likeCount: nextCount } : p))
-      );
-    } finally {
-      likeInFlightRef.current.delete(postId);
-    }
+    setBoardPosts((prev) =>
+      prev.map((p) => {
+        if (p.id !== postId) return p;
+        const nextLiked = !Boolean(p.liked);
+        return {
+          ...p,
+          liked: nextLiked,
+          likeCount: nextLiked ? p.likeCount + 1 : Math.max(0, p.likeCount - 1),
+        };
+      })
+    );
   }, []);
 
   const openMobileCategorySheet = () => {
@@ -287,7 +335,14 @@ export default function BoardPage() {
                         onClick={(e) => void handleLikeClick(e, post.id)}
                         onKeyDown={(e) => e.stopPropagation()}
                       >
-                        <Image src={heartIcon} alt="" width={24} height={24} className={cn("metricIcon")} aria-hidden />
+                        <Image
+                          src={post.liked ? heartFilledIcon : heartIcon}
+                          alt=""
+                          width={24}
+                          height={24}
+                          className={cn("metricIcon")}
+                          aria-hidden
+                        />
                         <span className={cn("metricCount")}>{post.likeCount}</span>
                       </button>
                       <div className={cn("metricItem")}>
