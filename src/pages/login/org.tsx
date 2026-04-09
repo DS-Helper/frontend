@@ -31,7 +31,12 @@ export default function OrgLoginPage() {
       const isSuccess = res && res.status >= 200 && res.status < 300;
       
       if (isSuccess) {
-        applyLoginResponseTokens(res.data);
+        const tokenState = applyLoginResponseTokens(res.data);
+        if (!tokenState.hasRefreshToken) {
+          console.warn(
+            "[auth] organization login 응답에 refreshToken이 없습니다."
+          );
+        }
         if (res.data?.user) {
           setUser(res.data.user);
         }

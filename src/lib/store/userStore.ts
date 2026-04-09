@@ -59,9 +59,22 @@ export const useUserStore = create(
           return;
         }
 
-        const { userType, isVerified } = get();
+        const { userType, isVerified, accessToken, refreshToken } = get();
 
         if (isVerified && userType) {
+          return;
+        }
+
+        // 토큰이 준비되기 전에는 check-logged-in 호출을 지연시켜
+        // OAuth/로그인 API 응답보다 먼저 검증 API가 실행되는 레이스를 방지한다.
+        const hasOrgToken = typeof accessToken === "string" && !!accessToken.trim();
+        const hasUserToken =
+          typeof refreshToken === "string" && !!refreshToken.trim();
+
+        if (userType === "organization" && !hasOrgToken) {
+          return;
+        }
+        if (userType !== "organization" && !hasUserToken) {
           return;
         }
 
@@ -116,16 +129,23 @@ export const useUserStore = create(
   )
 );
 
-export function applyLoginResponseTokens(body: unknown): void {
+export type AppliedLoginTokenState = {
+  hasAccessToken: boolean;
+  hasRefreshToken: boolean;
+};
+
+export function applyLoginResponseTokens(body: unknown): AppliedLoginTokenState {
   if (DEV_MOCK_LOGGED_IN_INDIVIDUAL) {
     useUserStore.setState({
       accessToken: DEV_MOCK_PLACEHOLDER_TOKEN,
       refreshToken: DEV_MOCK_PLACEHOLDER_TOKEN,
     });
-    return;
+    return { hasAccessToken: true, hasRefreshToken: true };
   }
 
-  if (body == null || typeof body !== "object") return;
+  if (body == null || typeof body !== "object") {
+    return { hasAccessToken: false, hasRefreshToken: false };
+  }
   const o = body as Record<string, unknown>;
   const nested =
     o.data != null && typeof o.data === "object"
@@ -151,8 +171,15 @@ export function applyLoginResponseTokens(body: unknown): void {
   const patch: Partial<Pick<UserState, "accessToken" | "refreshToken">> = {};
   if (access) patch.accessToken = access;
   if (refresh) patch.refreshToken = refresh;
-  if (Object.keys(patch).length === 0) return;
-  useUserStore.setState(patch);
+  if (Object.keys(patch).length > 0) {
+    useUserStore.setState(patch);
+  }
+
+  const { accessToken, refreshToken } = useUserStore.getState();
+  return {
+    hasAccessToken: typeof accessToken === "string" && !!accessToken.trim(),
+    hasRefreshToken: typeof refreshToken === "string" && !!refreshToken.trim(),
+  };
 }
 
 export function clearAuthCredentials(): void {
