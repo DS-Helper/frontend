@@ -62,4 +62,15 @@
   background: var(--color-semantic-bg-brand);
   cursor: pointer;
   font-family: inherit;
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+}
+
+.pageLoading {
+  margin: 0;
+  font-size: 1.6rem;
+  color: var(--color-semantic-text-secondary);
 }

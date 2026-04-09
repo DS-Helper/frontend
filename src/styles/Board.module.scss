@@ -70,6 +70,7 @@
 .mainContent {
 	flex: 1;
 	min-width: 0;
+	margin-bottom: 5rem;
 
 	@media (max-width: 611px) {
 		display: flex;
@@ -81,7 +82,8 @@
 .postList {
 	display: flex;
 	flex-direction: column;
-	gap: 3.4rem;
+	gap: 2.8rem;
+	margin-bottom: 7rem;
 }
 
 // 게시글 아이템
@@ -103,17 +105,17 @@
 }
 
 .postTitle {
-	font-size: 1.8rem;
-	font-weight: 600;
-	color: var(--primary-color-dark);
+	font-size: var(--title-S-size);
+	font-weight: var(--title-S-weight);
+	color: var(--color-semantic-text-primary);
 	margin: 0;
 	word-break: keep-all;
 }
 
 .postText {
-	font-size: 1.6rem;
-	font-weight: 400;
-	color: var(--grey-700);
+	font-size: var(--body-S-size);
+	font-weight: var(--body-S-weight);
+	color: var(--color-semantic-text-primary);
 	margin: 0;
 	word-break: keep-all;
 	white-space: nowrap;
@@ -134,14 +136,33 @@
 	color: #6c757d;
 }
 
+.metricLikeButton {
+	display: flex;
+	align-items: center;
+	gap: 0.2rem;
+	margin: 0;
+	padding: 0;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	font: inherit;
+	color: #6c757d;
+
+	&:focus-visible {
+		outline: 2px solid var(--color-semantic-border-default, #ccc);
+		outline-offset: 2px;
+		border-radius: 0.2rem;
+	}
+}
+
 .metricIcon {
 	font-size: 1.6rem;
 }
 
 .metricCount {
-	font-size: 1.6rem;
+	font-size: 1.4rem;
 	font-weight: 400;
-	color: var(--grey-700);
+	color: var(--color-semantic-text-secondary);
 }
 
 .postImage {
@@ -150,7 +171,7 @@
 	flex-shrink: 0;
 	border-radius: 0.8rem;
 	overflow: hidden;
-	background-color: var(--grey-200);
+	background-color: var(--color-semantic-bg-neutral-soft);
 }
 
 .image {
@@ -222,7 +243,7 @@
 	background: var(--color-semantic-bg-page);
 	box-sizing: border-box;
 
-	@media (max-width: 768px) {
+	@media (max-width: 611px) {
 		padding: 2.4rem 1.6rem;
 	}
 }
@@ -234,7 +255,7 @@
 	flex-direction: column;
 	gap: 2.4rem;
 
-	@media (max-width: 768px) {
+	@media (max-width: 611px) {
 		gap: 2.2rem;
 	}
 }
@@ -586,7 +607,13 @@
 	}
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) and (min-width: 612px) {
+	.boardContainer {
+		padding: 0 2.4rem;
+	}
+}
+
+@media (max-width: 611px) {
 	.boardContainer {
 		display: block;
 		padding: 0 1.6rem;
@@ -598,11 +625,12 @@
 	}
 
 	.postList {
-		gap: 2.4rem;
+		gap: 3.05rem;
 	}
 
 	.postItem {
 		padding: 0;
+		gap: 1.2rem;
 	}
 
 }

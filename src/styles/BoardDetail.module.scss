@@ -338,7 +338,7 @@
 }
 
 // 반응형
-@media (max-width: 768px) {
+@media (max-width: 611px) {
   .boardDetailPage {
     padding: 1.6rem;
   }
@@ -373,7 +373,7 @@
   animation: toastSlideUp 0.3s ease-out, toastFadeOut 0.3s ease-in 1.7s;
   pointer-events: none;
 
-  @media (max-width: 768px) {
+  @media (max-width: 611px) {
     bottom: 2rem;
     padding: 1rem 2rem;
     font-size: 1.3rem;

@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { useRouter } from "next/router";
 import classNames from "classnames/bind";
 import styles from "@/styles/Board.module.scss";
-import { boardWriteCategories, BoardCategory } from "@/types/board";
+import { boardWriteCategories, BoardPostCategory } from "@/types/board";
 import { postBoard } from "@/lib/apis/board";
 import { BsCardImage } from "react-icons/bs";
 import { IoIosArrowDown, IoMdClose } from "react-icons/io";
@@ -30,20 +30,11 @@ function getCreatedBoardIdFromResponse(body: unknown): string | null {
   return null;
 }
 
-function fileToDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result ?? ""));
-    reader.onerror = () => reject(new Error("이미지 변환에 실패했습니다."));
-    reader.readAsDataURL(file);
-  });
-}
-
 export default function BoardWritePage() {
   const router = useRouter();
   const categoryDropdownRef = useRef<HTMLDivElement | null>(null);
   const [categoryOpen, setCategoryOpen] = useState(false);
-  const [category, setCategory] = useState<BoardCategory | "">("");
+  const [category, setCategory] = useState<BoardPostCategory | "">("");
   const [title, setTitle] = useState("");
   const [contentTop, setContentTop] = useState("");
   const [contentBottom, setContentBottom] = useState("");
@@ -153,20 +144,13 @@ export default function BoardWritePage() {
     }
     setSubmitting(true);
     try {
-      const imagePayload =
-        imageFiles.length > 0
-          ? await Promise.all(imageFiles.map((file) => fileToDataUrl(file)))
-          : undefined;
-
       const res = await postBoard({
         dto: {
-          category: category as BoardCategory,
+          category: category as BoardPostCategory,
           title: title.trim(),
           content: mergedContent,
         },
-        ...(imagePayload && imagePayload.length > 0
-          ? { images: imagePayload }
-          : {}),
+        ...(imageFiles.length > 0 ? { images: imageFiles } : {}),
       });
 
       if (res && (res.status === 200 || res.status === 201)) {

@@ -118,7 +118,7 @@
   color: var(--color-semantic-text-inverse);
 }
 
-// 반응형 디자인
+// 반응형 디자인 (사이드바 숨김과 동일: Board.module.scss max-width 611px)
 @media (max-width: 611px) {
   /* 카테고리를 세로 2열(좌 4개 / 우 3개)로 배치 */
   .categoryList {
@@ -137,7 +137,7 @@
   .mobileCategoryBar {
     display: inline-flex;
     width: fit-content;
-    margin-bottom: 1.2rem;
+    margin-bottom: 1.8rem;
     margin-left: auto;
     gap: 0.2rem;
     align-items: center;

@@ -1,0 +1,67 @@
+$pageMinHeight: calc(100vh - 6rem);
+
+.pageRoot {
+  box-sizing: border-box;
+}
+
+.desktopOnlyMessage {
+  display: none;
+}
+
+.mobileMain {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: $pageMinHeight;
+  height: $pageMinHeight;
+}
+
+.mapShell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+
+.mapErrorBanner {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 1rem 1.4rem;
+  font-size: var(--caption-size);
+  font-weight: var(--caption-weight);
+  line-height: 1.45;
+  color: var(--color-semantic-text-danger);
+  background: var(--color-semantic-bg-danger-soft);
+  border-bottom: 1px solid var(--color-semantic-border-danger);
+}
+
+.mapContainer {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .pageRoot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: $pageMinHeight;
+  }
+
+  .desktopOnlyMessage {
+    display: block;
+    margin: 0;
+    text-align: center;
+    font-size: 1.7rem;
+    font-weight: 500;
+    color: var(--color-primitive-gray-800);
+  }
+
+  .mobileMain {
+    display: none;
+  }
+}

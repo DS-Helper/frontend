@@ -7,8 +7,13 @@ import styles from "@/styles/BoardDetail.module.scss";
 import Image from "next/image";
 import { BoardPostDetail, BoardComment } from "@/types/board";
 import { isScrapId, toggleScrapId } from "@/lib/board/scrapStorage";
-import { getBoardById } from "@/lib/apis/board";
-import { mapItemToBoardPostDetail } from "@/lib/board/mapBoardPost";
+import { getBoardById, likeBoard, likeCount } from "@/lib/apis/board";
+import {
+  mapItemToBoardPostDetail,
+  parseBoardRecordFromApi,
+  parseLikeCountResponse,
+  parseLikeToggleResponse,
+} from "@/lib/board/mapBoardPost";
 import { useUserStore } from "@/lib/store/userStore";
 import shareIcon from "@/public/boardShareIcon.svg";
 import { HiOutlineEllipsisVertical } from "react-icons/hi2";
@@ -33,6 +38,7 @@ export default function BoardDetailPage() {
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
+  const likeInFlightRef = useRef(false);
 
   // 작성자와 로그인 사용자 동일인물 여부 (id 또는 name으로 비교)
   const isAuthor = Boolean(
@@ -53,29 +59,33 @@ export default function BoardDetailPage() {
   }, [showMoreMenu]);
 
   useEffect(() => {
-    if (!id || typeof id !== "string") return;
+    if (!router.isReady || !id || typeof id !== "string") return;
     let cancelled = false;
     (async () => {
       const res = await getBoardById(id);
       if (cancelled) return;
-      const d = res?.data;
-      if (d && typeof d === "object" && !Array.isArray(d)) {
-        const detail = mapItemToBoardPostDetail(d as Record<string, unknown>);
-        if (!detail.id) {
-          router.push("/board");
-          return;
-        }
-        setPost(detail);
-        setComments([]);
-        setIsBookmarked(isScrapId(id));
-      } else {
+      const record = res?.data != null ? parseBoardRecordFromApi(res.data) : null;
+      if (!record) {
         router.push("/board");
+        return;
+      }
+      const detail = mapItemToBoardPostDetail(record);
+      if (!detail.id) {
+        router.push("/board");
+        return;
+      }
+      setPost(detail);
+      setComments([]);
+      setIsBookmarked(isScrapId(id));
+      const likedRaw = record.liked ?? record.isLiked;
+      if (typeof likedRaw === "boolean") {
+        setIsLiked(likedRaw);
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [id, router]);
+  }, [id, router.isReady, router]);
 
   // 공유 기능 (helpStory 상세와 동일)
   const handleShare = async () => {
@@ -172,6 +182,24 @@ export default function BoardDetailPage() {
     alert("신고 기능은 준비 중입니다.");
   };
 
+  const handleLikeClick = async () => {
+    if (typeof id !== "string" || !post || likeInFlightRef.current) return;
+    likeInFlightRef.current = true;
+    try {
+      const toggleRes = await likeBoard(id);
+      if (toggleRes == null) return;
+      const { liked } = parseLikeToggleResponse(toggleRes.data);
+      if (typeof liked === "boolean") setIsLiked(liked);
+      const countRes = await likeCount(id);
+      const nextCount = parseLikeCountResponse(countRes?.data ?? null);
+      if (nextCount != null) {
+        setPost((p) => (p ? { ...p, likeCount: nextCount } : null));
+      }
+    } finally {
+      likeInFlightRef.current = false;
+    }
+  };
+
   if (!post) {
     return (
       <div className={cn("boardDetailPage")}>
@@ -229,7 +257,7 @@ export default function BoardDetailPage() {
             <div className={cn("authorMeta")}>
               <span className={cn("authorName")}>{post.author.name}</span>
               <span className={cn("authorMetaDot")}>·</span>
-              <span className={cn("postTime")}>46분 전</span>
+              <span className={cn("postTime")}>{post.createdAt || "—"}</span>
             </div>
           </div>
           <div className={cn("postActions")}>
@@ -285,7 +313,7 @@ export default function BoardDetailPage() {
             <button
               type="button"
               className={cn("engagementItem", "engagementButton")}
-              onClick={() => setIsLiked((prev) => !prev)}
+              onClick={() => void handleLikeClick()}
               aria-label={isLiked ? "좋아요 취소" : "좋아요"}
             >
               <span className={cn("engagementIconWrap", { active: isLiked })}>

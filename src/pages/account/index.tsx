@@ -1,14 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, FormEvent } from "react";
 import { useRouter } from "next/router";
 import classNames from "classnames/bind";
 import Image from "next/image";
 import styles from "@/styles/Account.module.scss";
 import { handleLogout } from "@/lib/utils/logout";
 import AccountSideBar from "@/components/AccountSideBar";
-import { getMyInfo } from "@/lib/apis/account";
+import { getMyInfo, parseAccountMyInfoResponse, patchMyInfo } from "@/lib/apis/account";
 import { AccountMyInfoData } from "@/types/account";
 import { TiCamera } from "react-icons/ti";
 import { IoIosArrowForward } from "react-icons/io";
+import { IoMdClose } from "react-icons/io";
 import editIcon from "@/public/boardPencilIcon.svg";
 
 const cn = classNames.bind(styles);
@@ -16,7 +17,13 @@ const cn = classNames.bind(styles);
 export default function AccountPage() {
   const router = useRouter();
   const [myInfo, setMyInfo] = useState<AccountMyInfoData | null>(null);
+  const [myInfoLoading, setMyInfoLoading] = useState(true);
+  const [nameEditOpen, setNameEditOpen] = useState(false);
+  const [nameDraft, setNameDraft] = useState("");
+  const [nameEditSubmitting, setNameEditSubmitting] = useState(false);
+  const [profileImageUploading, setProfileImageUploading] = useState(false);
   const profileImageInputRef = useRef<HTMLInputElement>(null);
+  const nameEditInputRef = useRef<HTMLInputElement>(null);
 
   const handleLogoutClick = async () => {
     try {
@@ -29,24 +36,66 @@ export default function AccountPage() {
   };
 
   const openProfileImagePicker = () => {
+    if (profileImageUploading || !myInfo) return;
     profileImageInputRef.current?.click();
   };
 
-  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    // TODO: 프로필 이미지 업로드 API 연동
-    e.target.value = "";
+    if (!file || !myInfo) {
+      e.target.value = "";
+      return;
+    }
+    setProfileImageUploading(true);
+    try {
+      const res = await patchMyInfo({
+        dto: {
+          name: myInfo.name,
+          email: myInfo.email ?? "",
+          birthyear: myInfo.birthyear,
+          gender: myInfo.gender,
+          phoneNumber: myInfo.phoneNumber,
+          removeProfileImage: false,
+        },
+        profileImage: file,
+      });
+      if (!res?.data) {
+        alert("프로필 이미지 변경에 실패했습니다. 다시 시도해 주세요.");
+        return;
+      }
+      const envelope = res.data as { success?: boolean; message?: string };
+      const parsed = parseAccountMyInfoResponse(res.data);
+      if (envelope.success === false || !parsed) {
+        alert(
+          typeof envelope.message === "string" && envelope.message
+            ? envelope.message
+            : "프로필 이미지 변경에 실패했습니다."
+        );
+        return;
+      }
+      setMyInfo(parsed);
+    } finally {
+      setProfileImageUploading(false);
+      e.target.value = "";
+    }
   };
 
   useEffect(() => {
     let cancelled = false;
     const fetchMyInfo = async () => {
+      setMyInfoLoading(true);
       const res = await getMyInfo();
       if (cancelled) return;
-      const payload = res?.data;
-      if (payload?.success && payload.data) {
-        setMyInfo(payload.data);
+      setMyInfoLoading(false);
+      if (!res?.data) {
+        setMyInfo(null);
+        return;
+      }
+      const parsed = parseAccountMyInfoResponse(res.data);
+      if (parsed) {
+        setMyInfo(parsed);
+      } else {
+        setMyInfo(null);
       }
     };
     fetchMyInfo();
@@ -54,6 +103,75 @@ export default function AccountPage() {
       cancelled = true;
     };
   }, []);
+
+  const openNameEditModal = () => {
+    setNameDraft(myInfo?.name?.trim() ?? "");
+    setNameEditOpen(true);
+  };
+
+  const closeNameEditModal = () => {
+    setNameEditOpen(false);
+  };
+
+  useLayoutEffect(() => {
+    if (!nameEditOpen) return;
+    nameEditInputRef.current?.focus();
+  }, [nameEditOpen]);
+
+  useEffect(() => {
+    if (!nameEditOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKeyDown = (ev: KeyboardEvent) => {
+      if (ev.key === "Escape") setNameEditOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [nameEditOpen]);
+
+  const handleNameEditSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    const next = nameDraft.trim();
+    if (!next) {
+      alert("이름을 입력해 주세요.");
+      return;
+    }
+    if (!myInfo) return;
+    setNameEditSubmitting(true);
+    try {
+      const res = await patchMyInfo({
+        dto: {
+          name: next,
+          email: myInfo.email ?? "",
+          birthyear: myInfo.birthyear,
+          gender: myInfo.gender,
+          phoneNumber: myInfo.phoneNumber,
+          removeProfileImage: false,
+        },
+      });
+      if (!res?.data) {
+        alert("이름 수정에 실패했습니다. 다시 시도해 주세요.");
+        return;
+      }
+      const envelope = res.data as { success?: boolean; message?: string };
+      const parsed = parseAccountMyInfoResponse(res.data);
+      if (envelope.success === false || !parsed) {
+        alert(
+          typeof envelope.message === "string" && envelope.message
+            ? envelope.message
+            : "이름 수정에 실패했습니다."
+        );
+        return;
+      }
+      setMyInfo(parsed);
+      setNameEditOpen(false);
+    } finally {
+      setNameEditSubmitting(false);
+    }
+  };
 
   const genderText = useMemo(() => {
     const raw = (myInfo?.gender ?? "").toLowerCase();
@@ -78,6 +196,20 @@ export default function AccountPage() {
       <AccountSideBar activeTab="profile" onLogout={handleLogoutClick} />
 
       <main className={cn("main")}>
+        <input
+          id="account-profile-image-input"
+          ref={profileImageInputRef}
+          type="file"
+          accept="image/*"
+          className={cn("profileImageInput")}
+          onChange={handleProfileImageChange}
+          tabIndex={-1}
+          aria-hidden
+        />
+        {myInfoLoading ? (
+          <p className={cn("mainLoading")}>프로필 정보를 불러오는 중…</p>
+        ) : (
+          <>
         <section className={cn("profileSection")}>
           <div className={cn("avatarWrap")}>
             <Image
@@ -88,21 +220,14 @@ export default function AccountPage() {
               className={cn("avatarImage")}
               unoptimized={profileImageSrc.startsWith("http")}
             />
-            <input
-              ref={profileImageInputRef}
-              type="file"
-              accept="image/*"
-              className={cn("profileImageInput")}
-              onChange={handleProfileImageChange}
-              tabIndex={-1}
-              aria-hidden
-            />
             <div className={cn("avatarCameraButtonWrap")}>
               <button
                 type="button"
                 className={cn("avatarCameraButton")}
                 onClick={openProfileImagePicker}
                 aria-label="프로필 이미지 변경"
+                disabled={profileImageUploading}
+                aria-busy={profileImageUploading}
               >
                 <TiCamera className={cn("avatarCameraIcon")} aria-hidden />
               </button>
@@ -111,7 +236,14 @@ export default function AccountPage() {
           <div className={cn("userInfo")}>
             <div className={cn("userNameWrap")}>
               <h1 className={cn("userName")}>{displayName}</h1>
-              <Image src={editIcon} alt="프로필" width={24} height={24} className={cn("editButton")} />
+              <button
+                type="button"
+                className={cn("nameEditOpenButton")}
+                onClick={openNameEditModal}
+                aria-label="이름 변경"
+              >
+                <Image src={editIcon} alt="" width={24} height={24} className={cn("editButton")} />
+              </button>
             </div>
             {displayEmail && <p className={cn("userEmail")}>{displayEmail}</p>}
             {birthGenderText && (
@@ -137,21 +269,14 @@ export default function AccountPage() {
               className={cn("avatarImage")}
               unoptimized={profileImageSrc.startsWith("http")}
             />
-            <input
-              ref={profileImageInputRef}
-              type="file"
-              accept="image/*"
-              className={cn("profileImageInput")}
-              onChange={handleProfileImageChange}
-              tabIndex={-1}
-              aria-hidden
-            />
             <div className={cn("avatarCameraButtonWrap")}>
               <button
                 type="button"
                 className={cn("avatarCameraButton")}
                 onClick={openProfileImagePicker}
                 aria-label="프로필 이미지 변경"
+                disabled={profileImageUploading}
+                aria-busy={profileImageUploading}
               >
                 <TiCamera className={cn("avatarCameraIcon")} aria-hidden />
               </button>
@@ -196,7 +321,61 @@ export default function AccountPage() {
             )}
           </div>
         </section>
+          </>
+        )}
       </main>
+
+      {nameEditOpen && (
+        <div
+          className={cn("nameEditModalOverlay")}
+          role="presentation"
+          onClick={closeNameEditModal}
+        >
+          <div
+            className={cn("nameEditModal")}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="account-name-edit-title"
+            onClick={(ev) => ev.stopPropagation()}
+          >
+            <div className={cn("nameEditModalHeader")}>
+              <h2 id="account-name-edit-title" className={cn("nameEditModalTitle")}>
+                이름 변경
+              </h2>
+              <button
+                type="button"
+                className={cn("nameEditModalClose")}
+                onClick={closeNameEditModal}
+                aria-label="닫기"
+              >
+                <IoMdClose className={cn("nameEditModalCloseIcon")} aria-hidden />
+              </button>
+            </div>
+            <form className={cn("nameEditModalForm")} onSubmit={handleNameEditSubmit}>
+              <label htmlFor="account-name-edit-input" className={cn("visuallyHidden")}>
+                이름
+              </label>
+              <input
+                ref={nameEditInputRef}
+                id="account-name-edit-input"
+                type="text"
+                className={cn("nameEditModalInput")}
+                value={nameDraft}
+                onChange={(ev) => setNameDraft(ev.target.value)}
+                autoComplete="name"
+                maxLength={40}
+              />
+              <button
+                type="submit"
+                className={cn("nameEditModalSubmit")}
+                disabled={nameEditSubmitting}
+              >
+                {nameEditSubmitting ? "수정 중…" : "수정하기"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
