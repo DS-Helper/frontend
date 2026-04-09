@@ -1,13 +1,12 @@
-import { useState } from "react";
 import classNames from "classnames/bind";
 import styles from "@/styles/BoardCategoryFilter.module.scss";
-import { BoardCategory, boardCategories } from "@/types/board";
+import { BoardCategory, BoardPostCategory, boardCategories } from "@/types/board";
 
 const cn = classNames.bind(styles);
 
 interface BoardCategoryFilterProps {
-  selectedCategory: BoardCategory | null;
-  onCategoryChange: (category: BoardCategory | null) => void;
+  selectedCategory: BoardPostCategory | null;
+  onCategoryChange: (category: BoardPostCategory | null) => void;
 }
 
 export default function BoardCategoryFilter({
@@ -15,11 +14,15 @@ export default function BoardCategoryFilter({
   onCategoryChange,
 }: BoardCategoryFilterProps) {
   const handleCategoryToggle = (category: BoardCategory) => {
-    if (selectedCategory === category) {
-      // 이미 선택된 카테고리를 다시 클릭하면 선택 해제
+    if (category === "전체") {
+      onCategoryChange(null);
+      return;
+    }
+    const topic = category as BoardPostCategory;
+    if (selectedCategory === topic) {
       onCategoryChange(null);
     } else {
-      onCategoryChange(category);
+      onCategoryChange(topic);
     }
   };
 
@@ -32,12 +35,25 @@ export default function BoardCategoryFilter({
             <label className={cn("categoryLabel")}>
               <input
                 type="checkbox"
-                checked={selectedCategory === category}
+                checked={
+                  category === "전체"
+                    ? selectedCategory === null
+                    : selectedCategory === category
+                }
                 onChange={() => handleCategoryToggle(category)}
                 className={cn("categoryCheckbox")}
               />
-              <div className={cn("customCheckbox", { checked: selectedCategory === category })}>
-                {selectedCategory === category && (
+              <div
+                className={cn("customCheckbox", {
+                  checked:
+                    category === "전체"
+                      ? selectedCategory === null
+                      : selectedCategory === category,
+                })}
+              >
+                {(category === "전체"
+                  ? selectedCategory === null
+                  : selectedCategory === category) && (
                   <svg
                     className={cn("checkIcon")}
                     viewBox="0 0 12 12"

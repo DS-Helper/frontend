@@ -1,20 +1,24 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/router";
 import classNames from "classnames/bind";
 import styles from "@/styles/Board.module.scss";
 import filterStyles from "@/styles/BoardCategoryFilter.module.scss";
 import searchIcon from "@/public/searchIcon.svg";
 import BoardCategoryFilter from "@/components/BoardCategoryFilter";
-import { BoardCategory, boardCategories, BoardPost } from "@/types/board";
+import { BoardPost, BoardPostCategory, boardPostCategories } from "@/types/board";
 import Image from "next/image";
-import { getBoards } from "@/lib/apis/board";
-import { mapItemToBoardPost } from "@/lib/board/mapBoardPost";
+import { getBoards, likeBoard, likeCount } from "@/lib/apis/board";
+import {
+  mapGetBoardsItemToBoardPost,
+  parseGetBoardsPayload,
+  parseLikeCountResponse,
+} from "@/lib/board/mapBoardPost";
 import { PiSquaresFourFill } from "react-icons/pi";
 
-import heartIcon from "@/public/boardLikeGrey.svg";
-import commentIcon from "@/public/boardCommentGrey.svg";
+import heartIcon from "@/public/boardLikeIcon.svg";
+import commentIcon from "@/public/boardCommentIcon.svg";
 import boardPencilIcon from "@/public/boardPencilIcon.svg";
 import Pagination from "@/components/Pagination";
 
@@ -25,15 +29,15 @@ const POSTS_PER_PAGE = 10;
 
 function getCategoryFromQuery(
   query: Record<string, string | string[] | undefined>
-): BoardCategory | null {
+): BoardPostCategory | null {
   const c = query.category;
   if (typeof c !== "string") return null;
-  return boardCategories.includes(c as BoardCategory) ? (c as BoardCategory) : null;
+  return boardPostCategories.includes(c as BoardPostCategory) ? (c as BoardPostCategory) : null;
 }
 
 export default function BoardPage() {
   const router = useRouter();
-  const [selectedCategory, setSelectedCategory] = useState<BoardCategory | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<BoardPostCategory | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCategorySynced, setIsCategorySynced] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,19 +48,20 @@ export default function BoardPage() {
   const [hasMore, setHasMore] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [isMobileCategoryOpen, setIsMobileCategoryOpen] = useState(false);
-  const [mobileCategoryDraft, setMobileCategoryDraft] = useState<BoardCategory | null>(null);
+  const [mobileCategoryDraft, setMobileCategoryDraft] = useState<BoardPostCategory | null>(null);
   const loadMoreTriggerRef = useRef<HTMLDivElement | null>(null);
+  const likeInFlightRef = useRef<Set<string>>(new Set());
 
   // URL 쿼리에서 카테고리 복원 (상세에서 돌아왔을 때)
   useEffect(() => {
     if (!router.isReady) return;
     const fromQuery = getCategoryFromQuery(router.query);
-    setSelectedCategory(fromQuery ?? null);
+    setSelectedCategory(fromQuery);
     setIsCategorySynced(true);
   }, [router.isReady, router.query]);
 
   // 카테고리 변경 시 URL 반영 (다음에 상세 갔다 와도 유지되도록)
-  const handleCategoryChange = (category: BoardCategory | null) => {
+  const handleCategoryChange = (category: BoardPostCategory | null) => {
     setSelectedCategory(category);
     setBoardPosts([]);
     setHasMore(true);
@@ -65,11 +70,10 @@ export default function BoardPage() {
     router.replace({ pathname: "/board", query }, undefined, { shallow: true });
   };
 
-  // URL 복원 전까지 기본값, 복원 후에는 선택값 사용
-  const effectiveCategory = isCategorySynced ? (selectedCategory ?? "자유") : "자유";
+  const categoryForFetch = isCategorySynced ? selectedCategory : null;
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    const checkMobile = () => setIsMobile(window.innerWidth <= 611);
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
@@ -92,14 +96,16 @@ export default function BoardPage() {
         setIsLoading(true);
       }
       const res = await getBoards({
-        category: effectiveCategory === "자유" ? undefined : (effectiveCategory as BoardCategory),
-        page: currentPage,
+        category: categoryForFetch ?? undefined,
+        page: Math.max(0, currentPage - 1),
         size: POSTS_PER_PAGE,
       });
 
       setIsLoading(false);
       setIsFetchingMore(false);
-      if (!res?.data) {
+      const parsed = res?.data != null ? parseGetBoardsPayload(res.data) : null;
+
+      if (!parsed) {
         if (currentPage === 1) {
           setBoardPosts([]);
         }
@@ -108,19 +114,10 @@ export default function BoardPage() {
         return;
       }
 
-      const data = res.data;
-      const dataObj = data && typeof data === "object" && !Array.isArray(data) ? (data as Record<string, unknown>) : {};
-      const rawContent = Array.isArray(data) ? data : (dataObj.content ?? dataObj.data);
-      const content = Array.isArray(rawContent) ? rawContent : [];
-      const total = Number(dataObj.totalPages ?? dataObj.total_pages ?? 1);
-      const totalElements = dataObj.totalElements ?? dataObj.total_elements;
-      const computedTotalPages =
-        totalElements != null
-          ? Math.max(1, Math.ceil(Number(totalElements) / POSTS_PER_PAGE))
-          : total;
-
-      const mapped = content.map((item) => mapItemToBoardPost(item as Record<string, unknown>));
-      setTotalPages(Math.max(1, computedTotalPages));
+      const { boards, page } = parsed;
+      const mapped = boards.map(mapGetBoardsItemToBoardPost);
+      const computedTotalPages = Math.max(1, Number(page.totalPages) || 1);
+      setTotalPages(computedTotalPages);
 
       if (isMobile) {
         setBoardPosts((prev) => {
@@ -131,14 +128,14 @@ export default function BoardPage() {
           }
           return next;
         });
-        setHasMore(currentPage < Math.max(1, computedTotalPages) && mapped.length > 0);
+        setHasMore(Boolean(page.hasNext) && mapped.length > 0);
       } else {
         setBoardPosts(mapped);
       }
     };
 
     fetchBoards();
-  }, [isCategorySynced, effectiveCategory, currentPage, isMobile]);
+  }, [isCategorySynced, categoryForFetch, currentPage, isMobile]);
 
   // 검색어로 현재 페이지 목록만 클라이언트 필터 (서버 검색은 API 지원 시 연동)
   const filteredPosts = useMemo(() => {
@@ -162,8 +159,27 @@ export default function BoardPage() {
     // 검색은 이미 filteredPosts에서 처리됨
   };
 
+  const handleLikeClick = useCallback(async (e: React.MouseEvent, postId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (likeInFlightRef.current.has(postId)) return;
+    likeInFlightRef.current.add(postId);
+    try {
+      const toggleRes = await likeBoard(postId);
+      if (toggleRes == null) return;
+      const countRes = await likeCount(postId);
+      const nextCount = parseLikeCountResponse(countRes?.data ?? null);
+      if (nextCount == null) return;
+      setBoardPosts((prev) =>
+        prev.map((p) => (p.id === postId ? { ...p, likeCount: nextCount } : p))
+      );
+    } finally {
+      likeInFlightRef.current.delete(postId);
+    }
+  }, []);
+
   const openMobileCategorySheet = () => {
-    setMobileCategoryDraft(effectiveCategory === "자유" ? null : effectiveCategory);
+    setMobileCategoryDraft(selectedCategory);
     setIsMobileCategoryOpen(true);
   };
 
@@ -221,7 +237,7 @@ export default function BoardPage() {
       <div className={cn("boardContainer")}>
         <aside className={cn("sidebar")}>
           <BoardCategoryFilter
-            selectedCategory={effectiveCategory === "자유" ? null : effectiveCategory}
+            selectedCategory={selectedCategory}
             onCategoryChange={handleCategoryChange}
           />
         </aside>
@@ -264,18 +280,24 @@ export default function BoardPage() {
                     <h3 className={cn("postTitle")}>{post.title}</h3>
                     <p className={cn("postText")}>{post.content}</p>
                     <div className={cn("postMetrics")}>
-                      <div className={cn("metricItem")}>
-                        <Image src={heartIcon} alt="heart" width={24} height={24} className={cn("metricIcon")} />
+                      <button
+                        type="button"
+                        className={cn("metricLikeButton")}
+                        aria-label="좋아요"
+                        onClick={(e) => void handleLikeClick(e, post.id)}
+                        onKeyDown={(e) => e.stopPropagation()}
+                      >
+                        <Image src={heartIcon} alt="" width={24} height={24} className={cn("metricIcon")} aria-hidden />
                         <span className={cn("metricCount")}>{post.likeCount}</span>
-                      </div>
+                      </button>
                       <div className={cn("metricItem")}>
                         <Image src={commentIcon} alt="comment" width={24} height={24} className={cn("metricIcon")} />
                         <span className={cn("metricCount")}>{post.commentCount}</span>
                       </div>
                     </div>
                   </div>
-                  <div className={cn("postImage")} aria-hidden>
-                    {post.imageUrl ? (
+                  {post.imageUrl ? (
+                    <div className={cn("postImage")} aria-hidden>
                       <Image
                         src={post.imageUrl}
                         alt={post.title}
@@ -284,10 +306,8 @@ export default function BoardPage() {
                         className={cn("image")}
                         unoptimized={post.imageUrl.startsWith("http")}
                       />
-                    ) : (
-                      <div className={cn("imagePlaceholder")} />
-                    )}
-                  </div>
+                    </div>
+                  ) : null}
                 </article>
               ))
             ) : (
@@ -296,7 +316,7 @@ export default function BoardPage() {
               </div>
             )}
           </div>
-          {!isMobile && !isLoading && totalPages > 0 && (
+          {!isMobile && !isLoading && paginatedPosts.length > 0 && totalPages > 0 && (
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}

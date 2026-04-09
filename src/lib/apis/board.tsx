@@ -1,9 +1,18 @@
 import { instance } from "./axios";
-import { GetBoardsParams, PostBoardRequest, PatchBoardRequest } from "@/types/board";
+import {
+  GetBoardByIdApiResponse,
+  GetBoardsApiResponse,
+  GetBoardsParams,
+  PatchBoardRequest,
+  PostBoardRequest,
+} from "@/types/board";
+import { AxiosResponse } from "axios";
 
-export const getBoards = async (params: GetBoardsParams) => {
+export const getBoards = async (
+  params: GetBoardsParams
+): Promise<AxiosResponse<GetBoardsApiResponse> | null> => {
   try {
-    const res = await instance.get(`/boards`, { params });
+    const res = await instance.get<GetBoardsApiResponse>(`/boards`, { params });
     return res;
   } catch (e) {
     console.error(e);
@@ -13,7 +22,7 @@ export const getBoards = async (params: GetBoardsParams) => {
 
 export const getBoardById = async (boardId: string) => {
   try {
-    const res = await instance.get(`/board/${boardId}`);
+    const res = await instance.get<GetBoardByIdApiResponse>(`/board/${boardId}`);
     return res;
   } catch (e) {
     console.error(e);
@@ -21,9 +30,17 @@ export const getBoardById = async (boardId: string) => {
   }
 };
 
-export const postBoard = async (data: PostBoardRequest) => {
+export const postBoard = async ({ dto, images }: PostBoardRequest) => {
   try {
-    const res = await instance.post(`/boards`, data);
+    const formData = new FormData();
+    formData.append(
+      "dto",
+      new Blob([JSON.stringify(dto)], { type: "application/json" })
+    );
+    for (const file of images ?? []) {
+      formData.append("images", file);
+    }
+    const res = await instance.post(`/boards`, formData);
     return res;
   } catch (e) {
     console.error(e);
@@ -44,6 +61,26 @@ export const patchBoard = async (data: PatchBoardRequest) => {
 export const deleteBoard = async (boardId: string) => {
   try {
     const res = await instance.delete(`/board/${boardId}`);
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+export const likeBoard = async (boardId: string) => {
+  try {
+    const res = await instance.post(`/board/${boardId}/like`);
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+export const likeCount = async (boardId: string) => {
+  try {
+    const res = await instance.get(`/${boardId}/like/count`);
     return res;
   } catch (e) {
     console.error(e);
