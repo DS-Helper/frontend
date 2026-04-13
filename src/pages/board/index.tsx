@@ -9,9 +9,11 @@ import searchIcon from "@/public/searchIcon.svg";
 import BoardCategoryFilter from "@/components/BoardCategoryFilter";
 import { BoardPost, BoardPostCategory, boardPostCategories } from "@/types/board";
 import Image from "next/image";
-import { getBoards, getSearchBoards } from "@/lib/apis/board";
+import { getBoards, getSearchBoards, likeBoard, likeCount } from "@/lib/apis/board";
 import {
   mapGetBoardsItemToBoardPost,
+  parseLikeCountResponse,
+  parseLikeToggleResponse,
   parseGetBoardsPayload,
 } from "@/lib/board/mapBoardPost";
 import { PiSquaresFourFill } from "react-icons/pi";
@@ -59,6 +61,7 @@ export default function BoardPage() {
   const [isMobileCategoryOpen, setIsMobileCategoryOpen] = useState(false);
   const [mobileCategoryDraft, setMobileCategoryDraft] = useState<BoardPostCategory | null>(null);
   const loadMoreTriggerRef = useRef<HTMLDivElement | null>(null);
+  const likeInFlightIdsRef = useRef<Set<string>>(new Set());
   const isSearchMode = activeSearchKeyword.trim().length > 0;
 
   const syncBoardQuery = useCallback(
@@ -213,6 +216,14 @@ export default function BoardPage() {
   const handleLikeClick = useCallback(async (e: React.MouseEvent, postId: string) => {
     e.preventDefault();
     e.stopPropagation();
+    if (likeInFlightIdsRef.current.has(postId)) return;
+    likeInFlightIdsRef.current.add(postId);
+    const prevPost = boardPosts.find((p) => p.id === postId);
+    if (!prevPost) {
+      likeInFlightIdsRef.current.delete(postId);
+      return;
+    }
+    const prevLiked = Boolean(prevPost.liked);
     setBoardPosts((prev) =>
       prev.map((p) => {
         if (p.id !== postId) return p;
@@ -224,7 +235,36 @@ export default function BoardPage() {
         };
       })
     );
-  }, []);
+    try {
+      const toggleRes = await likeBoard(postId);
+      if (toggleRes == null) {
+        setBoardPosts((prev) =>
+          prev.map((p) => (p.id === postId ? prevPost : p))
+        );
+        return;
+      }
+      const { liked } = parseLikeToggleResponse(toggleRes.data);
+      if (typeof liked === "boolean") {
+        setBoardPosts((prev) =>
+          prev.map((p) => (p.id === postId ? { ...p, liked } : p))
+        );
+      }
+      const countRes = await likeCount(postId);
+      const nextCount = parseLikeCountResponse(countRes?.data ?? null);
+      if (nextCount != null) {
+        setBoardPosts((prev) =>
+          prev.map((p) => (p.id === postId ? { ...p, likeCount: nextCount } : p))
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      setBoardPosts((prev) =>
+        prev.map((p) => (p.id === postId ? prevPost : p))
+      );
+    } finally {
+      likeInFlightIdsRef.current.delete(postId);
+    }
+  }, [boardPosts]);
 
   const openMobileCategorySheet = () => {
     setMobileCategoryDraft(selectedCategory);

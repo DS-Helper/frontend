@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/router";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import classNames from "classnames/bind";
 import styles from "@/styles/BoardDetail.module.scss";
 import Image from "next/image";
 import { BoardPostDetail } from "@/types/board";
+import { resolveProfileImageSrc } from "@/lib/utils/image";
 import { getBoardById, likeBoard, likeCount, scrapBoard } from "@/lib/apis/board";
 import {
   mapItemToBoardPostDetail,
@@ -66,6 +67,10 @@ export default function BoardDetailPage() {
   const moreMenuRef = useRef<HTMLDivElement>(null);
   const likeInFlightRef = useRef(false);
   const scrapInFlightRef = useRef(false);
+  const authorAvatarSrc = useMemo(
+    () => resolveProfileImageSrc(post?.author.avatar, DEFAULT_AVATAR),
+    [post?.author.avatar]
+  );
 
   // 작성자와 로그인 사용자 동일인물 여부 (id 또는 name으로 비교)
   const isAuthor = Boolean(
@@ -281,10 +286,15 @@ export default function BoardDetailPage() {
           <div className={cn("authorInfo")}>
             <div className={cn("authorAvatar")}>
               <Image
-                src={post.author.avatar ?? DEFAULT_AVATAR}
+                src={authorAvatarSrc}
                 alt="작성자 아바타"
                 width={38}
                 height={38}
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  if (target.src.endsWith(DEFAULT_AVATAR)) return;
+                  target.src = DEFAULT_AVATAR;
+                }}
               />
             </div>
             <div className={cn("authorMeta")}>
