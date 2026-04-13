@@ -13,7 +13,7 @@ const cn = classNames.bind(styles);
 export default function OrgLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setIsVerified, setUser, setUserType } = useUserStore();
+  const { setUser, setUserType, checkAuthStatus } = useUserStore();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,8 +44,7 @@ export default function OrgLoginPage() {
         // 사용자 타입을 기관으로 설정
         setUserType('organization');
         
-        // 인증 상태 업데이트
-        setIsVerified(true);
+        await checkAuthStatus({ force: true });
         router.push("/");
       } else {
         alert("로그인 실패!");
