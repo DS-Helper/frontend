@@ -198,9 +198,7 @@ export const getCheckAuth = async () => {
     const { refreshToken } = useUserStore.getState();
     const normalizedRefreshToken =
       typeof refreshToken === "string" && refreshToken.trim()
-        ? /^Bearer\s+/i.test(refreshToken.trim())
-          ? refreshToken.trim()
-          : `Bearer ${refreshToken.trim()}`
+        ? refreshToken.trim()
         : undefined;
     const res = await instance.get("/auth/check-logged-in", {
       headers: normalizedRefreshToken
