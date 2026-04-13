@@ -196,6 +196,7 @@ export const googleLogin = async (body: { code: string }) => {
 export const getCheckAuth = async () => {
   try {
     const { refreshToken } = useUserStore.getState();
+    console.log(refreshToken);
     const normalizedRefreshToken =
       typeof refreshToken === "string" && refreshToken.trim()
         ? refreshToken.trim()
