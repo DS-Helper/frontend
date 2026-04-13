@@ -34,12 +34,11 @@ export async function completeIndividualSnsLogin(
     );
   }
 
-  if (data.user) {
+  {
     const { setUser, setUserType } = useUserStore.getState();
-    setUser(data.user);
+    if (data.user) setUser(data.user);
     setUserType("individual");
   }
-
-  useUserStore.getState().setIsVerified(true);
+  await useUserStore.getState().checkAuthStatus({ force: true });
   await router.replace("/");
 }

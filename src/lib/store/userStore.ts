@@ -19,7 +19,7 @@ interface UserState {
   setUser: (user: User | null) => void;
   setIsVerified: (isVerified: boolean) => void;
   setUserType: (userType: "individual" | "organization" | null) => void;
-  checkAuthStatus: () => void;
+  checkAuthStatus: (options?: { force?: boolean }) => Promise<void>;
 }
 
 type UserPersistedSlice = Pick<
@@ -37,7 +37,7 @@ export const useUserStore = create(
   persist<UserState, [], [], UserPersistedSlice>(
     (set, get) => ({
       user: null,
-      isVerified: DEV_MOCK_LOGGED_IN_INDIVIDUAL,
+      isVerified: false,
       userType: DEV_MOCK_LOGGED_IN_INDIVIDUAL ? "individual" : null,
       accessToken: DEV_MOCK_LOGGED_IN_INDIVIDUAL
         ? DEV_MOCK_PLACEHOLDER_TOKEN
@@ -48,20 +48,19 @@ export const useUserStore = create(
       setUser: (user) => set({ user }),
       setIsVerified: (isVerified) => set({ isVerified }),
       setUserType: (userType) => set({ userType }),
-      checkAuthStatus: () => {
+      checkAuthStatus: async (options) => {
+        const force = options?.force === true;
         if (DEV_MOCK_LOGGED_IN_INDIVIDUAL) {
           set({
-            isVerified: true,
             userType: "individual",
             accessToken: DEV_MOCK_PLACEHOLDER_TOKEN,
             refreshToken: DEV_MOCK_PLACEHOLDER_TOKEN,
           });
-          return;
         }
 
         const { userType, isVerified, accessToken, refreshToken } = get();
 
-        if (isVerified && userType) {
+        if (!force && isVerified && userType) {
           return;
         }
 
@@ -80,22 +79,11 @@ export const useUserStore = create(
 
         const checkAuthPromise =
           userType === "organization" ? getOrgCheckAuth() : getUserCheckAuth();
-
-        checkAuthPromise
-          .then((response) => {
-            if (response && response.data === true) {
-              set({ isVerified: true });
-            } else {
-              set({
-                isVerified: false,
-                user: null,
-                userType: null,
-                accessToken: null,
-                refreshToken: null,
-              });
-            }
-          })
-          .catch(() => {
+        try {
+          const response = await checkAuthPromise;
+          if (response && response.data === true) {
+            set({ isVerified: true });
+          } else {
             set({
               isVerified: false,
               user: null,
@@ -103,7 +91,16 @@ export const useUserStore = create(
               accessToken: null,
               refreshToken: null,
             });
+          }
+        } catch {
+          set({
+            isVerified: false,
+            user: null,
+            userType: null,
+            accessToken: null,
+            refreshToken: null,
           });
+        }
       },
     }),
     {
@@ -118,7 +115,6 @@ export const useUserStore = create(
       onRehydrateStorage: () => () => {
         if (DEV_MOCK_LOGGED_IN_INDIVIDUAL) {
           useUserStore.setState({
-            isVerified: true,
             userType: "individual",
             accessToken: DEV_MOCK_PLACEHOLDER_TOKEN,
             refreshToken: DEV_MOCK_PLACEHOLDER_TOKEN,
