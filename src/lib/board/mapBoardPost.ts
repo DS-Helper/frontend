@@ -7,6 +7,7 @@ import {
   GetBoardsData,
   GetBoardsPageInfo,
 } from "@/types/board";
+import { isUsableImageSrc } from "@/lib/utils/image";
 
 /** axios 응답 본문에서 `boards` / `page` 추출 (래핑 `{ data: { boards, page } }` 및 평평한 형태 모두 시도) */
 export function parseGetBoardsPayload(body: unknown): GetBoardsData | null {
@@ -75,7 +76,9 @@ export function mapGetBoardsItemToBoardPost(item: GetBoardsBoardItem): BoardPost
     author: {
       id: "",
       name: String(item.writerName ?? ""),
-      avatar: profile != null && String(profile).trim() !== "" ? String(profile) : undefined,
+      avatar: isUsableImageSrc(profile == null ? undefined : String(profile))
+        ? String(profile).trim()
+        : undefined,
     },
   };
 }
@@ -105,10 +108,10 @@ export function mapItemToBoardPost(item: Record<string, unknown>): BoardPost {
           ? String(thumb)
           : undefined;
   const authorAvatar =
-    author.avatar != null && String(author.avatar).trim() !== ""
-      ? String(author.avatar)
-      : writerAvatar != null && String(writerAvatar).trim() !== ""
-        ? String(writerAvatar)
+    isUsableImageSrc(author.avatar == null ? undefined : String(author.avatar))
+      ? String(author.avatar).trim()
+      : isUsableImageSrc(writerAvatar == null ? undefined : String(writerAvatar))
+        ? String(writerAvatar).trim()
         : undefined;
   const likedRaw = item.liked ?? item.isLiked ?? item.is_liked;
   const liked =

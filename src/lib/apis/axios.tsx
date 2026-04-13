@@ -30,7 +30,7 @@ function tokenRawForRequestUrl(
   refreshToken: string | null
 ): string | null {
   if (url.includes("/auth/check-logged-in/organization")) return accessToken;
-  if (url.includes("/auth/check-logged-in")) return refreshToken;
+  if (url.includes("/auth/check-logged-in")) return null;
   return accessToken;
 }
 

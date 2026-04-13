@@ -2,12 +2,45 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import classNames from "classnames/bind";
 import Image from "next/image";
 import styles from "@/styles/Comment.module.scss";
-import { getComments, getRecomments, postComment } from "@/lib/apis/comment";
+import {
+  deleteComment,
+  getComments,
+  getRecomments,
+  patchComment,
+  postComment,
+} from "@/lib/apis/comment";
 import { BoardComment } from "@/types/board";
 import type { GetCommentsResponse } from "@/types/comment";
+import { resolveProfileImageSrc } from "@/lib/utils/image";
+import commentIcon from "@/public/commentIcon.svg";
+import commentIconOn from "@/public/commentIconOn.svg";
+import { HiOutlineEllipsisVertical } from "react-icons/hi2";
+import { useUserStore } from "@/lib/store/userStore";
 
 const cn = classNames.bind(styles);
 const DEFAULT_AVATAR = "/userIcon.svg";
+
+function CommentAvatar({ src, alt }: { src?: string; alt: string }) {
+  const [avatarSrc, setAvatarSrc] = useState(
+    resolveProfileImageSrc(src, DEFAULT_AVATAR)
+  );
+
+  useEffect(() => {
+    setAvatarSrc(resolveProfileImageSrc(src, DEFAULT_AVATAR));
+  }, [src]);
+
+  return (
+    <Image
+      src={avatarSrc}
+      alt={alt}
+      width={30}
+      height={30}
+      onError={() => {
+        setAvatarSrc(DEFAULT_AVATAR);
+      }}
+    />
+  );
+}
 
 function formatRelativeTime(dateLike: string): string {
   const raw = dateLike?.trim();
@@ -130,6 +163,7 @@ interface BoardCommentSectionProps {
 }
 
 export default function BoardCommentSection({ boardId }: BoardCommentSectionProps) {
+  const { user } = useUserStore();
   const [comments, setComments] = useState<BoardComment[]>([]);
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [commentDraft, setCommentDraft] = useState("");
@@ -137,6 +171,9 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
   const [replyTargetId, setReplyTargetId] = useState<string | null>(null);
   const [replyDraft, setReplyDraft] = useState("");
   const [replyPosting, setReplyPosting] = useState(false);
+  const [activeMenuCommentId, setActiveMenuCommentId] = useState<string | null>(null);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingDraft, setEditingDraft] = useState("");
 
   const loadComments = async () => {
     setCommentsLoading(true);
@@ -171,6 +208,16 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
   useEffect(() => {
     void loadComments();
   }, [boardId]);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest(`.${styles.commentMoreWrapper}`)) return;
+      setActiveMenuCommentId(null);
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
 
   const topLevelComments = useMemo(
     () => comments.filter((c) => !c.parentId),
@@ -231,15 +278,55 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
     }
   };
 
+  const isCommentAuthor = (comment: BoardComment): boolean => {
+    if (!user) return false;
+    const userId = String(user.id ?? "");
+    const userName = String(user.name ?? "");
+    return (
+      (userId !== "" && userId === comment.author.id) ||
+      (userName !== "" && userName === comment.author.name)
+    );
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    const ok = window.confirm("댓글을 삭제하시겠습니까?");
+    if (!ok) return;
+    try {
+      await deleteComment({ commentId });
+      setActiveMenuCommentId(null);
+      if (editingCommentId === commentId) {
+        setEditingCommentId(null);
+        setEditingDraft("");
+      }
+      await loadComments();
+    } catch (error) {
+      console.error(error);
+      alert("댓글 삭제에 실패했습니다. 다시 시도해 주세요.");
+    }
+  };
+
+  const handleSubmitEdit = async (e: FormEvent, commentId: string) => {
+    e.preventDefault();
+    const next = editingDraft.trim();
+    if (!next) return;
+    try {
+      await patchComment({ commentId, content: next });
+      setEditingCommentId(null);
+      setEditingDraft("");
+      await loadComments();
+    } catch (error) {
+      console.error(error);
+      alert("댓글 수정에 실패했습니다. 다시 시도해 주세요.");
+    }
+  };
+
   const renderComment = (comment: BoardComment, isReply?: boolean) => (
     <div key={comment.id} className={cn("commentItem", { isReply })}>
       <div className={cn("commentBody")}>
         <div className={cn("commentAvatar")}>
-          <Image
-            src={comment.author.avatar ?? DEFAULT_AVATAR}
+          <CommentAvatar
+            src={comment.author.avatar}
             alt={`${comment.author.name} 프로필`}
-            width={30}
-            height={30}
           />
         </div>
         <div className={cn("commentMeta")}>
@@ -247,43 +334,137 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
           <span className={cn("commentMetaDot")}>·</span>
           <span className={cn("commentTime")}>{formatRelativeTime(comment.createdAt)}</span>
         </div>
+        <div className={cn("commentMoreWrapper")}>
+          <button
+            type="button"
+            className={cn("commentMoreButton")}
+            aria-label="댓글 더보기"
+            aria-expanded={activeMenuCommentId === comment.id}
+            onClick={() =>
+              setActiveMenuCommentId((prev) => (prev === comment.id ? null : comment.id))
+            }
+          >
+            <HiOutlineEllipsisVertical size={18} />
+          </button>
+          {activeMenuCommentId === comment.id && (
+            <div className={cn("commentMoreMenu")}>
+              {isCommentAuthor(comment) ? (
+                <>
+                  <button
+                    type="button"
+                    className={cn("commentMoreMenuItem")}
+                    onClick={() => {
+                      setActiveMenuCommentId(null);
+                      setEditingCommentId(comment.id);
+                      setEditingDraft(comment.content);
+                      setReplyTargetId(null);
+                      setReplyDraft("");
+                    }}
+                  >
+                    수정
+                  </button>
+                  <button
+                    type="button"
+                    className={cn("commentMoreMenuItem", "danger")}
+                    onClick={() => void handleDeleteComment(comment.id)}
+                  >
+                    삭제
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className={cn("commentMoreMenuItem", "danger")}
+                  onClick={() => {
+                    setActiveMenuCommentId(null);
+                    alert("신고 기능은 준비 중입니다.");
+                  }}
+                >
+                  신고
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-      <p className={cn("commentContent")}>{comment.content}</p>
-      {replyTargetId === comment.id && (
-        <form className={cn("replyComposer")} onSubmit={(e) => void handleSubmitReply(e)}>
+      {editingCommentId === comment.id ? (
+        <form
+          className={cn("commentComposer", "editComposer")}
+          onSubmit={(e) => void handleSubmitEdit(e, comment.id)}
+        >
+          <label htmlFor={`edit-input-${comment.id}`} className={cn("commentComposerSrOnly")}>
+            댓글 수정
+          </label>
+          <input
+            id={`edit-input-${comment.id}`}
+            type="text"
+            className={cn("commentComposerInput")}
+            placeholder="댓글을 수정해보세요."
+            value={editingDraft}
+            onChange={(e) => setEditingDraft(e.target.value)}
+            maxLength={1000}
+          />
+          <button
+            type="submit"
+            className={cn("commentComposerIcon")}
+            aria-label="댓글 수정 등록"
+          >
+            <Image
+              src={editingDraft.trim() ? commentIconOn : commentIcon}
+              alt=""
+              width={30}
+              height={30}
+              className={cn("commentComposerIconImage")}
+            />
+          </button>
+        </form>
+      ) : (
+        <p className={cn("commentContent")}>{comment.content}</p>
+      )}
+      {!isReply && (
+        <button
+          type="button"
+          className={cn("commentReplyButton")}
+          onClick={() => {
+            setReplyTargetId((prev) => (prev === comment.id ? null : comment.id));
+            setReplyDraft("");
+          }}
+        >
+          답글 쓰기
+        </button>
+      )}
+      {!isReply && replyTargetId === comment.id && (
+        <form
+          className={cn("replyComposer")}
+          onSubmit={(e) => void handleSubmitReply(e)}
+        >
           <label htmlFor={`reply-input-${comment.id}`} className={cn("commentComposerSrOnly")}>
             대댓글 입력
           </label>
           <input
             id={`reply-input-${comment.id}`}
             type="text"
-            className={cn("replyComposerInput")}
+            className={cn("commentComposerInput")}
             placeholder="대댓글을 작성해보세요."
             value={replyDraft}
             onChange={(e) => setReplyDraft(e.target.value)}
             maxLength={1000}
             disabled={replyPosting}
           />
-          <div className={cn("replyComposerActions")}>
-            <button
-              type="button"
-              className={cn("replyComposerCancel")}
-              onClick={() => {
-                setReplyTargetId(null);
-                setReplyDraft("");
-              }}
-              disabled={replyPosting}
-            >
-              취소
-            </button>
-            <button
-              type="submit"
-              className={cn("replyComposerSubmit")}
-              disabled={replyPosting}
-            >
-              등록
-            </button>
-          </div>
+          <button
+            type="submit"
+            className={cn("commentComposerIcon")}
+            aria-label="대댓글 등록"
+            disabled={replyPosting}
+          >
+            <Image
+              src={replyDraft.trim() ? commentIconOn : commentIcon}
+              alt=""
+              width={30}
+              height={30}
+              className={cn("commentComposerIconImage")}
+            />
+          </button>
         </form>
       )}
     </div>
@@ -306,6 +487,20 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
           maxLength={1000}
           disabled={commentPosting}
         />
+        <button
+          type="submit"
+          className={cn("commentComposerIcon")}
+          aria-label="댓글 등록"
+          disabled={commentPosting}
+        >
+          <Image
+            src={commentDraft.trim() ? commentIconOn : commentIcon}
+            alt=""
+            width={30}
+            height={30}
+            className={cn("commentComposerIconImage")}
+          />
+        </button>
       </form>
       <div className={cn("commentList")}>
         {commentsLoading ? (
@@ -318,7 +513,8 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
             </div>
           ))
         ) : (
-          <p className={cn("commentEmptyText")}>첫 댓글을 남겨보세요.</p>
+          <p className={cn("commentEmptyText")}>아직 댓글이 없어요.
+            <br />첫 댓글을 남겨보세요!</p>
         )}
       </div>
     </section>
