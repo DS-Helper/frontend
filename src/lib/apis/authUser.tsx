@@ -82,6 +82,7 @@ export const getLogin = async (code: string) => {
     const res = await instance.post("/oauth/kakao/login", {
       code,
     });
+    console.log("[oauth/kakao/login] response.data", res.data);
     return res;
   } catch (e) {
     console.error(e);
@@ -196,7 +197,6 @@ export const googleLogin = async (body: { code: string }) => {
 export const getCheckAuth = async () => {
   try {
     const { refreshToken } = useUserStore.getState();
-    console.log(refreshToken);
     const normalizedRefreshToken =
       typeof refreshToken === "string" && refreshToken.trim()
         ? refreshToken.trim()
