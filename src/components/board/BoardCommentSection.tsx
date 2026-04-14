@@ -163,7 +163,7 @@ interface BoardCommentSectionProps {
 }
 
 export default function BoardCommentSection({ boardId }: BoardCommentSectionProps) {
-  const { user } = useUserStore();
+  const { userId } = useUserStore();
   const [comments, setComments] = useState<BoardComment[]>([]);
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [commentDraft, setCommentDraft] = useState("");
@@ -279,13 +279,9 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
   };
 
   const isCommentAuthor = (comment: BoardComment): boolean => {
-    if (!user) return false;
-    const userId = String(user.id ?? "");
-    const userName = String(user.name ?? "");
-    return (
-      (userId !== "" && userId === comment.author.id) ||
-      (userName !== "" && userName === comment.author.name)
-    );
+    const normalizedMyId = String(userId ?? "").trim();
+    if (normalizedMyId === "") return false;
+    return normalizedMyId === String(comment.author.id ?? "").trim();
   };
 
   const handleDeleteComment = async (commentId: string) => {
@@ -419,7 +415,7 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
           </button>
         </form>
       ) : (
-        <p className={cn("commentContent")}>{comment.content}</p>
+        <span className={cn("commentContent")}>{comment.content}</span>
       )}
       {!isReply && (
         <button

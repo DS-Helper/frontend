@@ -9,7 +9,7 @@ import searchIcon from "@/public/searchIcon.svg";
 import BoardCategoryFilter from "@/components/BoardCategoryFilter";
 import { BoardPost, BoardPostCategory, boardPostCategories } from "@/types/board";
 import Image from "next/image";
-import { getBoards, getSearchBoards, likeBoard, likeCount } from "@/lib/apis/board";
+import { getBoards, likeBoard, likeCount } from "@/lib/apis/board";
 import {
   mapGetBoardsItemToBoardPost,
   parseLikeCountResponse,
@@ -52,7 +52,6 @@ export default function BoardPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [boardPosts, setBoardPosts] = useState<BoardPost[]>([]);
   const [activeSearchKeyword, setActiveSearchKeyword] = useState("");
-  const [searchRequestTick, setSearchRequestTick] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -62,7 +61,6 @@ export default function BoardPage() {
   const [mobileCategoryDraft, setMobileCategoryDraft] = useState<BoardPostCategory | null>(null);
   const loadMoreTriggerRef = useRef<HTMLDivElement | null>(null);
   const likeInFlightIdsRef = useRef<Set<string>>(new Set());
-  const isSearchMode = activeSearchKeyword.trim().length > 0;
 
   const syncBoardQuery = useCallback(
     (category: BoardPostCategory | null, keyword: string) => {
@@ -126,13 +124,12 @@ export default function BoardPage() {
         setIsLoading(true);
       }
       const pageParam = Math.max(0, currentPage - 1);
-      const res = isSearchMode
-        ? await getSearchBoards(activeSearchKeyword, pageParam, POSTS_PER_PAGE)
-        : await getBoards({
-            category: categoryForFetch ?? undefined,
-            page: pageParam,
-            size: POSTS_PER_PAGE,
-          });
+      const res = await getBoards({
+        category: categoryForFetch ?? undefined,
+        keyword: activeSearchKeyword.trim() || undefined,
+        page: pageParam,
+        size: POSTS_PER_PAGE,
+      });
 
       setIsLoading(false);
       setIsFetchingMore(false);
@@ -173,9 +170,7 @@ export default function BoardPage() {
     categoryForFetch,
     currentPage,
     isMobile,
-    isSearchMode,
     activeSearchKeyword,
-    searchRequestTick,
   ]);
 
   const paginatedPosts = boardPosts;
@@ -200,18 +195,8 @@ export default function BoardPage() {
     setHasMore(true);
     setCurrentPage(1);
     setActiveSearchKeyword(keyword);
-    setSearchRequestTick((prev) => prev + 1);
     syncBoardQuery(selectedCategory, keyword);
   };
-
-  useEffect(() => {
-    if (searchQuery.trim()) return;
-    setActiveSearchKeyword("");
-    setBoardPosts([]);
-    setHasMore(true);
-    setCurrentPage(1);
-    syncBoardQuery(selectedCategory, "");
-  }, [searchQuery, selectedCategory, syncBoardQuery]);
 
   const handleLikeClick = useCallback(async (e: React.MouseEvent, postId: string) => {
     e.preventDefault();

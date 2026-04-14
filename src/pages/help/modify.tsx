@@ -159,6 +159,20 @@ export default function ModifyPage() {
     return Number.isInteger(number) && number > 0;
   };
 
+  const getSelectedMinutes = (start: string, end: string): number => {
+    const parse = (time: string): number | null => {
+      const [hh, mm] = time.split(":");
+      const h = Number(hh);
+      const m = Number(mm);
+      if (!Number.isFinite(h) || !Number.isFinite(m)) return null;
+      return h * 60 + m;
+    };
+    const startMinutes = parse(start);
+    const endMinutes = parse(end);
+    if (startMinutes == null || endMinutes == null) return 0;
+    return endMinutes - startMinutes;
+  };
+
   // 도움받는 사람 수 증감 핸들러 (최소 1명)
   const handleRecipientCountChange = (type: "increase" | "decrease") => {
     setRecipientNumber((prev) => {
@@ -218,6 +232,11 @@ export default function ModifyPage() {
     // 도움받는 사람 수 검증
     if (!validateRecipientNumber(recipientNumber)) {
       alert("도움받는 사람 수를 올바르게 입력해주세요.\n숫자만 입력 가능하며, 1 이상의 값을 입력해주세요.");
+      return;
+    }
+
+    if (getSelectedMinutes(startTime, endTime) < 30) {
+      alert("시간은 30분 이상 선택해주세요.");
       return;
     }
 

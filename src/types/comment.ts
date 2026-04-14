@@ -17,6 +17,7 @@ export interface DeleteCommentRequest {
 export interface CommentListItemDto {
   commentId: string;
   writerName: string;
+  writerId?: string;
   writerProfileImageUrl?: string | null;
   content: string;
   createdAt: string;

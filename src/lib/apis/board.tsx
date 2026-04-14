@@ -1,6 +1,7 @@
 import { instance } from "./axios";
 import {
   GetBoardByIdApiResponse,
+  GetBoardMeApiResponse,
   GetBoardsApiResponse,
   GetBoardsParams,
   PatchBoardRequest,
@@ -30,6 +31,16 @@ export const getBoardById = async (boardId: string) => {
   }
 };
 
+export const getBoardMe = async () => {
+  try {
+    const res = await instance.get<GetBoardMeApiResponse>(`/boards/me`);
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
 export const postBoard = async ({ dto, images }: PostBoardRequest) => {
   try {
     const formData = new FormData();
@@ -48,9 +59,17 @@ export const postBoard = async ({ dto, images }: PostBoardRequest) => {
   }
 };
 
-export const patchBoard = async (data: PatchBoardRequest) => {
+export const patchBoard = async ({ dto, images }: PatchBoardRequest) => {
   try {
-    const res = await instance.patch(`/boards`, data);
+    const formData = new FormData();
+    formData.append(
+      "dto",
+      new Blob([JSON.stringify(dto)], { type: "application/json" })
+    );
+    for (const file of images ?? []) {
+      formData.append("images", file);
+    }
+    const res = await instance.patch(`/boards`, formData);
     return res;
   } catch (e) {
     console.error(e);
@@ -61,26 +80,6 @@ export const patchBoard = async (data: PatchBoardRequest) => {
 export const deleteBoard = async (boardId: string) => {
   try {
     const res = await instance.delete(`/board/${boardId}`);
-    return res;
-  } catch (e) {
-    console.error(e);
-    return null;
-  }
-};
-
-export const getSearchBoards = async (
-  keyword: string,
-  page?: number,
-  size?: number
-): Promise<AxiosResponse<GetBoardsApiResponse> | null> => {
-  try {
-    const res = await instance.get<GetBoardsApiResponse>("/boards/search", {
-      params: {
-        keyword,
-        page,
-        size,
-      },
-    });
     return res;
   } catch (e) {
     console.error(e);

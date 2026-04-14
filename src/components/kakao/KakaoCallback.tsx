@@ -62,9 +62,6 @@ export default function KakaoCallback() {
     if (kakaoOAuthAttempted.has(code)) return;
     kakaoOAuthAttempted.add(code);
 
-    console.log("[kakao callback] OAuth code (before POST /oauth/kakao/login)", code);
-    alert(code);
-
     void completeLogin(code);
   }, [router.isReady, router, completeLogin]);
 

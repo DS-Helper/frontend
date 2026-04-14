@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import classNames from "classnames/bind";
 import styles from "@/styles/Board.module.scss";
 import { boardWriteCategories, BoardPostCategory } from "@/types/board";
-import { postBoard } from "@/lib/apis/board";
+import { patchBoard, postBoard } from "@/lib/apis/board";
 import { BsCardImage } from "react-icons/bs";
 import { IoIosArrowDown, IoMdClose } from "react-icons/io";
 
@@ -40,13 +40,20 @@ export default function BoardWritePage() {
   const [contentBottom, setContentBottom] = useState("");
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const contentTopRef = useRef<HTMLTextAreaElement>(null);
   const contentBottomRef = useRef<HTMLTextAreaElement>(null);
   const boardImageFileInputRef = useRef<HTMLInputElement>(null);
   const prevImagePreviewCountRef = useRef(0);
+  const [hasPrefilledEditData, setHasPrefilledEditData] = useState(false);
+  const isEditMode = router.query.mode === "edit";
 
   const openBoardImagePicker = () => {
+    if (imageFiles.length > 0) {
+      alert("이미지는 하나만 업로드가 가능합니다.");
+      return;
+    }
     boardImageFileInputRef.current?.click();
   };
 
@@ -94,6 +101,30 @@ export default function BoardWritePage() {
     };
   }, [imageFiles]);
 
+  useEffect(() => {
+    if (!router.isReady || !isEditMode || hasPrefilledEditData) return;
+    const query = router.query;
+    const boardId = typeof query.boardId === "string" ? query.boardId : "";
+    const categoryFromQuery =
+      typeof query.category === "string" ? query.category : "";
+    const titleFromQuery = typeof query.title === "string" ? query.title : "";
+    const contentFromQuery =
+      typeof query.content === "string" ? query.content : "";
+    const imageUrlFromQuery =
+      typeof query.imageUrl === "string" ? query.imageUrl : "";
+
+    if (boardId) {
+      if (boardWriteCategories.includes(categoryFromQuery as BoardPostCategory)) {
+        setCategory(categoryFromQuery as BoardPostCategory);
+      }
+      setTitle(titleFromQuery);
+      setContentTop(contentFromQuery);
+      setContentBottom("");
+      setExistingImageUrl(imageUrlFromQuery.trim() || null);
+    }
+    setHasPrefilledEditData(true);
+  }, [router.isReady, router.query, isEditMode, hasPrefilledEditData]);
+
   /** 첫 이미지 첨부로 아래 textarea가 나타날 때 자동 포커스 */
   useLayoutEffect(() => {
     const n = imagePreviewUrls.length;
@@ -122,10 +153,16 @@ export default function BoardWritePage() {
     const input = e.target;
     const list = input.files;
     if (!list?.length) return;
+    if (imageFiles.length > 0) {
+      alert("이미지는 하나만 업로드가 가능합니다.");
+      input.value = "";
+      return;
+    }
     // input.value를 비우면 FileList가 즉시 비워져, 배치된 setState 업데이터가 빈 목록을 읽을 수 있음 (textarea 포커스 시 특히 잘 재현됨)
-    const added = Array.from(list);
+    const added = [list[0]];
     input.value = "";
-    setImageFiles((prev) => [...prev, ...added]);
+    setExistingImageUrl(null);
+    setImageFiles(added);
   };
 
   const removeImageAt = (index: number) => {
@@ -144,6 +181,30 @@ export default function BoardWritePage() {
     }
     setSubmitting(true);
     try {
+      if (isEditMode) {
+        const boardId =
+          typeof router.query.boardId === "string" ? router.query.boardId : "";
+        if (!boardId.trim()) {
+          alert("수정할 게시글 정보를 찾을 수 없습니다.");
+          return;
+        }
+        const res = await patchBoard({
+          dto: {
+            boardId: boardId.trim(),
+            title: title.trim(),
+            content: mergedContent,
+            keepImageUrls: existingImageUrl ? [existingImageUrl] : null,
+          },
+          ...(imageFiles.length > 0 ? { images: imageFiles } : {}),
+        });
+        if (res && (res.status === 200 || res.status === 201)) {
+          await router.push(`/board/${boardId}`);
+          return;
+        }
+        alert("게시글 수정에 실패했습니다. 다시 시도해 주세요.");
+        return;
+      }
+
       const res = await postBoard({
         dto: {
           category: category as BoardPostCategory,
@@ -297,6 +358,23 @@ export default function BoardWritePage() {
                     </button>
                   </p>
                 ))}
+                {imagePreviewUrls.length === 0 && existingImageUrl && (
+                  <p className={cn("writeImageParagraph")} aria-label="기존 첨부 이미지">
+                    <img
+                      src={existingImageUrl}
+                      alt=""
+                      className={cn("writeImagePreviewImg")}
+                    />
+                    <button
+                      type="button"
+                      className={cn("writeImagePreviewRemove")}
+                      onClick={() => setExistingImageUrl(null)}
+                      aria-label="기존 첨부 이미지 제거"
+                    >
+                      <IoMdClose className={cn("writeImagePreviewRemoveIcon")} aria-hidden />
+                    </button>
+                  </p>
+                )}
 
                 {imagePreviewUrls.length > 0 && (
                   <>
@@ -330,7 +408,6 @@ export default function BoardWritePage() {
                     ref={boardImageFileInputRef}
                     type="file"
                     accept="image/*"
-                    multiple
                     className={cn("writeFileInputHidden")}
                     onChange={handleFilesChange}
                     tabIndex={-1}
