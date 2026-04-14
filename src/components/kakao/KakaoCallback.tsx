@@ -15,6 +15,7 @@ export default function KakaoCallback() {
   const completeLogin = useCallback(
     async (code: string) => {
       try {
+        console.log("[kakao callback] login request code", code);
         const response = await getLogin(code);
         if (!response?.data) {
           throw new Error("로그인 요청에 실패했습니다.");
@@ -35,10 +36,12 @@ export default function KakaoCallback() {
 
   useEffect(() => {
     if (!router.isReady || typeof window === "undefined") return;
+    console.log("[kakao callback] href", window.location.href);
 
     const { code, error, errorDescription } = parseOAuthCallbackUrl(
       window.location.href
     );
+    console.log("[kakao callback] parsed", { code, error, errorDescription });
 
     if (error) {
       alert(
