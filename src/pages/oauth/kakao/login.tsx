@@ -16,6 +16,12 @@ export default function KakaoLoginLegacyRedirectPage() {
     const qIndex = router.asPath.indexOf("?");
     const query = qIndex >= 0 ? router.asPath.slice(qIndex) : "";
     console.log("[kakao legacy login-url] redirectQuery", query);
+
+    const search = qIndex >= 0 ? router.asPath.slice(qIndex + 1) : "";
+    const code = new URLSearchParams(search).get("code");
+    console.log("[oauth/kakao/login] OAuth code (before redirect to /kakao/callback)", code);
+    alert(code ?? "code 없음");
+
     void router.replace(`/kakao/callback${query}`);
   }, [router.isReady, router.asPath, router]);
 
