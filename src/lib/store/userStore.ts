@@ -8,15 +8,17 @@ import { getCheckAuth as getOrgCheckAuth } from "../apis/authOrganization";
 const DEV_MOCK_LOGGED_IN_INDIVIDUAL = false;
 
 /** 모의 로그인 시 API `Authorization`에 실릴 access/refresh 값 */
-const DEV_MOCK_PLACEHOLDER_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjU1YTE1NTI0LTU0MjQtNDQyNS1iMzY0LWU3MGZlYzM5MTBjOSIsInJvbGUiOiJVU0VSIiwidHlwZSI6IlBFUlNPTkFMIiwidG9rZW5UeXBlIjoiYWNjZXNzVG9rZW4iLCJpYXQiOjE3NzYwNzI2ODMsImV4cCI6MTc3NjE1OTA4M30.WwCxM1jgNBfSSuhDMWWKdUEI4PZvl9tKCQvT1o2RceE";
+const DEV_MOCK_PLACEHOLDER_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjU1YTE1NTI0LTU0MjQtNDQyNS1iMzY0LWU3MGZlYzM5MTBjOSIsInJvbGUiOiJVU0VSIiwidHlwZSI6IlBFUlNPTkFMIiwidG9rZW5UeXBlIjoiYWNjZXNzVG9rZW4iLCJpYXQiOjE3NzYxNTc2NTcsImV4cCI6MTc3NjE2MTI1N30.qOEOL8-0s1NNhLxt6HXzw5_xVEf1Nxt0vnPiuxddm40";
 
 interface UserState {
   user: User | null;
+  userId: string | null;
   isVerified: boolean;
   userType: "individual" | "organization" | null;
   accessToken: string | null;
   refreshToken: string | null;
   setUser: (user: User | null) => void;
+  setUserId: (userId: string | null) => void;
   setIsVerified: (isVerified: boolean) => void;
   setUserType: (userType: "individual" | "organization" | null) => void;
   checkAuthStatus: (options?: { force?: boolean }) => Promise<void>;
@@ -24,7 +26,7 @@ interface UserState {
 
 type UserPersistedSlice = Pick<
   UserState,
-  "user" | "isVerified" | "userType" | "accessToken" | "refreshToken"
+  "user" | "userId" | "isVerified" | "userType"
 >;
 
 function normalizeToken(value: unknown): string | null {
@@ -37,6 +39,7 @@ export const useUserStore = create(
   persist<UserState, [], [], UserPersistedSlice>(
     (set, get) => ({
       user: null,
+      userId: null,
       isVerified: false,
       userType: DEV_MOCK_LOGGED_IN_INDIVIDUAL ? "individual" : null,
       accessToken: DEV_MOCK_LOGGED_IN_INDIVIDUAL
@@ -46,6 +49,7 @@ export const useUserStore = create(
         ? DEV_MOCK_PLACEHOLDER_TOKEN
         : null,
       setUser: (user) => set({ user }),
+      setUserId: (userId) => set({ userId }),
       setIsVerified: (isVerified) => set({ isVerified }),
       setUserType: (userType) => set({ userType }),
       checkAuthStatus: async (options) => {
@@ -87,6 +91,7 @@ export const useUserStore = create(
             set({
               isVerified: false,
               user: null,
+              userId: null,
               userType: null,
               accessToken: null,
               refreshToken: null,
@@ -96,6 +101,7 @@ export const useUserStore = create(
           set({
             isVerified: false,
             user: null,
+            userId: null,
             userType: null,
             accessToken: null,
             refreshToken: null,
@@ -107,10 +113,9 @@ export const useUserStore = create(
       name: "user-store",
       partialize: (state) => ({
         user: state.user,
+        userId: state.userId,
         isVerified: state.isVerified,
         userType: state.userType,
-        accessToken: state.accessToken,
-        refreshToken: state.refreshToken,
       }),
       onRehydrateStorage: () => () => {
         if (DEV_MOCK_LOGGED_IN_INDIVIDUAL) {
@@ -185,6 +190,7 @@ export function clearAuthCredentials(): void {
 export function resetUserSession(): void {
   useUserStore.setState({
     user: null,
+    userId: null,
     isVerified: false,
     userType: null,
     accessToken: null,

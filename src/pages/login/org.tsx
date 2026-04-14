@@ -4,6 +4,7 @@ import styles from "@/styles/Login.module.scss";
 import classNames from "classnames/bind";
 import { useState } from "react";
 import { postLogin } from "../../lib/apis/authOrganization";
+import { getMyIdentifier, parseMyIdentifierUserId } from "../../lib/apis/account";
 import { applyLoginResponseTokens } from "../../lib/store/userStore";
 import { useUserStore } from "../../lib/store/userStore";
 import { useRouter } from "next/router";
@@ -13,7 +14,7 @@ const cn = classNames.bind(styles);
 export default function OrgLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setUser, setUserType, checkAuthStatus } = useUserStore();
+  const { setUser, setUserId, setUserType, checkAuthStatus } = useUserStore();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,6 +40,15 @@ export default function OrgLoginPage() {
         }
         if (res.data?.user) {
           setUser(res.data.user);
+        }
+        setUserId(null);
+
+        try {
+          const myIdentifierRes = await getMyIdentifier();
+          const nextUserId = parseMyIdentifierUserId(myIdentifierRes?.data ?? null);
+          if (nextUserId) setUserId(nextUserId);
+        } catch (error) {
+          console.error("[auth] getMyIdentifier failed:", error);
         }
         
         // 사용자 타입을 기관으로 설정

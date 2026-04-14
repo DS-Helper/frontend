@@ -70,3 +70,14 @@ export interface GetScrapsApiResponse {
   message: string;
   data: GetScrapsData;
 }
+
+export interface GetMyIdentifierData {
+  userId: string;
+}
+
+export interface GetMyIdentifierApiResponse {
+  success: boolean;
+  code: AccountCode;
+  message: string;
+  data: GetMyIdentifierData;
+}

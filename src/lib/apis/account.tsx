@@ -2,6 +2,7 @@ import { instance } from "./axios";
 import {
   AccountMyInfoData,
   AccountMyInfoResponse,
+  GetMyIdentifierApiResponse,
   GetScrapsApiResponse,
   PatchMyInfoRequest,
   PatchMyInfoResponse,
@@ -26,6 +27,21 @@ export function parseAccountMyInfoResponse(body: unknown): AccountMyInfoData | n
     phoneNumber: String(inner.phoneNumber ?? ""),
     profileImageUrl: String(inner.profileImageUrl ?? ""),
   };
+}
+
+/** `GET /user/my-identifier` 응답에서 userId 추출 (`{ userId }` / `{ data: { userId } }` 모두 대응) */
+export function parseMyIdentifierUserId(body: unknown): string | null {
+  if (body == null || typeof body !== "object" || Array.isArray(body)) return null;
+  const root = body as Record<string, unknown>;
+  const nested =
+    root.data != null && typeof root.data === "object" && !Array.isArray(root.data)
+      ? (root.data as Record<string, unknown>)
+      : null;
+
+  const raw = root.userId ?? root.user_id ?? nested?.userId ?? nested?.user_id;
+  if (raw == null) return null;
+  const normalized = String(raw).trim();
+  return normalized.length > 0 ? normalized : null;
 }
 
 export const getMyInfo = async () => {
@@ -54,6 +70,16 @@ export const patchMyInfo = async ({ dto, profileImage }: PatchMyInfoRequest) => 
       formData.append("profileImage", profileImage);
     }
     const res = await instance.patch<PatchMyInfoResponse>("/user/my-info", formData);
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+export const getMyIdentifier = async () => {
+  try {
+    const res = await instance.get<GetMyIdentifierApiResponse>("/user/my-identifier");
     return res;
   } catch (e) {
     console.error(e);

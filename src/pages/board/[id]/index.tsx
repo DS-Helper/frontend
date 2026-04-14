@@ -7,7 +7,7 @@ import styles from "@/styles/BoardDetail.module.scss";
 import Image from "next/image";
 import { BoardPostDetail } from "@/types/board";
 import { resolveProfileImageSrc } from "@/lib/utils/image";
-import { getBoardById, likeBoard, likeCount, scrapBoard } from "@/lib/apis/board";
+import { deleteBoard, getBoardById, likeBoard, likeCount, scrapBoard } from "@/lib/apis/board";
 import {
   mapItemToBoardPostDetail,
   parseBoardRecordFromApi,
@@ -58,12 +58,14 @@ function formatRelativeTime(dateLike: string): string {
 export default function BoardDetailPage() {
   const router = useRouter();
   const { id } = router.query;
-  const { user } = useUserStore();
+  const { userId } = useUserStore();
   const [post, setPost] = useState<BoardPostDetail | null>(null);
+  const [postWriterId, setPostWriterId] = useState<string>("");
   const [showToast, setShowToast] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [deleteInFlight, setDeleteInFlight] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
   const likeInFlightRef = useRef(false);
   const scrapInFlightRef = useRef(false);
@@ -72,10 +74,13 @@ export default function BoardDetailPage() {
     [post?.author.avatar]
   );
 
-  // 작성자와 로그인 사용자 동일인물 여부 (id 또는 name으로 비교)
-  const isAuthor = Boolean(
-    user && post && (user.id === post.author.id || user.name === post.author.name)
-  );
+  // writerId(=author.id)와 저장된 userId를 기준으로 작성자 여부 판단
+  const normalizedMyId = String(userId ?? "").trim();
+  const normalizedPostWriterId = String(postWriterId || post?.author.id || "").trim();
+  const isAuthor =
+    normalizedMyId !== "" &&
+    normalizedPostWriterId !== "" &&
+    normalizedMyId === normalizedPostWriterId;
 
   // 메뉴 외부 클릭 시 닫기
   useEffect(() => {
@@ -107,6 +112,8 @@ export default function BoardDetailPage() {
         return;
       }
       setPost(detail);
+      const rawWriterId = record.writerId ?? record.writer_id ?? record.userId ?? null;
+      setPostWriterId(rawWriterId == null ? "" : String(rawWriterId).trim());
       const scrapRaw = record.isScrapped ?? record.scrapped ?? record.isScrap;
       if (typeof scrapRaw === "boolean") {
         setIsBookmarked(scrapRaw);
@@ -208,15 +215,39 @@ export default function BoardDetailPage() {
 
   const handleEdit = () => {
     setShowMoreMenu(false);
-    // TODO: 수정 페이지로 이동 또는 수정 모달
-    alert("수정 기능은 준비 중입니다.");
+    if (!post) return;
+    void router.push({
+      pathname: "/board/write",
+      query: {
+        mode: "edit",
+        boardId: post.id,
+        category: post.category,
+        title: post.title,
+        content: post.contentFull,
+        imageUrl: post.imageUrl ?? "",
+      },
+    });
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     setShowMoreMenu(false);
-    if (window.confirm("정말 삭제하시겠습니까?")) {
-      // TODO: 삭제 API 호출 후 목록으로 이동
-      router.push("/board");
+    if (typeof id !== "string" || deleteInFlight) return;
+    const shouldDelete = window.confirm("정말 삭제하시겠습니까?");
+    if (!shouldDelete) return;
+    setDeleteInFlight(true);
+    try {
+      const res = await deleteBoard(id);
+      if (res == null) {
+        alert("삭제에 실패했습니다. 다시 시도해 주세요.");
+        return;
+      }
+      alert("게시글이 삭제되었습니다.");
+      await router.push("/board");
+    } catch (error) {
+      console.error(error);
+      alert("삭제 중 오류가 발생했습니다.");
+    } finally {
+      setDeleteInFlight(false);
     }
   };
 
@@ -324,7 +355,7 @@ export default function BoardDetailPage() {
                       <button type="button" className={cn("moreMenuItem")} onClick={handleEdit}>
                         수정
                       </button>
-                      <button type="button" className={cn("moreMenuItem", "danger")} onClick={handleDelete}>
+                      <button type="button" className={cn("moreMenuItem", "danger")} onClick={() => void handleDelete()}>
                         삭제
                       </button>
                     </>

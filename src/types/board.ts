@@ -13,6 +13,7 @@ export type BoardCategory = BoardPostCategory | '전체';
 
 export interface GetBoardsParams {
   category?: BoardPostCategory;
+  keyword?: string;
   page?: number;
   size?: number;
   sort?: string;
@@ -25,6 +26,7 @@ export interface GetBoardsBoardItem {
   title: string;
   content: string;
   writerName: string;
+  writerId?: string;
   commentCount: number;
   likeCount: number;
   liked?: boolean;
@@ -59,6 +61,22 @@ export interface GetBoardsApiResponse {
   code?: { code: string; message: string; httpStatus: string };
   message?: string;
   data: GetBoardsData;
+}
+
+/** GET /boards/me 의 `data` 본문 (커서 기반) */
+export interface GetBoardMeData {
+  content: GetBoardsBoardItem[];
+  cursorTime?: string | null;
+  cursorId?: string | null;
+  hasNext: boolean;
+}
+
+/** GET /boards/me 전체 응답 (axios `response.data`) */
+export interface GetBoardMeApiResponse {
+  success: boolean;
+  code?: { code: string; message: string; httpStatus: string };
+  message?: string;
+  data: GetBoardMeData;
 }
 
 /** GET /board/:id 단건 `data` 본문 (목록 항목과 동일 필드 + 상세 전용) */
@@ -96,12 +114,12 @@ export interface PatchBoardDto {
   boardId: string;
   title?: string;
   content?: string;
-  keepImageUrls?: string[];
+  keepImageUrls?: string[] | null;
 }
 
 export interface PatchBoardRequest {
   dto: PatchBoardDto;
-  images?: string[];
+  images?: File[];
 }
 
 // 게시글 타입
