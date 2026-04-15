@@ -22,6 +22,14 @@ function resolveOAuthRedirectUri(
   envFullUrl: string | undefined,
   pathname: string
 ): string {
+  if (typeof window !== "undefined") {
+    const currentOrigin = window.location.origin.replace(/\/$/, "");
+    const currentHost = window.location.hostname.toLowerCase();
+    // test 배포에서는 현재 호스트 기준 callback을 강제해 잘못된 env 고정값을 방지한다.
+    if (currentHost === "test.dshelper.kr") {
+      return `${currentOrigin}${pathname}`;
+    }
+  }
   const fromEnv = envFullUrl?.trim();
   if (fromEnv) return fromEnv;
   if (typeof window === "undefined") return "";
