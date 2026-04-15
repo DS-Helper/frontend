@@ -1,11 +1,7 @@
 import type { NextApiRequest } from "next";
 
 /**
- * 카카오 지도 JavaScript 키 — **접속 호스트**로 운영/테스트 키를 고릅니다.
- *
- * - `dshelper.kr` / `www.dshelper.kr` → `NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY`(배포)
- * - 그 외(localhost, test.dshelper.kr, 스테이징 등) → `NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY_TEST`(테스트)
- * - 해당 키가 비어 있으면 반대쪽 키로 폴백합니다.
+ * 카카오 지도 JavaScript 키 — 배포 변수 `NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY`를 사용합니다.
  */
 
 const PRODUCTION_HOSTS = new Set(["dshelper.kr", "www.dshelper.kr"]);
@@ -17,12 +13,8 @@ export function isKakaoMapProductionHost(hostname: string): boolean {
 
 export function getKakaoMapJavaScriptKeyForHost(hostname: string): string {
   const prodKey = process.env.NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY?.trim() ?? "";
-  const testKey = process.env.NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY_TEST?.trim() ?? "";
-
-  if (isKakaoMapProductionHost(hostname)) {
-    return prodKey || testKey;
-  }
-  return testKey || prodKey;
+  void hostname;
+  return prodKey;
 }
 
 /** API 라우트에서 `Host` / `X-Forwarded-Host` 기준 호스트명만 추출 */
