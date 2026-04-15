@@ -133,7 +133,7 @@ export default function TrashBinListMapView() {
     const appKey = getKakaoMapJavaScriptKeyForHost(window.location.hostname);
     if (!appKey) {
       setMapError(
-        "지도를 표시하려면 .env에 NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY(카카오 JavaScript 키)를 설정해 주세요."
+        "지도를 표시하려면 도메인에 맞게 카카오 JavaScript 키를 넣어 주세요. dshelper.kr 은 NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY, 그 외는 NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY_TEST."
       );
       return;
     }
