@@ -8,18 +8,26 @@ import { useRouter } from "next/router";
 import KakaoLoginButton from "@/components/kakao/KakaoLoginButton";
 import NaverLoginButton from "@/components/naver/NaverLoginButton";
 import GoogleLoginButton from "@/components/google/GoogleLoginButton";
+import { useUserStore } from "@/lib/store/userStore";
 
 const cn = classNames.bind(styles);
 
 export default function LoginPage() {
   const router = useRouter();
+  const { setSelectedSocialLoginProvider } = useUserStore();
 
   return (
     <div className={cn("container")}>
       <div className={cn("buttonGroup")}>
-        <KakaoLoginButton />
-        <NaverLoginButton />
-        <GoogleLoginButton />
+        <KakaoLoginButton
+          onBeforeRedirect={() => setSelectedSocialLoginProvider("kakao")}
+        />
+        <NaverLoginButton
+          onBeforeRedirect={() => setSelectedSocialLoginProvider("naver")}
+        />
+        <GoogleLoginButton
+          onBeforeRedirect={() => setSelectedSocialLoginProvider("google")}
+        />
         {/* <button
           className={`${cn("btn")} ${cn("org")}`}
           onClick={() => router.push("/login/org")}

@@ -7,9 +7,14 @@ import styles from "@/styles/Login.module.scss";
 
 const cn = classNames.bind(styles);
 
-export default function GoogleLoginButton() {
+interface GoogleLoginButtonProps {
+  onBeforeRedirect?: () => void;
+}
+
+export default function GoogleLoginButton({ onBeforeRedirect }: GoogleLoginButtonProps) {
   const handleClick = async () => {
     try {
+      onBeforeRedirect?.();
       window.location.href = await getGoogleOAuthStartUrl();
     } catch (error) {
       console.error(error);
