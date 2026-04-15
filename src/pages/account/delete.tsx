@@ -9,7 +9,7 @@ const cn = classNames.bind(styles);
 
 export default function AccountDeletePage() {
   const router = useRouter();
-  const { isVerified, checkAuthStatus, user } = useUserStore();
+  const { isVerified, checkAuthStatus, user, selectedSocialLoginProvider } = useUserStore();
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -52,10 +52,13 @@ export default function AccountDeletePage() {
   }, [isVerified]);
 
   const loginTypeText = useMemo(() => {
+    if (selectedSocialLoginProvider === "kakao") return "카카오";
+    if (selectedSocialLoginProvider === "naver") return "네이버";
+    if (selectedSocialLoginProvider === "google") return "구글";
     const raw = user?.type?.trim() ?? "";
     if (!raw) return "";
     return raw;
-  }, [user?.type]);
+  }, [selectedSocialLoginProvider, user?.type]);
 
   const handleDeleteClick = () => {
     setDeleteConfirmOpen(true);
