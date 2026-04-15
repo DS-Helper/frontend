@@ -4,33 +4,21 @@ export default function Document() {
   return (
     <Html lang="ko">
       <Head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-W9SFJS2J');
+            `,
+          }}
+        />
         {/* 기본 META 태그 */}
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         
-        {/* SEO 기본 정보 */}
-        <meta name="description" content="달성군 이웃을 위한 무료 방문 서비스 디에스헬퍼. 생활 돌봄, 정서적 돌봄, 아이돌봄, 청년/성인 대상 지원, 기관/단체 대상 지원 등 다양한 봉사 활동을 제공합니다." />
-        <meta name="keywords" content="디에스헬퍼, 달성군, 봉사, dshelepr, DS Helper, 달성군 봉사, 무료 방문 서비스, 생활 돌봄, 정서적 돌봄, 아이돌봄, 청년 지원, 기관 지원" />
-        <meta name="author" content="디에스헬퍼" />
-        <meta name="robots" content="index, follow" />
-        
-        {/* Open Graph 태그 (SNS 공유용) */}
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="디에스헬퍼 - 달성군 이웃을 위한 무료 방문 서비스" />
-        <meta property="og:description" content="달성군 이웃을 위한 무료 방문 서비스 디에스헬퍼. 생활 돌봄, 정서적 돌봄, 아이돌봄 등 다양한 봉사 활동을 제공합니다." />
-        <meta property="og:site_name" content="디에스헬퍼" />
-        <meta property="og:locale" content="ko_KR" />
-        
-        {/* Twitter Card 태그 */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="디에스헬퍼 - 달성군 이웃을 위한 무료 방문 서비스" />
-        <meta name="twitter:description" content="달성군 이웃을 위한 무료 방문 서비스 디에스헬퍼. 생활 돌봄, 정서적 돌봄, 아이돌봄 등 다양한 봉사 활동을 제공합니다." />
-        
-        {/* 검색 엔진 인증 */}
-        <meta name="google-site-verification" content="b7oOKTY7k-qg3A4gkXUCFsBVTQXE8zyUidmQSmvLiMI" />
-        <meta name="naver-site-verification" content="4eb1187d35e1ff152099ee3a80d8b0da0783c803" />
-        
-        {/* 추가 SEO 태그 */}
         <meta name="theme-color" content="#0DBA53" />
 
         <link rel="canonical" href="https://www.dshelper.kr/" />
@@ -44,6 +32,14 @@ export default function Document() {
         
       </Head>
       <body>
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-W9SFJS2J"
+            height={0}
+            width={0}
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
         <Main />
         <NextScript />
       </body>
