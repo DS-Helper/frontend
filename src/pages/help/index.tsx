@@ -1,4 +1,4 @@
-import styles from "@/styles/Help.module.scss";
+import styles from "../../styles/Help.module.scss";
 import classNames from 'classnames/bind';
 import Image from 'next/image';
 import banner from '@/public/help_request_banner.svg'
@@ -11,10 +11,10 @@ export default function Help(){
   const router = useRouter();
 
   const checklist = [
-    "방문시간은 일요일 오전 10시 ~ 오후 5시 사이만 가능해요.",
-    "최소 30분, 최대 3시간까지 예약 할 수 있어요.",
-    "예약 완료 전에는 추가 예약이 불가해요.",
-    "도움 활동 중 촬영된 사진은 SNS와 ‘도와드린 이야기’ 페이지에 공유될 수 있습니다.",
+    "방문?�간?� ?�요???�전 10??~ ?�후 5???�이�?가?�해??",
+    "최소 30�? 최�? 3?�간까�? ?�약 ?????�어??",
+    "?�약 ?�료 ?�에??추�? ?�약??불�??�요.",
+    "?��? ?�동 �?촬영???�진?� SNS?� ?�도?�?�린 ?�야기�??�이지??공유?????�습?�다.",
   ];
 
   const [checkedItems, setCheckedItems] = useState(
@@ -33,15 +33,15 @@ export default function Help(){
     if (allChecked) {
       router.push('help/modify')
     } else {
-      alert("모든 항목에 체크해야 진행할 수 있어요.");
+      alert("모든 ??��??체크?�야 진행?????�어??");
     }
   };
 
   return (
     <div className={cn("help")}>
-      <h1 className={cn("title")}>도움 요청하기</h1>
+      <h1 className={cn("title")}>?��? ?�청?�기</h1>
       <div className={cn("helpContent")}>
-        <h2 className={cn("secondTitle")}>예약 전 꼭 읽어주세요!</h2>
+        <h2 className={cn("secondTitle")}>?�약 ??�??�어주세??</h2>
         <ul className={cn("list")}>
           {checklist.map((text, i) => (
             <li key={i}>
@@ -60,7 +60,7 @@ export default function Help(){
           className={cn("nextButton", { nextButtonDisabled: !allChecked })}
           onClick={handleNext}
         >
-          확인
+          ?�인
         </button>
       </div>
       <div className={cn("bannerWrapper")}>

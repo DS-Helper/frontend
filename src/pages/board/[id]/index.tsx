@@ -3,7 +3,7 @@
 import { useRouter } from "next/router";
 import { useState, useEffect, useRef, useMemo } from "react";
 import classNames from "classnames/bind";
-import styles from "@/styles/BoardDetail.module.scss";
+import styles from "../../../styles/BoardDetail.module.scss";
 import Image from "next/image";
 import { BoardPostDetail } from "@/types/board";
 import { resolveProfileImageSrc } from "@/lib/utils/image";
@@ -32,21 +32,21 @@ const cn = classNames.bind(styles);
 
 function formatRelativeTime(dateLike: string): string {
   const raw = dateLike?.trim();
-  if (!raw) return "—";
+  if (!raw) return "??;
   const time = new Date(raw).getTime();
   if (!Number.isFinite(time)) return raw;
 
   const diffMs = Date.now() - time;
-  if (diffMs < 0) return "방금 전";
+  if (diffMs < 0) return "방금 ??;
 
   const minuteMs = 60 * 1000;
   const hourMs = 60 * minuteMs;
   const dayMs = 24 * hourMs;
 
-  if (diffMs < minuteMs) return "방금 전";
-  if (diffMs < hourMs) return `${Math.floor(diffMs / minuteMs)}분 전`;
-  if (diffMs < dayMs) return `${Math.floor(diffMs / hourMs)}시간 전`;
-  if (diffMs < 7 * dayMs) return `${Math.floor(diffMs / dayMs)}일 전`;
+  if (diffMs < minuteMs) return "방금 ??;
+  if (diffMs < hourMs) return `${Math.floor(diffMs / minuteMs)}�???;
+  if (diffMs < dayMs) return `${Math.floor(diffMs / hourMs)}?�간 ??;
+  if (diffMs < 7 * dayMs) return `${Math.floor(diffMs / dayMs)}????;
 
   const d = new Date(time);
   const yyyy = d.getFullYear();
@@ -74,7 +74,7 @@ export default function BoardDetailPage() {
     [post?.author.avatar]
   );
 
-  // writerId(=author.id)와 저장된 userId를 기준으로 작성자 여부 판단
+  // writerId(=author.id)?� ?�?�된 userId�?기�??�로 ?�성???��? ?�단
   const normalizedMyId = String(userId ?? "").trim();
   const normalizedPostWriterId = String(postWriterId || post?.author.id || "").trim();
   const isAuthor =
@@ -82,7 +82,7 @@ export default function BoardDetailPage() {
     normalizedPostWriterId !== "" &&
     normalizedMyId === normalizedPostWriterId;
 
-  // 메뉴 외부 클릭 시 닫기
+  // 메뉴 ?��? ?�릭 ???�기
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
@@ -138,7 +138,7 @@ export default function BoardDetailPage() {
     };
   }, [id, router.isReady, router]);
 
-  // 공유 기능 (helpStory 상세와 동일)
+  // 공유 기능 (helpStory ?�세?� ?�일)
   const handleShare = async () => {
     const shareUrl = typeof window !== "undefined" ? window.location.href : "";
     const isWeb = typeof window !== "undefined" && window.innerWidth >= 661;
@@ -162,14 +162,14 @@ export default function BoardDetailPage() {
           setTimeout(() => setShowToast(false), 2000);
         }
       } catch (err) {
-        console.error("클립보드 복사 실패:", err);
-        alert("링크 복사에 실패했습니다.");
+        console.error("?�립보드 복사 ?�패:", err);
+        alert("링크 복사???�패?�습?�다.");
       }
     } else {
       if (typeof navigator !== "undefined" && navigator.share) {
         try {
           await navigator.share({
-            title: post?.title || "커뮤니티 게시글",
+            title: post?.title || "커�??�티 게시글",
             text: post?.contentFull || "",
             url: shareUrl,
           });
@@ -183,7 +183,7 @@ export default function BoardDetailPage() {
                 setTimeout(() => setShowToast(false), 2000);
               }
             } catch (clipboardErr) {
-              console.error("클립보드 복사 실패:", clipboardErr);
+              console.error("?�립보드 복사 ?�패:", clipboardErr);
             }
           }
         }
@@ -206,8 +206,8 @@ export default function BoardDetailPage() {
             setTimeout(() => setShowToast(false), 2000);
           }
         } catch (err) {
-          console.error("클립보드 복사 실패:", err);
-          alert("링크 복사에 실패했습니다.");
+          console.error("?�립보드 복사 ?�패:", err);
+          alert("링크 복사???�패?�습?�다.");
         }
       }
     }
@@ -232,20 +232,20 @@ export default function BoardDetailPage() {
   const handleDelete = async () => {
     setShowMoreMenu(false);
     if (typeof id !== "string" || deleteInFlight) return;
-    const shouldDelete = window.confirm("정말 삭제하시겠습니까?");
+    const shouldDelete = window.confirm("?�말 ??��?�시겠습?�까?");
     if (!shouldDelete) return;
     setDeleteInFlight(true);
     try {
       const res = await deleteBoard(id);
       if (res == null) {
-        alert("삭제에 실패했습니다. 다시 시도해 주세요.");
+        alert("??��???�패?�습?�다. ?�시 ?�도??주세??");
         return;
       }
-      alert("게시글이 삭제되었습니다.");
+      alert("게시글????��?�었?�니??");
       await router.push("/board");
     } catch (error) {
       console.error(error);
-      alert("삭제 중 오류가 발생했습니다.");
+      alert("??�� �??�류가 발생?�습?�다.");
     } finally {
       setDeleteInFlight(false);
     }
@@ -253,8 +253,8 @@ export default function BoardDetailPage() {
 
   const handleReport = () => {
     setShowMoreMenu(false);
-    // TODO: 신고 모달 또는 API
-    alert("신고 기능은 준비 중입니다.");
+    // TODO: ?�고 모달 ?�는 API
+    alert("?�고 기능?� 준�?중입?�다.");
   };
 
   const handleLikeClick = async () => {
@@ -293,7 +293,7 @@ export default function BoardDetailPage() {
       if (typeof isScrapped === "boolean") {
         setIsBookmarked(isScrapped);
       } else {
-        // 응답에 상태 필드가 없는 경우에도 토글 UX 유지
+        // ?�답???�태 ?�드가 ?�는 경우?�도 ?��? UX ?��?
         setIsBookmarked((prev) => !prev);
       }
     } finally {
@@ -304,7 +304,7 @@ export default function BoardDetailPage() {
   if (!post) {
     return (
       <div className={cn("boardDetailPage")}>
-        <div className={cn("loading")}>로딩 중...</div>
+        <div className={cn("loading")}>로딩 �?..</div>
       </div>
     );
   }
@@ -318,7 +318,7 @@ export default function BoardDetailPage() {
             <div className={cn("authorAvatar")}>
               <Image
                 src={authorAvatarSrc}
-                alt="작성자 아바타"
+                alt="?�성???�바?�"
                 width={38}
                 height={38}
                 onError={(e) => {
@@ -342,7 +342,7 @@ export default function BoardDetailPage() {
               <button
                 type="button"
                 className={cn("iconButton", "settingButton")}
-                aria-label="더보기"
+                aria-label="?�보�?
                 aria-expanded={showMoreMenu}
                 onClick={() => setShowMoreMenu((prev) => !prev)}
               >
@@ -353,15 +353,15 @@ export default function BoardDetailPage() {
                   {isAuthor ? (
                     <>
                       <button type="button" className={cn("moreMenuItem")} onClick={handleEdit}>
-                        수정
+                        ?�정
                       </button>
                       <button type="button" className={cn("moreMenuItem", "danger")} onClick={() => void handleDelete()}>
-                        삭제
+                        ??��
                       </button>
                     </>
                   ) : (
                     <button type="button" className={cn("moreMenuItem", "danger")} onClick={handleReport}>
-                      신고
+                      ?�고
                     </button>
                   )}
                 </div>
@@ -381,7 +381,7 @@ export default function BoardDetailPage() {
               type="button"
               className={cn("engagementItem", "engagementButton")}
               onClick={() => void handleLikeClick()}
-              aria-label={isLiked ? "좋아요 취소" : "좋아요"}
+              aria-label={isLiked ? "좋아??취소" : "좋아??}
             >
               <span className={cn("engagementIconWrap", { active: isLiked })}>
                 <Image src={isLiked ? likeActiveIcon : heartIcon} alt="" width={24} height={24} className={cn("engagementIcon")} />
@@ -389,16 +389,16 @@ export default function BoardDetailPage() {
               <span>{post.likeCount}</span>
             </button>
             <div className={cn("engagementItem")}>
-              <Image src={commentIcon} alt="댓글" width={24} height={24} />
+              <Image src={commentIcon} alt="?��?" width={24} height={24} />
               <span>{post.commentCount}</span>
             </div>
             <button
               type="button"
               className={cn("iconButton", { active: isBookmarked })}
-              aria-label={isBookmarked ? "북마크 취소" : "북마크"}
+              aria-label={isBookmarked ? "북마??취소" : "북마??}
               onClick={() => void handleScrapClick()}
             >
-              <Image src={isBookmarked ? bookmarkActiveIcon : bookmarkIcon} alt="북마크" width={24} height={24} className={cn("bookmarkIcon", { active: isBookmarked })} />
+              <Image src={isBookmarked ? bookmarkActiveIcon : bookmarkIcon} alt="북마?? width={24} height={24} className={cn("bookmarkIcon", { active: isBookmarked })} />
             </button>
           </div>
           <span className={cn("viewCount")}>조회 {post.viewCount}</span>
@@ -409,7 +409,7 @@ export default function BoardDetailPage() {
 
       {showToast && (
         <div className={cn("toast")}>
-          <p>링크가 복사되었습니다.</p>
+          <p>링크가 복사?�었?�니??</p>
         </div>
       )}
     </div>

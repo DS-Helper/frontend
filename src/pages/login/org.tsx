@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "@/styles/Login.module.scss";
+import styles from "../../styles/Login.module.scss";
 import classNames from "classnames/bind";
 import { useState } from "react";
 import { postLogin } from "../../lib/apis/authOrganization";
@@ -28,14 +28,14 @@ export default function OrgLoginPage() {
     try {
       const res = await postLogin(payload);
       
-      // 로그인 성공 조건: 응답이 있고 상태가 200번대인 경우
+      // 로그???�공 조건: ?�답???�고 ?�태가 200번�???경우
       const isSuccess = res && res.status >= 200 && res.status < 300;
       
       if (isSuccess) {
         const tokenState = applyLoginResponseTokens(res.data);
         if (!tokenState.hasRefreshToken) {
           console.warn(
-            "[auth] organization login 응답에 refreshToken이 없습니다."
+            "[auth] organization login ?�답??refreshToken???�습?�다."
           );
         }
         if (res.data?.user) {
@@ -51,26 +51,26 @@ export default function OrgLoginPage() {
           console.error("[auth] getMyIdentifier failed:", error);
         }
         
-        // 사용자 타입을 기관으로 설정
+        // ?�용???�?�을 기�??�로 ?�정
         setUserType('organization');
         
         await checkAuthStatus({ force: true });
         router.push("/");
       } else {
-        alert("로그인 실패!");
+        alert("로그???�패!");
       }
     } catch (error: any) {
       
-      // Axios 에러인 경우 더 자세한 정보 제공
+      // Axios ?�러??경우 ???�세???�보 ?�공
       if (error.response) {
-        // 서버에서 명시적으로 에러 메시지를 보낸 경우
+        // ?�버?�서 명시?�으�??�러 메시지�?보낸 경우
         if (error.response.data?.message) {
-          alert(`로그인 실패: ${error.response.data.message}`);
+          alert(`로그???�패: ${error.response.data.message}`);
         } else {
-          alert("로그인 처리 중 오류가 발생했습니다.");
+          alert("로그??처리 �??�류가 발생?�습?�다.");
         }
       } else {
-        alert("로그인 처리 중 오류가 발생했습니다.");
+        alert("로그??처리 �??�류가 발생?�습?�다.");
       }
     }
   };
@@ -78,16 +78,16 @@ export default function OrgLoginPage() {
   return (
     <div className={cn("orgContainer")}> 
       <div className={cn("formWrapper")}>
-        <h2 className={cn("title")}>기관 로그인</h2>
+        <h2 className={cn("title")}>기�? 로그??/h2>
 
         <form className={cn("form")} onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="email" className={cn("label")}>이메일</label>
+            <label htmlFor="email" className={cn("label")}>?�메??/label>
             <input
               id="email"
               name="email"
               type="email"
-              placeholder="이메일"
+              placeholder="?�메??
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={cn("input")}
@@ -96,12 +96,12 @@ export default function OrgLoginPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className={cn("label")}>비밀번호</label>
+            <label htmlFor="password" className={cn("label")}>비�?번호</label>
             <input
               id="password"
               name="password"
               type="password"
-              placeholder="비밀번호"
+              placeholder="비�?번호"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={cn("input")}
@@ -110,16 +110,16 @@ export default function OrgLoginPage() {
           </div>
 
           <button type="submit" className={cn("loginBtn")}>
-            로그인
+            로그??
           </button>
         </form>
 
         <div className={cn("links")}>
-          <a href="#">이메일찾기</a>
+          <a href="#">?�메?�찾�?/a>
           <span>|</span>
-          <a href="#">비밀번호찾기</a>
+          <a href="#">비�?번호찾기</a>
           <span>|</span>
-          <a href="#">회원가입</a>
+          <a href="#">?�원가??/a>
         </div>
       </div>
     </div>

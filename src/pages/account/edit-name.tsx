@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import classNames from "classnames/bind";
-import styles from "@/styles/AccountEditName.module.scss";
+import styles from "../../styles/AccountEditName.module.scss";
 import { getMyInfo, parseAccountMyInfoResponse, patchMyInfo } from "@/lib/apis/account";
 import { AccountMyInfoData } from "@/types/account";
 
@@ -49,7 +49,7 @@ export default function AccountEditNamePage() {
     e.preventDefault();
     const next = name.trim();
     if (!next) {
-      alert("이름을 입력해 주세요.");
+      alert("?�름???�력??주세??");
       return;
     }
     if (!myInfo) return;
@@ -66,7 +66,7 @@ export default function AccountEditNamePage() {
         },
       });
       if (!res?.data) {
-        alert("이름 수정에 실패했습니다. 다시 시도해 주세요.");
+        alert("?�름 ?�정???�패?�습?�다. ?�시 ?�도??주세??");
         return;
       }
       const envelope = res.data as { success?: boolean; message?: string };
@@ -75,7 +75,7 @@ export default function AccountEditNamePage() {
         alert(
           typeof envelope.message === "string" && envelope.message
             ? envelope.message
-            : "이름 수정에 실패했습니다."
+            : "?�름 ?�정???�패?�습?�다."
         );
         return;
       }
@@ -88,7 +88,7 @@ export default function AccountEditNamePage() {
   if (pageLoading) {
     return (
       <div className={cn("page")}>
-        <p className={cn("pageLoading")}>프로필 정보를 불러오는 중…</p>
+        <p className={cn("pageLoading")}>?�로???�보�?불러?�는 중�?/p>
       </div>
     );
   }
@@ -96,9 +96,9 @@ export default function AccountEditNamePage() {
   if (!myInfo) {
     return (
       <div className={cn("page")}>
-        <p className={cn("pageLoading")}>프로필을 불러오지 못했습니다.</p>
+        <p className={cn("pageLoading")}>?�로?�을 불러?��? 못했?�니??</p>
         <button type="button" className={cn("submitButton")} onClick={() => router.back()}>
-          돌아가기
+          ?�아가�?
         </button>
       </div>
     );
@@ -107,10 +107,10 @@ export default function AccountEditNamePage() {
   return (
     <div className={cn("page")}>
       <form className={cn("form")} onSubmit={(e) => void handleSubmit(e)}>
-        <h1 className={cn("title")}>이름을 입력해주세요</h1>
+        <h1 className={cn("title")}>?�름???�력?�주?�요</h1>
 
         <label htmlFor="account-edit-name" className={cn("label")}>
-          이름<span className={cn("requiredDot")} aria-hidden />
+          ?�름<span className={cn("requiredDot")} aria-hidden />
         </label>
         <input
           ref={inputRef}
@@ -123,7 +123,7 @@ export default function AccountEditNamePage() {
         />
 
         <button type="submit" className={cn("submitButton")} disabled={submitting}>
-          {submitting ? "수정 중…" : "수정하기"}
+          {submitting ? "?�정 중�? : "?�정?�기"}
         </button>
       </form>
     </div>

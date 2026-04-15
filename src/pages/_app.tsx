@@ -1,4 +1,4 @@
-import "@/styles/globals.css";
+import "";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import type { AppProps } from "next/app";
@@ -15,18 +15,18 @@ export default function App({ Component, pageProps }: AppProps) {
   const [isHydrated, setIsHydrated] = useState(false);
   const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
   
-  // 알림 모달 상태
+  // ?�림 모달 ?�태
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const [isNotificationModalClosing, setIsNotificationModalClosing] = useState(false);
   const [isNotificationModalOpening, setIsNotificationModalOpening] = useState(false);
 
   useEffect(() => {
-    // 클라이언트 사이드에서 하이드레이션 완료 후 인증 상태 확인
+    // ?�라?�언???�이?�에???�이?�레?�션 ?�료 ???�증 ?�태 ?�인
     setIsHydrated(true);
   }, []);
 
   useEffect(() => {
-    // 하이드레이션이 완료되고 아직 인증 확인을 하지 않았을 때만 확인
+    // ?�이?�레?�션???�료?�고 ?�직 ?�증 ?�인???��? ?�았???�만 ?�인
     if (isHydrated && !hasCheckedAuth) {
       void (async () => {
         try {
@@ -37,7 +37,7 @@ export default function App({ Component, pageProps }: AppProps) {
           const nextUserId = parseMyIdentifierUserId(myIdentifierRes?.data ?? null);
           if (nextUserId) setUserId(nextUserId);
         } catch (error) {
-          // 비로그인 상태에서는 자연스럽게 실패할 수 있어 조용히 무시
+          // 비로그인 ?�태?�서???�연?�럽�??�패?????�어 조용??무시
           console.debug("[auth] getMyIdentifier skipped:", error);
         }
       })();
@@ -45,7 +45,7 @@ export default function App({ Component, pageProps }: AppProps) {
     }
   }, [isHydrated, hasCheckedAuth, checkAuthStatus, setUserId]);
 
-  // 알림 모달 열기 이벤트 리스너 (모든 페이지에서 작동)
+  // ?�림 모달 ?�기 ?�벤??리스??(모든 ?�이지?�서 ?�동)
   useEffect(() => {
     const handleOpenNotificationModal = () => {
       setIsNotificationModalOpen(true);
@@ -96,7 +96,7 @@ export default function App({ Component, pageProps }: AppProps) {
     return () => observer.disconnect();
   }, []);
 
-  // 알림 모달 닫기 핸들러
+  // ?�림 모달 ?�기 ?�들??
   const handleCloseNotificationModal = () => {
     setIsNotificationModalClosing(true);
     setIsNotificationModalOpening(false);
@@ -111,14 +111,14 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <Head>
-        <title>디에스헬퍼 - 달성군 이웃을 위한 무료 방문 서비스</title>
+        <title>?�에?�헬??- ?�성�??�웃???�한 무료 방문 ?�비??/title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <Header />
       <Component {...pageProps} />
       <Footer />
       
-      {/* 알림 모달 - 모든 페이지에서 작동 */}
+      {/* ?�림 모달 - 모든 ?�이지?�서 ?�동 */}
       <NotificationListModal
         isOpen={isNotificationModalOpen}
         isClosing={isNotificationModalClosing}

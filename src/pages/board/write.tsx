@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { useRouter } from "next/router";
 import classNames from "classnames/bind";
-import styles from "@/styles/Board.module.scss";
+import styles from "../../styles/Board.module.scss";
 import { boardWriteCategories, BoardPostCategory } from "@/types/board";
 import { patchBoard, postBoard } from "@/lib/apis/board";
 import { BsCardImage } from "react-icons/bs";
@@ -13,7 +13,7 @@ const cn = classNames.bind(styles);
 const MAX_UPLOAD_IMAGE_SIZE_MB = 10;
 const MAX_UPLOAD_IMAGE_SIZE_BYTES = MAX_UPLOAD_IMAGE_SIZE_MB * 1024 * 1024;
 
-/** POST /boards 응답에서 생성된 게시글 id 추출 (백엔드 필드명 차이 대응) */
+/** POST /boards ?�답?�서 ?�성??게시글 id 추출 (백엔???�드�?차이 ?�?? */
 function getCreatedBoardIdFromResponse(body: unknown): string | null {
   if (body == null || typeof body !== "object") return null;
   const o = body as Record<string, unknown>;
@@ -53,7 +53,7 @@ export default function BoardWritePage() {
 
   const openBoardImagePicker = () => {
     if (imageFiles.length > 0) {
-      alert("이미지는 하나만 업로드가 가능합니다.");
+      alert("?��?지???�나�??�로?��? 가?�합?�다.");
       return;
     }
     boardImageFileInputRef.current?.click();
@@ -127,7 +127,7 @@ export default function BoardWritePage() {
     setHasPrefilledEditData(true);
   }, [router.isReady, router.query, isEditMode, hasPrefilledEditData]);
 
-  /** 첫 이미지 첨부로 아래 textarea가 나타날 때 자동 포커스 */
+  /** �??��?지 첨�?�??�래 textarea가 ?��??????�동 ?�커??*/
   useLayoutEffect(() => {
     const n = imagePreviewUrls.length;
     const prev = prevImagePreviewCountRef.current;
@@ -137,7 +137,7 @@ export default function BoardWritePage() {
     }
   }, [imagePreviewUrls.length]);
 
-  /** 이미지를 전부 제거하면 숨겨지는 아래 칸 내용을 위 본문에 합침 */
+  /** ?��?지�??��? ?�거?�면 ?�겨지???�래 �??�용????본문???�침 */
   useEffect(() => {
     if (imageFiles.length > 0) return;
     setContentBottom((bottom) => {
@@ -156,17 +156,17 @@ export default function BoardWritePage() {
     const list = input.files;
     if (!list?.length) return;
     if (imageFiles.length > 0) {
-      alert("이미지는 하나만 업로드가 가능합니다.");
+      alert("?��?지???�나�??�로?��? 가?�합?�다.");
       input.value = "";
       return;
     }
     const selectedFile = list[0];
     if (selectedFile.size > MAX_UPLOAD_IMAGE_SIZE_BYTES) {
-      alert(`이미지는 ${MAX_UPLOAD_IMAGE_SIZE_MB}MB 이하만 업로드할 수 있습니다.`);
+      alert(`?��?지??${MAX_UPLOAD_IMAGE_SIZE_MB}MB ?�하�??�로?�할 ???�습?�다.`);
       input.value = "";
       return;
     }
-    // input.value를 비우면 FileList가 즉시 비워져, 배치된 setState 업데이터가 빈 목록을 읽을 수 있음 (textarea 포커스 시 특히 잘 재현됨)
+    // input.value�?비우�?FileList가 즉시 비워?? 배치??setState ?�데?�터가 �?목록???�을 ???�음 (textarea ?�커?????�히 ???�현??
     const added = [selectedFile];
     input.value = "";
     setExistingImageUrl(null);
@@ -184,7 +184,7 @@ export default function BoardWritePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!category || !title.trim() || !mergedContent) {
-      alert("카테고리, 제목, 내용을 모두 입력해 주세요.");
+      alert("카테고리, ?�목, ?�용??모두 ?�력??주세??");
       return;
     }
     setSubmitting(true);
@@ -193,7 +193,7 @@ export default function BoardWritePage() {
         const boardId =
           typeof router.query.boardId === "string" ? router.query.boardId : "";
         if (!boardId.trim()) {
-          alert("수정할 게시글 정보를 찾을 수 없습니다.");
+          alert("?�정??게시글 ?�보�?찾을 ???�습?�다.");
           return;
         }
         const res = await patchBoard({
@@ -209,7 +209,7 @@ export default function BoardWritePage() {
           await router.push(`/board/${boardId}`);
           return;
         }
-        alert("게시글 수정에 실패했습니다. 다시 시도해 주세요.");
+        alert("게시글 ?�정???�패?�습?�다. ?�시 ?�도??주세??");
         return;
       }
 
@@ -229,13 +229,13 @@ export default function BoardWritePage() {
           return;
         }
         alert(
-          "게시글은 등록되었으나 상세 페이지로 이동할 정보가 없습니다. 목록에서 확인해 주세요.",
+          "게시글?� ?�록?�었?�나 ?�세 ?�이지�??�동???�보가 ?�습?�다. 목록?�서 ?�인??주세??",
         );
         return;
       }
-      alert("게시글 등록에 실패했습니다. 다시 시도해 주세요.");
+      alert("게시글 ?�록???�패?�습?�다. ?�시 ?�도??주세??");
     } catch {
-      alert("게시글 등록 중 오류가 발생했습니다.");
+      alert("게시글 ?�록 �??�류가 발생?�습?�다.");
     } finally {
       setSubmitting(false);
     }
@@ -259,14 +259,14 @@ export default function BoardWritePage() {
                 writeCategoryPlaceholder: !category,
                 writeCategoryTriggerOpen: categoryOpen,
               })}
-              aria-label="카테고리 선택"
+              aria-label="카테고리 ?�택"
               aria-expanded={categoryOpen}
               aria-haspopup="listbox"
               aria-controls="board-category-listbox"
               onClick={() => setCategoryOpen((o) => !o)}
             >
               <span className={cn("writeCategoryTriggerText")}>
-                {category || "카테고리를 선택해주세요."}
+                {category || "카테고리�??�택?�주?�요."}
               </span>
               <IoIosArrowDown
                 className={cn("writeCategoryChevron")}
@@ -305,20 +305,20 @@ export default function BoardWritePage() {
 
         <div className={cn("writeEditorCard")}>
           <label htmlFor="board-title" className={cn("visuallyHidden")}>
-            제목
+            ?�목
           </label>
           <input
             id="board-title"
             type="text"
             className={cn("writeTitleInput")}
-            placeholder="제목을 입력하세요."
+            placeholder="?�목???�력?�세??"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             maxLength={200}
             spellCheck={false}
           />
           <label htmlFor="board-content" className={cn("visuallyHidden")}>
-            내용
+            ?�용
           </label>
           <div className={cn("writeContentStack")}>
             <div className={cn("writeEditorColumn")}>
@@ -334,7 +334,7 @@ export default function BoardWritePage() {
                         imagePreviewUrls.length > 0,
                     },
                   )}
-                  placeholder="내용을 입력하세요."
+                  placeholder="?�용???�력?�세??"
                   value={contentTop}
                   onChange={(e) => {
                     setContentTop(e.target.value);
@@ -349,7 +349,7 @@ export default function BoardWritePage() {
                   <p
                     key={`${url}-${idx}`}
                     className={cn("writeImageParagraph")}
-                    aria-label={`첨부 이미지 ${idx + 1}`}
+                    aria-label={`첨�? ?��?지 ${idx + 1}`}
                   >
                     <img
                       src={url}
@@ -360,14 +360,14 @@ export default function BoardWritePage() {
                       type="button"
                       className={cn("writeImagePreviewRemove")}
                       onClick={() => removeImageAt(idx)}
-                      aria-label={`첨부 이미지 ${idx + 1} 제거`}
+                      aria-label={`첨�? ?��?지 ${idx + 1} ?�거`}
                     >
                       <IoMdClose className={cn("writeImagePreviewRemoveIcon")} aria-hidden />
                     </button>
                   </p>
                 ))}
                 {imagePreviewUrls.length === 0 && existingImageUrl && (
-                  <p className={cn("writeImageParagraph")} aria-label="기존 첨부 이미지">
+                  <p className={cn("writeImageParagraph")} aria-label="기존 첨�? ?��?지">
                     <img
                       src={existingImageUrl}
                       alt=""
@@ -377,7 +377,7 @@ export default function BoardWritePage() {
                       type="button"
                       className={cn("writeImagePreviewRemove")}
                       onClick={() => setExistingImageUrl(null)}
-                      aria-label="기존 첨부 이미지 제거"
+                      aria-label="기존 첨�? ?��?지 ?�거"
                     >
                       <IoMdClose className={cn("writeImagePreviewRemoveIcon")} aria-hidden />
                     </button>
@@ -390,7 +390,7 @@ export default function BoardWritePage() {
                       htmlFor="board-content-after"
                       className={cn("visuallyHidden")}
                     >
-                      이미지 아래 내용
+                      ?��?지 ?�래 ?�용
                     </label>
                     <textarea
                       ref={contentBottomRef}
@@ -425,10 +425,10 @@ export default function BoardWritePage() {
                     type="button"
                     className={cn("writeImageButton")}
                     onClick={openBoardImagePicker}
-                    aria-label="이미지 파일 선택"
+                    aria-label="?��?지 ?�일 ?�택"
                   >
                     <BsCardImage className={cn("writeImageIcon")} aria-hidden />
-                    이미지 업로드
+                    ?��?지 ?�로??
                   </button>
                 </div>
               </div>
@@ -442,7 +442,7 @@ export default function BoardWritePage() {
             className={cn("writeConfirmButton")}
             disabled={submitting}
           >
-            {submitting ? "등록 중…" : "확인"}
+            {submitting ? "?�록 중�? : "?�인"}
           </button>
           <button
             type="button"

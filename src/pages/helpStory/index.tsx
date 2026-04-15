@@ -4,7 +4,7 @@ import { getPosts, parsePostsListResponse } from "@/lib/apis/helpStory";
 import type { PostListItem } from "@/types/helpStory";
 import Pagination from "@/components/Pagination";
 import classNames from "classnames/bind";
-import styles from "@/styles/HelpStory.module.scss";
+import styles from "../../styles/HelpStory.module.scss";
 import Image from "next/image";
 
 type SortType = "latest" | "popular";
@@ -15,7 +15,7 @@ type Post = PostListItem;
 
 const POST_PAGE_SIZE = 10;
 
-/** 백엔드 sort / sortBy 규약에 맞춤 (필요 시 값만 조정) */
+/** 백엔??sort / sortBy 규약??맞춤 (?�요 ??값만 조정) */
 function sortParamsForType(sortType: SortType): { sort: string; sortBy: string } {
   if (sortType === "latest") {
     return { sort: "DESC", sortBy: "createdAt" };
@@ -68,7 +68,7 @@ export default function HelpStoryPage() {
         }
       } catch (error) {
         if (!cancelled) {
-          console.error("도와드린 이야기 조회 실패:", error);
+          console.error("?��??�린 ?�야�?조회 ?�패:", error);
           setPosts([]);
           setTotalPages(1);
           setTotalElements(0);
@@ -100,12 +100,12 @@ export default function HelpStoryPage() {
     }).replace(/\./g, '.').replace(/\s/g, '');
   };
 
-  // 이미지 URL 유효성 검증
+  // ?��?지 URL ?�효??검�?
   const isValidImageUrl = (url: string | null | undefined): boolean => {
     if (!url) return false;
-    // 'null'이 포함된 URL은 유효하지 않음
+    // 'null'???�함??URL?� ?�효?��? ?�음
     if (url.includes('null')) return false;
-    // 기본 URL 형식 검증
+    // 기본 URL ?�식 검�?
     try {
       const parsedUrl = new URL(url);
       return parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:';
@@ -124,7 +124,7 @@ export default function HelpStoryPage() {
     router.push(`/helpStory/${postId}`);
   };
 
-  /** 정렬은 API(page 요청의 sort/sortBy) 기준 — 여기서는 현재 페이지 내 검색만 */
+  /** ?�렬?� API(page ?�청??sort/sortBy) 기�? ???�기?�는 ?�재 ?�이지 ??검?�만 */
   const displayedPosts = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return posts;
@@ -135,7 +135,7 @@ export default function HelpStoryPage() {
     return (
       <div className={cn("container")}>
         <div className={cn("loading")}>
-          <p>도와드린 이야기를 불러오는 중...</p>
+          <p>?��??�린 ?�야기�? 불러?�는 �?..</p>
         </div>
       </div>
     );
@@ -144,18 +144,18 @@ export default function HelpStoryPage() {
   return (
     <div className={cn("container")}>
       <main className={cn("main")}>
-        <h1 className={cn("title")}>도와드린 이야기</h1>
+        <h1 className={cn("title")}>?��??�린 ?�야�?/h1>
 
         <div className={cn("listToolbar")}>
           <form
             className={cn("searchForm")}
             onSubmit={(e) => e.preventDefault()}
-            aria-label="게시물 제목 검색"
+            aria-label="게시�??�목 검??
           >
             <input
               type="search"
               className={cn("searchInput")}
-              placeholder="게시물의 제목을 입력해보세요."
+              placeholder="게시물의 ?�목???�력?�보?�요."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               enterKeyHint="search"
@@ -182,20 +182,20 @@ export default function HelpStoryPage() {
               </svg>
             </span>
           </form>
-          <div className={cn("sortRow")} role="group" aria-label="정렬">
+          <div className={cn("sortRow")} role="group" aria-label="?�렬">
             <button
               type="button"
               className={cn("sortButton", { sortButtonActive: sortType === "latest" })}
               onClick={() => applySortType("latest")}
             >
-              최신순
+              최신??
             </button>
             <button
               type="button"
               className={cn("sortButton", { sortButtonActive: sortType === "popular" })}
               onClick={() => applySortType("popular")}
             >
-              인기순
+              ?�기??
             </button>
           </div>
         </div>
@@ -232,11 +232,11 @@ export default function HelpStoryPage() {
             ))
           ) : posts.length > 0 ? (
             <div className={cn("emptyState")}>
-              <p>검색 결과가 없습니다.</p>
+              <p>검??결과가 ?�습?�다.</p>
             </div>
           ) : (
             <div className={cn("emptyState")}>
-              <p>아직 도와드린 이야기가 없습니다.</p>
+              <p>?�직 ?��??�린 ?�야기�? ?�습?�다.</p>
             </div>
           )}
         </ul>

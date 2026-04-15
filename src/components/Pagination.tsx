@@ -1,7 +1,7 @@
 "use client";
 
 import classNames from "classnames/bind";
-import styles from "@/styles/Pagination.module.scss";
+import styles from "../styles/Pagination.module.scss";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 
 const cn = classNames.bind(styles);
@@ -43,13 +43,13 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
   const visiblePages = getVisiblePages(currentPage, totalPages);
 
   return (
-    <nav className={cn("pagination")} aria-label="페이지 네비게이션">
+    <nav className={cn("pagination")} aria-label="?�이지 ?�비게이??>
       <button
         type="button"
         className={cn("navButton")}
         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
         disabled={currentPage <= 1}
-        aria-label="이전 페이지"
+        aria-label="?�전 ?�이지"
       >
         <FaAngleLeft className={cn("navButtonIcon")} />
       </button>
@@ -57,7 +57,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         {visiblePages.map((page, index) =>
           page === "ellipsis" ? (
             <span key={`ellipsis-${index}`} className={cn("ellipsis")}>
-              …
+              ??
             </span>
           ) : (
             <button
@@ -65,7 +65,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
               type="button"
               className={cn("pageButton", { active: currentPage === page })}
               onClick={() => onPageChange(page)}
-              aria-label={`${page}페이지`}
+              aria-label={`${page}?�이지`}
               aria-current={currentPage === page ? "page" : undefined}
             >
               {page}
@@ -78,7 +78,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         className={cn("navButton")}
         onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
         disabled={currentPage >= totalPages}
-        aria-label="다음 페이지"
+        aria-label="?�음 ?�이지"
       >
         <FaAngleRight className={cn("navButtonIcon")} />
       </button>

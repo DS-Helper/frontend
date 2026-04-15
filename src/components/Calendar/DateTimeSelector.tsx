@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Calendar from "react-calendar";
 import classNames from "classnames/bind";
-import styles from "@/styles/Modify.module.scss";
+import styles from "../../styles/Modify.module.scss";
 import { getReservationReserved } from "@/lib/apis/reservationUser";
 
 const cn = classNames.bind(styles);
@@ -29,7 +29,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
     return times;
   };
 
-  // 로컬 날짜를 yyyy-mm-dd 형식으로 변환하는 함수
+  // 로컬 ?�짜�?yyyy-mm-dd ?�식?�로 변?�하???�수
   const formatLocalDate = (date: Date): string => {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -41,22 +41,22 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
     setSelectedDate(date);
     setSelectedTimeBlocks([]);
     
-    // 날짜를 로컬 시간 기준으로 yyyy-mm-dd 형식으로 변환
+    // ?�짜�?로컬 ?�간 기�??�로 yyyy-mm-dd ?�식?�로 변??
     const dateKey = formatLocalDate(date);
     
-    // 이미 로드된 예약 시간이 있으면 재사용
+    // ?��? 로드???�약 ?�간???�으�??�사??
     if (reservedTimes[dateKey]) {
       return;
     }
     
-    // API 호출하여 예약된 시간 가져오기
+    // API ?�출?�여 ?�약???�간 가?�오�?
     setIsLoadingReservedTimes(true);
     try {
       const response = await getReservationReserved(dateKey);
       
       if (response && response.data) {
-        // API 응답 형식에 따라 예약된 시간 배열 추출
-        // 응답이 배열인 경우와 객체인 경우 모두 처리
+        // API ?�답 ?�식???�라 ?�약???�간 배열 추출
+        // ?�답??배열??경우?� 객체??경우 모두 처리
         let reservedTimeSlots: TimeSlot[] = [];
         
         if (Array.isArray(response.data)) {
@@ -67,21 +67,21 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
           reservedTimeSlots = response.data.reservedTimes;
         }
         
-        // 예약된 시간을 상태에 저장
+        // ?�약???�간???�태???�??
         setReservedTimes(prev => ({
           ...prev,
           [dateKey]: reservedTimeSlots
         }));
       } else {
-        // 응답이 없거나 데이터가 없으면 빈 배열로 설정
+        // ?�답???�거???�이?��? ?�으�?�?배열�??�정
         setReservedTimes(prev => ({
           ...prev,
           [dateKey]: []
         }));
       }
     } catch (error) {
-      console.error('예약된 시간 조회 실패:', error);
-      // 에러 발생 시 빈 배열로 설정
+      console.error('?�약???�간 조회 ?�패:', error);
+      // ?�러 발생 ??�?배열�??�정
       setReservedTimes(prev => ({
         ...prev,
         [dateKey]: []
@@ -100,50 +100,50 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
 
     let newTimeBlocks = [...selectedTimeBlocks];
     
-    // 중간 타일인지 확인
+    // 중간 ?�?�인지 ?�인
     if (newTimeBlocks.length > 1) {
       const allTimes = getTimes();
       const currentIndex = allTimes.indexOf(time);
       const firstIndex = allTimes.indexOf(newTimeBlocks[0]);
       const lastIndex = allTimes.indexOf(newTimeBlocks[newTimeBlocks.length - 1]);
       
-      // 시작 시간을 다시 클릭한 경우 - 모든 선택 해제
+      // ?�작 ?�간???�시 ?�릭??경우 - 모든 ?�택 ?�제
       if (time === newTimeBlocks[0]) {
         newTimeBlocks = [];
         setSelectedTimeBlocks(newTimeBlocks);
         return;
       }
       
-      // 중간 타일을 클릭한 경우 - 아무 기능도 하지 않음
+      // 중간 ?�?�을 ?�릭??경우 - ?�무 기능???��? ?�음
       if (currentIndex > firstIndex && currentIndex < lastIndex) {
         return;
       }
     }
     
     if (newTimeBlocks.includes(time)) {
-      // 이미 선택된 시간이면 제거
+      // ?��? ?�택???�간?�면 ?�거
       newTimeBlocks = newTimeBlocks.filter((t) => t !== time);
     } else {
-      // 새로운 시간 추가 (최대 6개)
+      // ?�로???�간 추�? (최�? 6�?
       if (newTimeBlocks.length >= 7) {
-        alert("최대 예약 가능 시간은 3시간입니다.");
+        alert("최�? ?�약 가???�간?� 3?�간?�니??");
         return;
       }
       
-      // 연속된 시간 범위 자동 선택 로직
+      // ?�속???�간 범위 ?�동 ?�택 로직
       if (newTimeBlocks.length === 0) {
-        // 첫 번째 선택
+        // �?번째 ?�택
         newTimeBlocks.push(time);
       } else {
-        // 두 번째 이상 선택 - 연속된 범위 자동 채우기
+        // ??번째 ?�상 ?�택 - ?�속??범위 ?�동 채우�?
         const allTimes = getTimes();
         const currentIndex = allTimes.indexOf(time);
         const firstIndex = allTimes.indexOf(newTimeBlocks[0]);
         const lastIndex = allTimes.indexOf(newTimeBlocks[newTimeBlocks.length - 1]);
         
-        // 선택된 시간이 기존 범위의 앞쪽인지 뒤쪽인지 확인
+        // ?�택???�간??기존 범위???�쪽?��? ?�쪽?��? ?�인
         if (currentIndex < firstIndex) {
-          // 앞쪽에 선택 - 앞쪽부터 현재까지 모든 시간 선택
+          // ?�쪽???�택 - ?�쪽부???�재까�? 모든 ?�간 ?�택
           newTimeBlocks = [];
           for (let i = currentIndex; i <= lastIndex; i++) {
             const timeSlot = allTimes[i];
@@ -152,7 +152,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
             }
           }
         } else if (currentIndex > lastIndex) {
-          // 뒤쪽에 선택 - 첫 번째부터 현재까지 모든 시간 선택
+          // ?�쪽???�택 - �?번째부???�재까�? 모든 ?�간 ?�택
           newTimeBlocks = [];
           for (let i = firstIndex; i <= currentIndex; i++) {
             const timeSlot = allTimes[i];
@@ -162,21 +162,21 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
           }
         }
         
-        // 최대 6개 블록 제한 확인
+        // 최�? 6�?블록 ?�한 ?�인
         if (newTimeBlocks.length > 7) {
-          alert("최대 예약 가능 시간은 3시간입니다.");
+          alert("최�? ?�약 가???�간?� 3?�간?�니??");
           return;
         }
       }
     }
 
-    // 시간 순서대로 정렬
+    // ?�간 ?�서?��??�렬
     newTimeBlocks.sort();
     
-    // 선택된 시간 블록 업데이트
+    // ?�택???�간 블록 ?�데?�트
     setSelectedTimeBlocks(newTimeBlocks);
     
-    // 선택된 시간이 있을 때만 onChange 호출
+    // ?�택???�간???�을 ?�만 onChange ?�출
     if (newTimeBlocks.length > 0) {
       const [startHour, startMin] = newTimeBlocks[0].split(":").map(Number);
       const [endHour, endMin] = newTimeBlocks[newTimeBlocks.length - 1].split(":").map(Number);
@@ -195,10 +195,10 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
     }
   };
 
-  // 일요일(0)만 선택 가능
+  // ?�요??0)�??�택 가??
   const isAvailableDay = (date: Date) => {
     const day = date.getDay();
-    return day === 0; // 일요일
+    return day === 0; // ?�요??
   };
 
   const isPastDate = (date: Date) => {
@@ -213,17 +213,17 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
     return date.getDay() === 0;
   };
 
-  // 분을 시간과 분으로 변환하는 함수
+  // 분을 ?�간�?분으�?변?�하???�수
   const formatDuration = (minutes: number): string => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     
     if (hours === 0) {
-      return `${mins}분`;
+      return `${mins}�?;
     } else if (mins === 0) {
-      return `${hours}시간`;
+      return `${hours}?�간`;
     } else {
-      return `${hours}시간 ${mins}분`;
+      return `${hours}?�간 ${mins}�?;
     }
   };
 
@@ -242,14 +242,14 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
           prevLabel={
             <img
               src="/arrow_left_M.svg"
-              alt="이전 달"
+              alt="?�전 ??
               className={cn("calendarNavArrow", "calendarNavArrowPrev")}
             />
           }
           nextLabel={
             <img
               src="/arrow_right_L.svg"
-              alt="다음 달"
+              alt="?�음 ??
               className={cn("calendarNavArrow", "calendarNavArrowNext")}
             />
           }
@@ -281,7 +281,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
             return '';
           }}
           formatShortWeekday={(locale, date) => {
-            const days = ['일', '월', '화', '수', '목', '금', '토'];
+            const days = ['??, '??, '??, '??, '�?, '�?, '??];
             return days[date.getDay()];
           }}
           showNeighboringMonth={true}
@@ -304,7 +304,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
           <div className={cn("timeSelectionContainer")}>
             {isLoadingReservedTimes && (
               <div className={cn("loadingMessage")}>
-                <p>예약 가능한 시간을 불러오는 중...</p>
+                <p>?�약 가?�한 ?�간??불러?�는 �?..</p>
               </div>
             )}
             <div className={cn("timeGrid")}>
@@ -314,7 +314,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
                 const isReserved = reserved.includes(time);
                 const isSelected = selectedTimeBlocks.includes(time);
                 
-                // 연속된 시간 블록에서의 위치 확인
+                // ?�속???�간 블록?�서???�치 ?�인
                 const isSingleTime = selectedTimeBlocks.length === 1 && isSelected;
                 const isStartTime = isSelected && selectedTimeBlocks.length > 1 && time === selectedTimeBlocks[0];
                 const isEndTime = isSelected && selectedTimeBlocks.length > 1 && time === selectedTimeBlocks[selectedTimeBlocks.length - 1];
@@ -338,7 +338,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
                     })}
                   >
                     <span className={cn("timeText")}>{time}</span>
-                    {isStartTime && <span className={cn("timeLabel")}>시작</span>}
+                    {isStartTime && <span className={cn("timeLabel")}>?�작</span>}
                     {isEndTime && <span className={cn("timeLabel")}>종료</span>}
                   </button>
                 );
@@ -347,24 +347,24 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
             
             {selectedTimeBlocks.length > 0 && (
               <div className={cn("selectedTimesInfo")}>
-                <p>선택된 시간: {selectedDate?.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })} {selectedTimeBlocks.length > 1 ? `${selectedTimeBlocks[0]} ~ ${selectedTimeBlocks[selectedTimeBlocks.length - 1]}` : selectedTimeBlocks[0]}</p>
-                <p>총 예약 시간: {(() => {
-                  // 시작 시간과 종료 시간의 실제 차이를 계산
+                <p>?�택???�간: {selectedDate?.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })} {selectedTimeBlocks.length > 1 ? `${selectedTimeBlocks[0]} ~ ${selectedTimeBlocks[selectedTimeBlocks.length - 1]}` : selectedTimeBlocks[0]}</p>
+                <p>�??�약 ?�간: {(() => {
+                  // ?�작 ?�간�?종료 ?�간???�제 차이�?계산
                   const startTime = selectedTimeBlocks[0];
                   const endTime = selectedTimeBlocks[selectedTimeBlocks.length - 1];
                   const [startHour, startMin] = startTime.split(":").map(Number);
                   const [endHour, endMin] = endTime.split(":").map(Number);
                   
-                  // 시작 시간과 종료 시간을 분 단위로 변환
+                  // ?�작 ?�간�?종료 ?�간??�??�위�?변??
                   const startMinutes = startHour * 60 + startMin;
                   const endMinutes = endHour * 60 + endMin;
                   
-                  // 시간 차이 계산 (종료 시간 - 시작 시간)
+                  // ?�간 차이 계산 (종료 ?�간 - ?�작 ?�간)
                   const durationMinutes = endMinutes - startMinutes;
                   
                   return formatDuration(durationMinutes);
                 })()}</p>
-                <p className={cn("timeLimitInfo")}>최대 예약 가능: 3시간</p>
+                <p className={cn("timeLimitInfo")}>최�? ?�약 가?? 3?�간</p>
               </div>
             )}
           </div>

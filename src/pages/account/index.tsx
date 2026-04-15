@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, FormEvent } from
 import { useRouter } from "next/router";
 import classNames from "classnames/bind";
 import Image from "next/image";
-import styles from "@/styles/Account.module.scss";
+import styles from "../../styles/Account.module.scss";
 import { handleLogout } from "@/lib/utils/logout";
 import AccountSideBar from "@/components/AccountSideBar";
 import { getMyInfo, parseAccountMyInfoResponse, patchMyInfo } from "@/lib/apis/account";
@@ -36,7 +36,7 @@ export default function AccountPage() {
       await handleLogout();
       router.push("/");
     } catch (error) {
-      console.error("로그아웃 중 오류:", error);
+      console.error("로그?�웃 �??�류:", error);
       router.push("/");
     }
   };
@@ -74,7 +74,7 @@ export default function AccountPage() {
         },
       });
       if (!res?.data) {
-        alert("기본 이미지 적용에 실패했습니다. 다시 시도해 주세요.");
+        alert("기본 ?��?지 ?�용???�패?�습?�다. ?�시 ?�도??주세??");
         return;
       }
       const envelope = res.data as { success?: boolean; message?: string };
@@ -83,7 +83,7 @@ export default function AccountPage() {
         alert(
           typeof envelope.message === "string" && envelope.message
             ? envelope.message
-            : "기본 이미지 적용에 실패했습니다."
+            : "기본 ?��?지 ?�용???�패?�습?�다."
         );
         return;
       }
@@ -114,7 +114,7 @@ export default function AccountPage() {
         profileImage: file,
       });
       if (!res?.data) {
-        alert("프로필 이미지 변경에 실패했습니다. 다시 시도해 주세요.");
+        alert("?�로???��?지 변경에 ?�패?�습?�다. ?�시 ?�도??주세??");
         return;
       }
       const envelope = res.data as { success?: boolean; message?: string };
@@ -123,7 +123,7 @@ export default function AccountPage() {
         alert(
           typeof envelope.message === "string" && envelope.message
             ? envelope.message
-            : "프로필 이미지 변경에 실패했습니다."
+            : "?�로???��?지 변경에 ?�패?�습?�다."
         );
         return;
       }
@@ -213,7 +213,7 @@ export default function AccountPage() {
     e.preventDefault();
     const next = nameDraft.trim();
     if (!next) {
-      alert("이름을 입력해 주세요.");
+      alert("?�름???�력??주세??");
       return;
     }
     if (!myInfo) return;
@@ -230,7 +230,7 @@ export default function AccountPage() {
         },
       });
       if (!res?.data) {
-        alert("이름 수정에 실패했습니다. 다시 시도해 주세요.");
+        alert("?�름 ?�정???�패?�습?�다. ?�시 ?�도??주세??");
         return;
       }
       const envelope = res.data as { success?: boolean; message?: string };
@@ -239,7 +239,7 @@ export default function AccountPage() {
         alert(
           typeof envelope.message === "string" && envelope.message
             ? envelope.message
-            : "이름 수정에 실패했습니다."
+            : "?�름 ?�정???�패?�습?�다."
         );
         return;
       }
@@ -252,8 +252,8 @@ export default function AccountPage() {
 
   const genderText = useMemo(() => {
     const raw = (myInfo?.gender ?? "").toLowerCase();
-    if (raw === "female" || raw === "f") return "여자";
-    if (raw === "male" || raw === "m") return "남자";
+    if (raw === "female" || raw === "f") return "?�자";
+    if (raw === "male" || raw === "m") return "?�자";
     return myInfo?.gender?.trim() ?? "";
   }, [myInfo?.gender]);
 
@@ -263,7 +263,7 @@ export default function AccountPage() {
     return `${year} ${genderText}`;
   }, [myInfo?.birthyear, genderText]);
 
-  const displayName = myInfo?.name?.trim() || "사용자";
+  const displayName = myInfo?.name?.trim() || "?�용??;
   const rawEmail = myInfo?.email?.trim() ?? "";
   const rawPhone = myInfo?.phoneNumber?.trim() ?? "";
   const normalizedPhoneDigits = rawPhone.replace(/\D/g, "");
@@ -290,14 +290,14 @@ export default function AccountPage() {
           aria-hidden
         />
         {myInfoLoading ? (
-          <p className={cn("mainLoading")}>프로필 정보를 불러오는 중…</p>
+          <p className={cn("mainLoading")}>?�로???�보�?불러?�는 중�?/p>
         ) : (
           <>
         <section className={cn("profileSection")}>
           <div className={cn("avatarWrap")} ref={desktopAvatarWrapRef}>
             <Image
               src={profileImageSrc}
-              alt="프로필"
+              alt="?�로??
               width={94}
               height={94}
               className={cn("avatarImage")}
@@ -308,7 +308,7 @@ export default function AccountPage() {
                 type="button"
                 className={cn("avatarCameraButton")}
                 onClick={openProfileImageMenu}
-                aria-label="프로필 이미지 변경"
+                aria-label="?�로???��?지 변�?
                 disabled={profileImageUploading}
                 aria-busy={profileImageUploading}
               >
@@ -316,7 +316,7 @@ export default function AccountPage() {
               </button>
             </div>
             {profileImageMenuOpen && (
-              <div className={cn("profileImageMenu")} role="menu" aria-label="프로필 이미지 메뉴">
+              <div className={cn("profileImageMenu")} role="menu" aria-label="?�로???��?지 메뉴">
                 <button
                   type="button"
                   className={cn("profileImageMenuItem")}
@@ -324,7 +324,7 @@ export default function AccountPage() {
                   role="menuitem"
                   disabled={profileImageUploading}
                 >
-                  {isMobileViewport ? "갤러리에서 가져오기" : "내 컴퓨터에서 가져오기"}
+                  {isMobileViewport ? "갤러리에??가?�오�? : "??컴퓨?�에??가?�오�?}
                 </button>
                 <button
                   type="button"
@@ -333,7 +333,7 @@ export default function AccountPage() {
                   role="menuitem"
                   disabled={profileImageUploading}
                 >
-                  기본 이미지로 적용
+                  기본 ?��?지�??�용
                 </button>
               </div>
             )}
@@ -345,7 +345,7 @@ export default function AccountPage() {
                 type="button"
                 className={cn("nameEditOpenButton")}
                 onClick={openNameEditModal}
-                aria-label="이름 변경"
+                aria-label="?�름 변�?
               >
                 <Image src={editIcon} alt="" width={24} height={24} className={cn("editButton")} />
               </button>
@@ -368,7 +368,7 @@ export default function AccountPage() {
           <div className={cn("avatarWrap", "avatarWrapMobile")} ref={mobileAvatarWrapRef}>
             <Image
               src={profileImageSrc}
-              alt="프로필"
+              alt="?�로??
               width={88}
               height={88}
               className={cn("avatarImage")}
@@ -379,7 +379,7 @@ export default function AccountPage() {
                 type="button"
                 className={cn("avatarCameraButton")}
                 onClick={openProfileImageMenu}
-                aria-label="프로필 이미지 변경"
+                aria-label="?�로???��?지 변�?
                 disabled={profileImageUploading}
                 aria-busy={profileImageUploading}
               >
@@ -387,7 +387,7 @@ export default function AccountPage() {
               </button>
             </div>
             {profileImageMenuOpen && (
-              <div className={cn("profileImageMenu")} role="menu" aria-label="프로필 이미지 메뉴">
+              <div className={cn("profileImageMenu")} role="menu" aria-label="?�로???��?지 메뉴">
                 <button
                   type="button"
                   className={cn("profileImageMenuItem")}
@@ -395,7 +395,7 @@ export default function AccountPage() {
                   role="menuitem"
                   disabled={profileImageUploading}
                 >
-                  {isMobileViewport ? "갤러리에서 가져오기" : "내 컴퓨터에서 가져오기"}
+                  {isMobileViewport ? "갤러리에??가?�오�? : "??컴퓨?�에??가?�오�?}
                 </button>
                 <button
                   type="button"
@@ -404,7 +404,7 @@ export default function AccountPage() {
                   role="menuitem"
                   disabled={profileImageUploading}
                 >
-                  기본 이미지로 적용
+                  기본 ?��?지�??�용
                 </button>
               </div>
             )}
@@ -412,14 +412,14 @@ export default function AccountPage() {
 
           <div className={cn("mobileInfoList")}>
             <div className={cn("mobileInfoRow")}>
-              <span className={cn("mobileInfoLabel")}>이름</span>
+              <span className={cn("mobileInfoLabel")}>?�름</span>
               <span className={cn("mobileInfoValueWrap")}>
                 <span className={cn("mobileInfoValue")}>{displayName}</span>
                   <button
                     type="button"
                     className={cn("mobileInfoArrowButton")}
                     onClick={() => router.push("/account/edit-name")}
-                    aria-label="이름 수정 페이지로 이동"
+                    aria-label="?�름 ?�정 ?�이지�??�동"
                   >
                     <IoIosArrowForward className={cn("mobileInfoArrow")} aria-hidden />
                   </button>
@@ -428,21 +428,21 @@ export default function AccountPage() {
 
             {displayEmail && (
               <div className={cn("mobileInfoRow")}>
-                <span className={cn("mobileInfoLabel")}>이메일</span>
+                <span className={cn("mobileInfoLabel")}>?�메??/span>
                 <span className={cn("mobileInfoValue")}>{displayEmail}</span>
               </div>
             )}
 
             {myInfo?.birthyear?.trim() && (
               <div className={cn("mobileInfoRow")}>
-                <span className={cn("mobileInfoLabel")}>생년월일</span>
+                <span className={cn("mobileInfoLabel")}>?�년?�일</span>
                 <span className={cn("mobileInfoValue")}>{myInfo.birthyear}</span>
               </div>
             )}
 
             {displayPhone && (
               <div className={cn("mobileInfoRow")}>
-                <span className={cn("mobileInfoLabel")}>전화번호</span>
+                <span className={cn("mobileInfoLabel")}>?�화번호</span>
                 <span className={cn("mobileInfoValue")}>{displayPhone}</span>
               </div>
             )}
@@ -467,20 +467,20 @@ export default function AccountPage() {
           >
             <div className={cn("nameEditModalHeader")}>
               <h2 id="account-name-edit-title" className={cn("nameEditModalTitle")}>
-                이름 변경
+                ?�름 변�?
               </h2>
               <button
                 type="button"
                 className={cn("nameEditModalClose")}
                 onClick={closeNameEditModal}
-                aria-label="닫기"
+                aria-label="?�기"
               >
                 <IoMdClose className={cn("nameEditModalCloseIcon")} aria-hidden />
               </button>
             </div>
             <form className={cn("nameEditModalForm")} onSubmit={handleNameEditSubmit}>
               <label htmlFor="account-name-edit-input" className={cn("visuallyHidden")}>
-                이름
+                ?�름
               </label>
               <input
                 ref={nameEditInputRef}
@@ -497,7 +497,7 @@ export default function AccountPage() {
                 className={cn("nameEditModalSubmit")}
                 disabled={nameEditSubmitting}
               >
-                {nameEditSubmitting ? "수정 중…" : "수정하기"}
+                {nameEditSubmitting ? "?�정 중�? : "?�정?�기"}
               </button>
             </form>
           </div>

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import classNames from "classnames/bind";
-import styles from "@/styles/TrashBinList.module.scss";
+import styles from "../../styles/TrashBinList.module.scss";
 import { getKakaoMapJavaScriptKeyForHost } from "@/lib/maps/kakaoMapEnv";
 import { getKakaoMapLoadErrorMessage, loadKakaoMapSdk } from "@/lib/maps/loadKakaoMapSdk";
 import type { TrashBinPlace } from "@/types/trashBin";
@@ -15,8 +15,8 @@ const MY_LOC_SIZE = { width: 24, height: 24 };
 const MY_LOC_ANCHOR = { x: 12, y: 12 };
 
 /**
- * 달성군청(논공읍 청사) — 지도 **최초 중심**만 여기로 고정.
- * 사용자 위치는 허용 시 `myLocationDot.svg` 마커로만 별도 표시합니다.
+ * ?�성군청(?�공??�?��) ??지??**최초 중심**�??�기�?고정.
+ * ?�용???�치???�용 ??`myLocationDot.svg` 마커로만 별도 ?�시?�니??
  */
 const DALSEONG_COUNTY_OFFICE = { lat: 35.77448, lng: 128.43018 };
 
@@ -54,15 +54,15 @@ function formatDistance(meters: number): string {
   return `${(meters / 1000).toFixed(1)}km`;
 }
 
-/** 백엔드 연동 전 목 데이터 */
+/** 백엔???�동 ??�??�이??*/
 const MOCK_TRASH_BINS: TrashBinPlace[] = [
   {
     id: "mock-1",
     lat: 35.7751,
     lng: 128.4302,
-    name: "새마을공원 인근 휴지통",
-    categoryLabel: "일반쓰레기통",
-    description: "새마을공원 우측에 위치해 있어요!",
+    name: "?�마?�공???�근 ?��???,
+    categoryLabel: "?�반?�레기통",
+    description: "?�마?�공???�측???�치???�어??",
     imageUrl:
       "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=240&h=240&fit=crop&q=80",
   },
@@ -70,9 +70,9 @@ const MOCK_TRASH_BINS: TrashBinPlace[] = [
     id: "mock-2",
     lat: 35.7736,
     lng: 128.4275,
-    name: "달성군청 주변 수거함",
-    categoryLabel: "일반쓰레기통",
-    description: "군청 민원 동선 쪽에 설치되어 있어요.",
+    name: "?�성군청 주�? ?�거??,
+    categoryLabel: "?�반?�레기통",
+    description: "군청 민원 ?�선 쪽에 ?�치?�어 ?�어??",
     imageUrl:
       "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=240&h=240&fit=crop&q=80",
   },
@@ -80,9 +80,9 @@ const MOCK_TRASH_BINS: TrashBinPlace[] = [
     id: "mock-3",
     lat: 35.7758,
     lng: 128.4268,
-    name: "공원 산책로 분리수거함",
-    categoryLabel: "재활용",
-    description: "플라스틱·캔 분리 배출이 가능해요.",
+    name: "공원 ?�책�?분리?�거??,
+    categoryLabel: "?�활??,
+    description: "?�라?�틱·�?분리 배출??가?�해??",
     imageUrl:
       "https://images.unsplash.com/photo-1605600659908-0ef14b481dfd?w=240&h=240&fit=crop&q=80",
   },
@@ -90,9 +90,9 @@ const MOCK_TRASH_BINS: TrashBinPlace[] = [
     id: "mock-4",
     lat: 35.7729,
     lng: 128.4315,
-    name: "마을 입구 대형 수거함",
-    categoryLabel: "일반쓰레기통",
-    description: "주차장 근처에 쉽게 찾을 수 있어요.",
+    name: "마을 ?�구 ?�???�거??,
+    categoryLabel: "?�반?�레기통",
+    description: "주차??근처???�게 찾을 ???�어??",
     imageUrl:
       "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=240&h=240&fit=crop&q=80",
   },
@@ -133,7 +133,7 @@ export default function TrashBinListMapView() {
     const appKey = getKakaoMapJavaScriptKeyForHost(window.location.hostname);
     if (!appKey) {
       setMapError(
-        "지도를 표시하려면 .env에 NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY(카카오 JavaScript 키)를 설정해 주세요."
+        "지?��? ?�시?�려�?.env??NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY(카카??JavaScript ??�??�정??주세??"
       );
       return;
     }
@@ -169,12 +169,12 @@ export default function TrashBinListMapView() {
       mapInstanceRef.current = map;
       maps.event.addListener(map, "dragstart", () => {
         isMapDraggingRef.current = true;
-        // 터치/마우스 드래그 시작 시 click 처리 유예
+        // ?�치/마우???�래�??�작 ??click 처리 ?�예
         ignoreMapClickUntilRef.current = Date.now() + 120;
       });
       maps.event.addListener(map, "dragend", () => {
         isMapDraggingRef.current = false;
-        // 드래그 종료 직후 발생할 수 있는 click을 무시
+        // ?�래�?종료 직후 발생?????�는 click??무시
         ignoreMapClickUntilRef.current = Date.now() + 220;
       });
 
@@ -227,7 +227,7 @@ export default function TrashBinListMapView() {
           const item = isOk ? result?.[0] : undefined;
           const road = item?.road_address?.address_name?.trim() ?? "";
           const jibun = item?.address?.address_name?.trim() ?? "";
-          const label = road || jibun || "선택한 위치";
+          const label = road || jibun || "?�택???�치";
           setSelectedMapTap({ lat, lng, addressLabel: label });
           setIsMapTapResolving(false);
         });
@@ -292,14 +292,14 @@ export default function TrashBinListMapView() {
         </p>
       )}
 
-      <div ref={mapElRef} className={cn("mapContainer")} aria-label="휴지통 지도" />
+      <div ref={mapElRef} className={cn("mapContainer")} aria-label="?��???지?? />
 
       {(selectedPlace || isMapTapResolving || selectedMapTap) && (
         <>
           <button
             type="button"
             className={cn("bottomSheetBackdrop")}
-            aria-label="상세 닫기"
+            aria-label="?�세 ?�기"
             onClick={() => {
               setSelectedPlace(null);
               setSelectedMapTap(null);
@@ -323,7 +323,7 @@ export default function TrashBinListMapView() {
                 <button
                   type="button"
                   className={cn("bottomSheetThumbWrap")}
-                  aria-label="휴지통 사진 크게 보기"
+                  aria-label="?��????�진 ?�게 보기"
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsImagePreviewOpen(true);
@@ -349,7 +349,7 @@ export default function TrashBinListMapView() {
                 className={cn("bottomSheetDirections")}
                 onClick={() => openKakaoDirections(selectedPlace)}
               >
-                길찾기
+                길찾�?
               </button>
             </div>
           )}
@@ -362,19 +362,19 @@ export default function TrashBinListMapView() {
               aria-labelledby="mapTapSheetTitle"
               onClick={(e) => e.stopPropagation()}
             >
-              {isMapTapResolving && <p className={cn("mapTapSheetAddress")}>주소를 불러오는 중...</p>}
+              {isMapTapResolving && <p className={cn("mapTapSheetAddress")}>주소�?불러?�는 �?..</p>}
               {!isMapTapResolving && selectedMapTap && (
                 <>
                   <p className={cn("mapTapSheetAddress")}>{selectedMapTap.addressLabel}</p>
                   <p className={cn("mapTapSheetDistance")}>
                     {currentLocation
-                      ? `현재 위치에서 ${formatDistance(
+                      ? `?�재 ?�치?�서 ${formatDistance(
                           distanceInMeters(currentLocation, {
                             lat: selectedMapTap.lat,
                             lng: selectedMapTap.lng,
                           })
                         )}`
-                      : "현재 위치를 확인할 수 없어 거리를 계산하지 못했어요."}
+                      : "?�재 ?�치�??�인?????�어 거리�?계산?��? 못했?�요."}
                   </p>
                   <button
                     type="button"
@@ -385,13 +385,13 @@ export default function TrashBinListMapView() {
                         lat: selectedMapTap.lat,
                         lng: selectedMapTap.lng,
                         name: selectedMapTap.addressLabel,
-                        categoryLabel: "선택 위치",
+                        categoryLabel: "?�택 ?�치",
                         description: selectedMapTap.addressLabel,
                         imageUrl: "",
                       })
                     }
                   >
-                    이 위치로 길찾기
+                    ???�치�?길찾�?
                   </button>
                 </>
               )}
@@ -405,14 +405,14 @@ export default function TrashBinListMapView() {
           <button
             type="button"
             className={cn("imagePreviewBackdrop")}
-            aria-label="사진 닫기"
+            aria-label="?�진 ?�기"
             onClick={() => setIsImagePreviewOpen(false)}
           />
           <div
             className={cn("imagePreviewFrame")}
             role="dialog"
             aria-modal="true"
-            aria-label={`${selectedPlace.name} 사진`}
+            aria-label={`${selectedPlace.name} ?�진`}
             onClick={(e) => e.stopPropagation()}
           >
             <div className={cn("imagePreviewImageWrap")}>
