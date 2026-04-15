@@ -7,9 +7,14 @@ import styles from "@/styles/Login.module.scss";
 
 const cn = classNames.bind(styles);
 
-export default function KakaoLoginButton() {
+interface KakaoLoginButtonProps {
+  onBeforeRedirect?: () => void;
+}
+
+export default function KakaoLoginButton({ onBeforeRedirect }: KakaoLoginButtonProps) {
   const handleClick = () => {
     try {
+      onBeforeRedirect?.();
       window.location.href = buildKakaoAuthorizeUrl();
     } catch (error) {
       console.error(error);

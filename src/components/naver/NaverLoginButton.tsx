@@ -7,9 +7,14 @@ import styles from "@/styles/Login.module.scss";
 
 const cn = classNames.bind(styles);
 
-export default function NaverLoginButton() {
+interface NaverLoginButtonProps {
+  onBeforeRedirect?: () => void;
+}
+
+export default function NaverLoginButton({ onBeforeRedirect }: NaverLoginButtonProps) {
   const handleClick = async () => {
     try {
+      onBeforeRedirect?.();
       window.location.href = await getNaverOAuthStartUrl();
     } catch (error) {
       console.error(error);

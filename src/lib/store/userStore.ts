@@ -17,16 +17,20 @@ interface UserState {
   userType: "individual" | "organization" | null;
   accessToken: string | null;
   refreshToken: string | null;
+  selectedSocialLoginProvider: "kakao" | "naver" | "google" | null;
   setUser: (user: User | null) => void;
   setUserId: (userId: string | null) => void;
   setIsVerified: (isVerified: boolean) => void;
   setUserType: (userType: "individual" | "organization" | null) => void;
+  setSelectedSocialLoginProvider: (
+    provider: "kakao" | "naver" | "google" | null
+  ) => void;
   checkAuthStatus: (options?: { force?: boolean }) => Promise<void>;
 }
 
 type UserPersistedSlice = Pick<
   UserState,
-  "user" | "userId" | "isVerified" | "userType" | "accessToken" | "refreshToken"
+  "user" | "userId" | "isVerified" | "userType" | "accessToken" | "selectedSocialLoginProvider"
 >;
 
 function normalizeToken(value: unknown): string | null {
@@ -48,10 +52,13 @@ export const useUserStore = create(
       refreshToken: DEV_MOCK_LOGGED_IN_INDIVIDUAL
         ? DEV_MOCK_PLACEHOLDER_TOKEN
         : null,
+      selectedSocialLoginProvider: null,
       setUser: (user) => set({ user }),
       setUserId: (userId) => set({ userId }),
       setIsVerified: (isVerified) => set({ isVerified }),
       setUserType: (userType) => set({ userType }),
+      setSelectedSocialLoginProvider: (selectedSocialLoginProvider) =>
+        set({ selectedSocialLoginProvider }),
       checkAuthStatus: async (options) => {
         const force = options?.force === true;
         if (DEV_MOCK_LOGGED_IN_INDIVIDUAL) {
@@ -117,7 +124,7 @@ export const useUserStore = create(
         isVerified: state.isVerified,
         userType: state.userType,
         accessToken: state.accessToken,
-        refreshToken: state.refreshToken,
+        selectedSocialLoginProvider: state.selectedSocialLoginProvider,
       }),
       onRehydrateStorage: () => () => {
         if (DEV_MOCK_LOGGED_IN_INDIVIDUAL) {
@@ -197,5 +204,6 @@ export function resetUserSession(): void {
     userType: null,
     accessToken: null,
     refreshToken: null,
+    selectedSocialLoginProvider: null,
   });
 }
