@@ -44,7 +44,7 @@ export async function loadKakaoMapSdk(appKey: string): Promise<void> {
   if (!key) {
     return Promise.reject(
       new Error(
-        "현재 도메인에 맞는 카카오 지도 JavaScript 키(NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY / _TEST)가 없습니다."
+        "카카오 지도 JavaScript 키(NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY)가 없습니다."
       )
     );
   }
