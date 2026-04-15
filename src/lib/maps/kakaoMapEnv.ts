@@ -4,7 +4,7 @@ import type { NextApiRequest } from "next";
  * 카카오 지도 JavaScript 키 — **접속 호스트**로 운영/테스트 키를 고릅니다.
  *
  * - `dshelper.kr` / `www.dshelper.kr` → `NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY`(배포)
- * - 그 외(localhost, 스테이징, preview 등) → `NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY_TEST`(테스트)
+ * - 그 외(localhost, test.dshelper.kr, 스테이징 등) → `NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY_TEST`(테스트)
  * - 해당 키가 비어 있으면 반대쪽 키로 폴백합니다.
  */
 

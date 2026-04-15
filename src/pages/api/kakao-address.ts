@@ -63,7 +63,7 @@ export default async function handler(
   if (!apiKey) {
     return res.status(500).json({
       error:
-        "KAKAO_REST_API_KEY(또는 기존 NEXT_PUBLIC_KAKAO_REST_API_KEY_TEST)가 설정되지 않았습니다.",
+        "KAKAO_REST_API_KEY(또는 NEXT_PUBLIC_KAKAO_REST_API_KEY_TEST)가 설정되지 않았습니다.",
     });
   }
 
