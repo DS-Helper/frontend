@@ -29,6 +29,10 @@ export default function AccountSideBar({ activeTab, onLogout }: AccountSideBarPr
     router.push("/account/posts");
   };
 
+  const goDeleteAccount = () => {
+    router.push("/account/delete");
+  };
+
   return (
     <aside className={cn("sidebar")}>
       <ul className={cn("navList")}>
@@ -67,6 +71,15 @@ export default function AccountSideBar({ activeTab, onLogout }: AccountSideBarPr
           tabIndex={0}
         >
           로그아웃
+        </li>
+        <li
+          className={cn("navItem")}
+          onClick={goDeleteAccount}
+          onKeyDown={(e) => e.key === "Enter" && goDeleteAccount()}
+          role="button"
+          tabIndex={0}
+        >
+          계정 삭제
         </li>
       </ul>
     </aside>

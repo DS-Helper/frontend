@@ -20,13 +20,13 @@ export default function LoginPage() {
         <KakaoLoginButton />
         <NaverLoginButton />
         <GoogleLoginButton />
-        <button
+        {/* <button
           className={`${cn("btn")} ${cn("org")}`}
           onClick={() => router.push("/login/org")}
         >
           <MdHome className={cn("icon")} />
           기관 로그인
-        </button>
+        </button> */}
       </div>
 
       <div className={cn("contact")}>
