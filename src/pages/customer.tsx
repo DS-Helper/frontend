@@ -1,7 +1,7 @@
 // 고객 문의 페이지
 import styles from '@/styles/Customer.module.scss';
 import classNames from 'classnames/bind';
-import React, { useState, useEffect, ChangeEvent, useRef } from "react";
+import React, { useState, useEffect, ChangeEvent, useRef, useCallback } from "react";
 import { getInquiries, postInquiry } from '@/lib/apis/customer';
 import { Inquiry } from '@/types/customer';
 import { IoIosArrowDown } from "react-icons/io";
@@ -10,10 +10,20 @@ import AnswerModal from '@/components/Modal/AnswerModal';
 
 const cn = classNames.bind(styles);
 
+const INQUIRY_TYPE_OPTIONS = [
+    { value: "help", label: "도움 요청" },
+    { value: "uncomfortable", label: "서비스 이용 불편" },
+    { value: "proposal", label: "서비스 개선 제안" },
+    { value: "etc", label: "기타" },
+] as const;
+
 export default function Customer(){
     const [activeTab, setActiveTab] = useState<"history" | "register">('history');
     const [inquiryType, setInquiryType] = useState(""); //문의 타입
+    const [inquiryTypeMenuOpen, setInquiryTypeMenuOpen] = useState(false);
+    const inquiryTypeDropdownRef = useRef<HTMLDivElement>(null);
     const [content, setContent] = useState("");
+    const inquiryContentRef = useRef<HTMLTextAreaElement>(null);
     const [images, setImages] = useState<string[]>([]); // 미리보기 URL 배열
     const [imageFiles, setImageFiles] = useState<File[]>([]); // 실제 파일 객체 배열
     
@@ -217,10 +227,51 @@ export default function Customer(){
         });
     }
 
+    const adjustInquiryContentHeight = useCallback(() => {
+        const el = inquiryContentRef.current;
+        if (!el) return;
+        el.style.height = "auto";
+        el.style.height = `${el.scrollHeight}px`;
+    }, []);
+
+    useEffect(() => {
+        adjustInquiryContentHeight();
+    }, [content, adjustInquiryContentHeight]);
+
+    useEffect(() => {
+        if (activeTab === "register") {
+            adjustInquiryContentHeight();
+        }
+    }, [activeTab, adjustInquiryContentHeight]);
+
+    useEffect(() => {
+        if (activeTab !== "register") setInquiryTypeMenuOpen(false);
+    }, [activeTab]);
+
+    useEffect(() => {
+        if (!inquiryTypeMenuOpen) return;
+        const close = (e: MouseEvent) => {
+            if (inquiryTypeDropdownRef.current && !inquiryTypeDropdownRef.current.contains(e.target as Node)) {
+                setInquiryTypeMenuOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", close);
+        return () => document.removeEventListener("mousedown", close);
+    }, [inquiryTypeMenuOpen]);
+
+    useEffect(() => {
+        if (!inquiryTypeMenuOpen) return;
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setInquiryTypeMenuOpen(false);
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [inquiryTypeMenuOpen]);
+
     /* 문의 내용 변경 처리 */
     const handleContentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         setContent(e.target.value);
-    }
+    };
 
     /* 등록 버튼 활성화 여부 
     inquiryType !== ""  :문의 유형이 선택됨
@@ -285,16 +336,16 @@ export default function Customer(){
                         <Image 
                         src={item.image}
                         alt="문의 이미지"
-                        width={200}
-                        height={200}
                         className={cn("inquiryImage")}
-                        style={{ height: 'auto' }}/>
+                        width={426}
+                        height={213}
+                        />
                     </div>
                 )}
 
                 <div className={cn("dateTime")}>
                     <span className={cn("date")}>{item.date}</span>
-                    <span className={cn("time")}>{item.time}</span>
+                    <span className={cn("time")}>({item.time})</span>
                 </div>
             </li>
         );
@@ -324,12 +375,7 @@ export default function Customer(){
                     {activeTab === "history" && (
                         loading ? (
                             <div className={cn("loadingBox")}>
-                                <p className={cn("loadingMessage")}>문의 내역을 불러오는 중...</p>
-                            </div>
-                        ) : error ? (
-                            <div className={cn("errorBox")}>
-                                <p className={cn("errorMessage")}>{error}</p>
-                                <button onClick={fetchInquiries} className={cn("retryBtn")}>다시 시도</button>
+                                <p className={cn("emptyMessage")}>문의 내역을 불러오는 중...</p>
                             </div>
                         ) : inquiries.length === 0 ? (
                             <div className={cn("emptyBox")}>
@@ -382,28 +428,78 @@ export default function Customer(){
                     {activeTab === "register" && (
                         <form className={cn("registerForm")} onSubmit={handleSubmit}>
                             <div className={cn("formGroup")}>
-                                <label>문의 유형</label>
-                                <div className={cn("customSelectWrapper")}>
-                                    <select 
-                                        className={cn("customSelect")}
-                                        value={inquiryType}
-                                        onChange={(e) => setInquiryType(e.target.value)}>
-                                        <option value="" disabled>문의 유형을 선택하세요</option>
-                                        <option value="help">도움 요청</option>
-                                        <option value="uncomfortable">서비스 이용 불편</option>
-                                        <option value="proposal">서비스 개선 제안</option>
-                                        <option value="etc">기타</option>
-                                    </select>
-                                    <IoIosArrowDown className={cn("selectIcon")} />
+                                <div className={cn("formGroupLabel")}>
+                                    <label id="inquiryTypeLabel" className={cn("inquiryFormLabel")}>
+                                        문의 유형
+                                        <span className={cn("requiredIcon", "inquiryRequiredMark")} aria-hidden="true">
+                                            *
+                                        </span>
+                                    </label>
+                                </div>
+                                <div
+                                    className={cn("customSelectWrapper", "inquiryTypeField")}
+                                    ref={inquiryTypeDropdownRef}>
+                                    <button
+                                        type="button"
+                                        className={cn("inquiryTypeTrigger", {
+                                            inquiryTypeTriggerPlaceholder: inquiryType === "",
+                                        })}
+                                        onClick={() => setInquiryTypeMenuOpen((o) => !o)}
+                                        aria-haspopup="listbox"
+                                        aria-expanded={inquiryTypeMenuOpen}
+                                        aria-controls="inquiryTypeListbox"
+                                        aria-labelledby="inquiryTypeLabel">
+                                        <span className={cn("inquiryTypeTriggerText")}>
+                                            {inquiryType === ""
+                                                ? "\u200b"
+                                                : INQUIRY_TYPE_OPTIONS.find((o) => o.value === inquiryType)?.label}
+                                        </span>
+                                        <IoIosArrowDown
+                                            className={cn("inquiryTypeChevron", {
+                                                inquiryTypeChevronOpen: inquiryTypeMenuOpen,
+                                            })}
+                                            aria-hidden
+                                        />
+                                    </button>
+                                    {inquiryTypeMenuOpen && (
+                                        <ul
+                                            id="inquiryTypeListbox"
+                                            className={cn("inquiryTypeList")}
+                                            role="listbox"
+                                            aria-labelledby="inquiryTypeLabel">
+                                            {INQUIRY_TYPE_OPTIONS.map((opt) => (
+                                                <li key={opt.value} role="presentation">
+                                                    <button
+                                                        type="button"
+                                                        role="option"
+                                                        aria-selected={inquiryType === opt.value}
+                                                        className={cn("inquiryTypeOption", {
+                                                            inquiryTypeOptionActive: inquiryType === opt.value,
+                                                        })}
+                                                        onClick={() => {
+                                                            setInquiryType(opt.value);
+                                                            setInquiryTypeMenuOpen(false);
+                                                        }}>
+                                                        {opt.label}
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
                                 </div>
                             </div>
                             <div className={cn("formGroup")}>
-                                <label>문의 내용</label>
-                                <textarea 
-                                className={cn("customSelect")} // 동일한 폼으로 맞추기 위해 클래스 재사용
-                                value={content}
-                                onChange={handleContentChange}
-                                placeholder='문의 내용을 작성해주세요.'
+                                <div className={cn("formGroupLabel")}>
+                                    <label>문의 내용</label>
+                                    <span className={cn("requiredIcon")}>*</span>
+                                </div>
+                                <textarea
+                                    ref={inquiryContentRef}
+                                    className={cn("customSelect")}
+                                    value={content}
+                                    rows={1}
+                                    spellCheck={false}
+                                    onChange={handleContentChange}
                                 />
                             </div>
 
@@ -411,35 +507,33 @@ export default function Customer(){
                             <div className={cn("formGroup")}>
                                 <label>관련 이미지</label>
                                 <div className={cn("imageUploadArea")}>
-                                    {/* 이미지 업로드 슬롯 1 (index0) */}
-                                    {[0,1].map((index) => (
-                                        <div key={index} className={cn("imageSlot")}>
-                                            {images[index] ? (
-                                                // 이미지가 있을 경우 미리보기와 삭제 버튼 표시
-                                                <div className={cn("imagePreview")}>
-                                                    <Image src={images[index]} alt={`문의 이미지 ${index+1}`} width={100} height={100} />
-                                                    <button 
-                                                        type="button" 
-                                                        className={cn("removeImageBtn")}
-                                                        onClick={() => handleImageRemove(index)}
-                                                    >
-                                                        &times;
-                                                    </button>
-                                                </div>
-                                            ):(
-                                                // 이미지가 없을 경우 업로드 버튼(label)
-                                                <label htmlFor={`image-upload-${index}`} className={cn("uploadLabel")}>
+                                    <div className={cn("imageSlot")}>
+                                        {images[0] ? (
+                                            <div className={cn("imagePreview")}>
+                                                <Image src={images[0]} alt="문의 이미지" width={100} height={100} />
+                                                <button
+                                                    type="button"
+                                                    className={cn("removeImageBtn")}
+                                                    onClick={() => handleImageRemove(0)}
+                                                >
+                                                    &times;
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <label htmlFor="image-upload-0" className={cn("uploadLabel")}>
+                                                <span className={cn("uploadPlusCircle")}>
                                                     <span className={cn("plusIcon")}>+</span>
-                                                    <input id={`image-upload-${index}`}
+                                                </span>
+                                                <input
+                                                    id="image-upload-0"
                                                     type="file"
                                                     accept="image/*"
                                                     className={cn("hiddenFileInput")}
-                                                    onChange={(e) => handleImageUpload(e, index)}
-                                                    />
-                                                </label>
-                                            )}
-                                        </div>
-                                    ))}
+                                                    onChange={(e) => handleImageUpload(e, 0)}
+                                                />
+                                            </label>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                             {/* 등록 버튼 추가 */}

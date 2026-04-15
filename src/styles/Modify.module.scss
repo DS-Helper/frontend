@@ -5,11 +5,13 @@
   justify-content: center;
   align-items: center;
   padding: 4rem 0;
-  gap: 4rem;
+  gap: 3.2rem;
+  max-width: 57rem;
+  width: 100%;
 
   @media (max-width: 611px) {
-    padding: 32px 20px;
     align-items: flex-start;
+    padding: 0;
   }
 }
 
@@ -26,17 +28,17 @@
 }
 
 .title {
-  font-size: 5rem;
-  font-weight: bold;
-  color: #222;
+  font-size: var(--Display-size);
+  font-weight: var(--Display-weight);
   margin-bottom: 1.6rem;
 
   @media (max-width: 611px) {
-    font-size: 3.2rem;
+    display: none;
   }
 }
 
 .toggleGroup {
+  width: 100%;
   display: flex;
   gap: 1.6rem;
 }
@@ -48,11 +50,16 @@
   align-items: center;
   justify-content: center;
   padding: 1.6rem;
-  border: 1px solid #ccc;
+  color: var(--color-semantic-text-tertiary);
+  border: 1px solid var(--color-semantic-border-default);
   border-radius: 1.2rem;
   cursor: pointer;
   transition: all 0.2s ease;
   filter: grayscale(100%);
+
+  @media (max-width: 611px) {
+    padding: 1.4rem 1.2rem;
+  }
 }
 
 .buttonImage {
@@ -61,20 +68,20 @@
 }
 
 .toggleButton.active {
-  border-color: var(--primary-color);
-  background: #e6f9ec;
+  color: var(--color-semantic-text-primary);
   filter: none;
 }
 
 .toggleLabel {
-  font-size: 1.7rem;
+  font-size: var(--title-S-size);
   letter-spacing: -1.5%;
-  font-weight: 600;
+  font-weight: var(--title-S-weight);
 }
 
 .toggleDescription {
-  font-size: 1.3rem;
-  color: var(--grey-500);
+  font-size: var(--caption-size);
+  font-weight: var(--caption-weight);
+  color: var(--color-semantic-text-secondary);
   text-align: center;
 }
 
@@ -89,35 +96,64 @@
   gap: 0.6rem;
 
   label {
-    font-weight: 500;
-    font-size: 1.7rem;
-    color: var(--grey-700);
+    font-weight: var(--label-M-weight);
+    font-size: var(--label-M-size);
   }
 
   input {
     padding: 1.2rem;
-    border: 1px solid #ccc;
-    border-radius: 0.8rem;
+    border: 1px solid var(--color-semantic-border-default);
+    border-radius: 1rem;
     outline: none;
-    font-size: 1.7rem;
-
-    &.success {
-      border: 1px solid var(--grey-800);
-    }
+    font-size: var(--value-M-size);
+    font-weight: var(--value-M-weight);
+    color: var(--color-primitive-gray-800);
   
     &.error {
-      border: 1px solid var(--red-color);
+      border: 1px solid var(--color-semantic-border-danger);
     }
   }
 }
 
 .required {
-  color: var(--red-color);
+  display: inline-block;
+  width: 0.3rem;
+  height: 0.3rem;
+  margin-left: 0.2rem;
+  border-radius: 50%;
+  background-color: var(--color-primitive-red-500);
+  font-size: 0;
+  line-height: 0;
+  vertical-align: text-top;
+}
+
+.recipientCountControl {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 1.4rem 1rem;
+}
+
+.countButton {
+  font-size: 1.5rem;
+  color: var(--color-primitive-gray-800);
+
+  &:disabled {
+    color: var(--color-semantic-text-disabled);
+    cursor: not-allowed;
+  }
+}
+
+.countValue {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-primitive-gray-800);
+  text-align: center;
 }
 
 .errorMsg {
   font-size: 1.7rem;
-  color: var(--red-color);
+  color: var(--color-semantic-text-danger);
   margin-top: 0.6rem;
 }
 
@@ -150,15 +186,28 @@
 
 .submitBtn {
   width: 100%;
-  background: var(--primary-color);
-  color: #fff;
-  padding: 1.4rem 0;
-  border-radius: 0.8rem;
+  background: var(--color-semantic-bg-brand);
+  color: var(--color-semantic-text-inverse);
+  padding: 1.55rem 0;
+  border-radius: 1.2rem;
   font-size: 1.8rem;
-  font-weight: bold;
+  font-weight: 500;
   cursor: pointer;
   border: none;
-  margin: 5.6rem 0 14rem;
+  margin: 4.8rem 0 17.5rem;
+
+  @media (max-width: 611px) {
+    font-size: 1.6rem;
+    padding: 1.35rem 0;
+    margin: 4.8rem 0;
+  }
+
+  &.disabled,
+  &:disabled {
+    background: var(--color-semantic-bg-disabled);
+    color: var(--color-semantic-text-disabled);
+    cursor: not-allowed;
+  }
 }
 
 .copy {
@@ -173,6 +222,7 @@
   flex-direction: column;
   gap: 2rem;
   background: transparent;
+  font-family: 'Pretendard Variable', sans-serif;
 
   @media (max-width: 611px) {
     max-width: 100%;
@@ -197,24 +247,28 @@
   background: transparent !important;
   border: none !important;
   color: #000 !important;
-  font-family: inherit !important;
+  font-family: 'Pretendard Variable', sans-serif !important;
   width: 100% !important;
   
-  // react-calendar 루트 요소 배경 제거
+  // react-calendar 루트 요소 배경 제거 및 폰트 상속
   :global(.react-calendar) {
     background: transparent !important;
+    font-family: 'Pretendard Variable', sans-serif !important;
   }
   
   :global(.react-calendar__viewContainer) {
     background: transparent !important;
+    font-family: inherit !important;
   }
-  
+
   :global(.react-calendar__month-view) {
     background: transparent !important;
+    font-family: inherit !important;
   }
 
   // 달력 네비게이션 버튼 (화살표 버튼 제외)
   button:not(.react-calendar__navigation__arrow) {
+    font-family: 'Pretendard Variable', sans-serif !important;
     background: transparent !important;
     color: #000 !important;
     border: none !important;
@@ -224,7 +278,7 @@
     }
     
     &:disabled {
-      color: #ccc !important;
+      color: var(--color-semantic-text-tertiary) !important;
     }
   }
 
@@ -244,35 +298,31 @@
       color: #000 !important;
       background: transparent !important;
       border: none !important;
-      padding: 0.8rem 1.2rem !important;
     }
   }
 
   // 네비게이션 라벨 (년도, 월)
   :global(.react-calendar__navigation__label) {
+    font-family: 'Pretendard Variable', sans-serif !important;
     flex-grow: 0 !important;
     text-align: center !important;
+    padding: 0 1.2rem !important;
   }
 
   // 네비게이션 화살표 (이전달, 다음달, 작년, 내년 버튼)
   :global(.react-calendar__navigation__arrow),
   :global(.react-calendar__navigation button.react-calendar__navigation__arrow),
   button.react-calendar__navigation__arrow {
-    color: var(--grey-600) !important;
     background: transparent !important;
-    
-    &:hover {
-      color: var(--grey-600) !important;
-      background: #f5f5f5 !important;
-    }
-    
-    &:active {
-      color: var(--grey-600) !important;
-    }
-    
-    &:focus {
-      color: var(--grey-600) !important;
-    }
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .calendarNavArrow {
+    display: block;
+    width: 2.4rem;
+    height: 2.4rem;
   }
 
   // 요일 헤더 전체 컨테이너 - CSS Grid로 변경
@@ -293,6 +343,7 @@
       justify-content: center !important;
       
       abbr {
+        font-family: 'Pretendard Variable', sans-serif !important;
         color: #000 !important;
         font-size: 1.4rem !important;
         font-weight: 600 !important;
@@ -308,12 +359,13 @@
 
   // 날짜 타일
   .calendarTile {
+    font-family: 'Pretendard Variable', sans-serif !important;
     background: transparent !important;
     color: #000 !important;
     border: none !important;
     border-radius: 0.8rem !important;
     margin: 0.2rem !important;
-    padding: 1.2rem 0.8rem !important;
+    padding: 1.5rem 3.6rem !important;
     font-size: 1.4rem !important;
     font-weight: 500 !important;
     position: relative !important;
@@ -322,6 +374,10 @@
     text-align: center !important;
     cursor: pointer !important;
     opacity: 1 !important;
+
+    @media (max-width: 611px) {
+      padding: 1.5rem 2.1rem !important;
+    }
     
     // 선택된 날짜
     &.selectedTile {
@@ -349,7 +405,7 @@
       &.fridayTile,
       &.availableTile {
         background: transparent !important;
-        color: #fff !important;
+        color: var(--color-semantic-text-inverse) !important;
         opacity: 1 !important;
         
         &::before {
@@ -360,7 +416,7 @@
           transform: translate(-50%, -50%);
           width: 60%;
           height: 100%;
-          background: var(--primary-color);
+          background: var(--color-semantic-bg-brand);
           border-radius: 0.8rem;
           z-index: -1;
         }
@@ -392,7 +448,7 @@
     
     // 선택 불가능한 날짜 (비활성화)
     &.disabledTile {
-      color: #ccc !important;
+      color: var(--color-semantic-text-tertiary) !important;
       background: transparent !important;
       opacity: 0.5 !important;
       cursor: not-allowed !important;
@@ -449,12 +505,14 @@
 
   // react-calendar의 기본 타일 스타일 오버라이드
   :global(.react-calendar__tile) {
+    font-family: 'Pretendard Variable', sans-serif !important;
     opacity: 1 !important;
     color: #000 !important;
   }
-  
+
   // react-calendar 타일 내부 텍스트
   :global(.react-calendar__tile abbr) {
+    font-family: 'Pretendard Variable', sans-serif !important;
     opacity: 1 !important;
     color: inherit !important;
   }
@@ -467,6 +525,8 @@
 }
 
 .timeSelectionContainer {
+  font-family: 'Pretendard Variable', sans-serif;
+
   .timeSelectionTitle {
     font-size: 1.6rem;
     font-weight: 600;
@@ -482,10 +542,12 @@
 }
 
 .genderTitle {
-  font-size: 1.7rem;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .timeButton {
+  font-family: 'Pretendard Variable', sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -514,27 +576,27 @@
   
   // 선택된 시간 (기본)
   &.selectedTime {
-    background: var(--primary-color) !important;
-    color: #fff !important;
+    background: var(--color-semantic-bg-brand) !important;
+    color: var(--color-semantic-text-inverse) !important;
     font-weight: 600;
-    border-color: var(--primary-color);
+    border-color: var(--color-semantic-bg-brand);
   }
   
   // 단일 시간 선택 (하나만 선택된 경우)
   &.singleTime {
-    background: var(--primary-color) !important;
-    color: #fff !important;
+    background: var(--color-semantic-bg-brand) !important;
+    color: var(--color-semantic-text-inverse) !important;
     font-weight: 600;
-    border-color: var(--primary-color);
+    border-color: var(--color-semantic-bg-brand);
     border-radius: 0.8rem !important;
   }
   
   // 시작 시간
   &.startTime {
-    background: var(--primary-color) !important;
-    color: #fff !important;
+    background: var(--color-semantic-bg-brand) !important;
+    color: var(--color-semantic-text-inverse) !important;
     font-weight: 600;
-    border-color: var(--primary-color);
+    border-color: var(--color-semantic-bg-brand);
     border-top-left-radius: 0.8rem !important;
     border-bottom-left-radius: 0.8rem !important;
     border-top-right-radius: 0.2rem !important;
@@ -543,10 +605,10 @@
   
   // 종료 시간
   &.endTime {
-    background: var(--primary-color) !important;
-    color: #fff !important;
+    background: var(--color-semantic-bg-brand) !important;
+    color: var(--color-semantic-text-inverse) !important;
     font-weight: 600;
-    border-color: var(--primary-color);
+    border-color: var(--color-semantic-bg-brand);
     border-top-left-radius: 0.2rem !important;
     border-bottom-left-radius: 0.2rem !important;
     border-top-right-radius: 0.8rem !important;
@@ -555,10 +617,9 @@
   
   // 중간 시간 (연속된 블록 내부)
   &.middleTime {
-    background: var(--grey-100) !important;
-    color: #666 !important;
+    background: var(--color-semantic-bg-neutral-soft) !important;
+    color: var(--color-semantic-text-primary) !important;
     font-weight: 500;
-    border-color: #e0e0e0;
     border-radius: 0.2rem !important;
   }
   
@@ -576,12 +637,13 @@
 }
 
 .selectedTimesInfo {
+  font-family: 'Pretendard Variable', sans-serif;
   margin-top: 1.6rem;
   padding: 1.2rem;
   background: #f8f9fa;
   border-radius: 0.8rem;
   border: 1px solid #e9ecef;
-  
+
   p {
     margin: 0.4rem 0;
     font-size: 1.4rem;
@@ -617,24 +679,36 @@
 
 // 완료 페이지 스타일
 .completeContent {
-  max-width: 48rem;
+  max-width: 57rem;
   margin: 0 auto;
-  padding: 4rem 2rem;
+  padding: 0.8rem;
+
+  @media (max-width: 611px) {
+    max-width: 34.3rem;
+  }
 }
 
 .completeTitle {
-  font-size: 3.2rem;
-  font-weight: bold;
-  color: #000;
+  font-size: var(--Display-size);
+  font-weight: var(--Display-weight);
   margin-bottom: 2.4rem;
   line-height: 1.3;
+
+  @media (max-width: 611px) {
+    font-size: var(--title-L-size);
+    font-weight: var(--title-L-weight);
+    margin-bottom: 1.2rem;
+  }
 }
 
 .completeMessage {
-  font-size: 1.8rem;
-  color: #000;
-  line-height: 1.6;
+  font-size: 1.7rem;
   margin-bottom: 4rem;
+
+  @media (max-width: 611px) {
+    font-size: var(--body-S-size);
+    font-weight: var(--body-S-weight);
+  }
 }
 
 // 모달 오버레이
@@ -676,8 +750,8 @@
 
 // 모달 제목
 .modalTitle {
-  font-size: 2.4rem;
-  font-weight: 600;
+  font-size: var(--title-L-size);
+  font-weight: var(--title-L-weight);
 }
 
 .modalText {
@@ -688,7 +762,9 @@
 
 // 모달 설명
 .modalDescription {
-  font-size: 1.5rem;
+  font-size: var(--body-M-size);
+  font-weight: var(--body-M-weight);
+  color: var(--color-semantic-text-secondary);
 }
 
 // 모달 버튼 영역
@@ -699,38 +775,100 @@
 
 .requestButton {
   flex: 1;
-  background: var(--primary-color);
-  color: #fff;
+  background: var(--color-semantic-bg-brand);
+  color: var(--color-semantic-text-inverse);
   border: none;
   padding: 1.4rem 2rem;
   border-radius: 0.8rem;
   font-size: 1.6rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  
-  &:hover {
-    background: #1a8f4a;
-  }
 }
 
 .laterButton {
   flex: 1;
-  color: var(--grey-600);
-  background: var(--grey-200);
+  color: var(--color-semantic-text-danger);
+  background: var(--color-semantic-bg-danger-soft);
   padding: 1.4rem 2rem;
   border-radius: 0.8rem;
   font-size: 1.6rem;
-  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  
+}
+
+.addressReadonlyInput {
+  cursor: pointer;
+}
+
+/* 우편번호 embed — fixed 뒷판 + flex 중앙 정렬 (open()은 레이아웃에 따라 모서리로 붙을 수 있음) */
+.postcodeLayerBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.6rem;
+  background: rgba(0, 0, 0, 0.45);
+  box-sizing: border-box;
+}
+
+.postcodeLayerPanel {
+  width: 100%;
+  max-width: 52rem;
+  max-height: min(90vh, 56rem);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.postcodeLayerHeader {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  padding: 1.4rem 1.6rem;
+  border-bottom: 1px solid var(--color-semantic-border-default);
+}
+
+.postcodeLayerTitle {
+  margin: 0;
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: var(--color-primitive-gray-800);
+}
+
+.postcodeLayerClose {
+  flex-shrink: 0;
+  width: 3.6rem;
+  height: 3.6rem;
+  border: none;
+  border-radius: 0.8rem;
+  background: transparent;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--color-semantic-text-tertiary);
+  cursor: pointer;
+
   &:hover {
-    background: #f8f9fa;
-    border-color: #ccc;
+    background: #f0f0f0;
+    color: var(--color-primitive-gray-800);
   }
-  
-  &:active {
-    transform: translateY(0);
+}
+
+.postcodeEmbedHost {
+  flex: 1;
+  min-height: 30rem;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: #fafafa;
+
+  @media (max-width: 611px) {
+    min-height: min(62vh, 30rem);
   }
 }

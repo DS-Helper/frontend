@@ -1,0 +1,640 @@
+.boardPage {
+	min-height: 100vh;
+}
+
+// 검색 바
+.searchSection {
+	width: 100%;
+	padding: 2.4rem;
+	background-color: #fff;
+
+	@media screen and (max-width: 611px) {
+		padding: 1.8rem 1.6rem;
+	}
+}
+
+.searchForm {
+	max-width: 102.4rem;
+	margin: 0 auto;
+	position: relative;
+}
+
+.searchInput {
+	width: 100%;
+	padding: 1.4rem 2rem;
+	border: 1px solid var(--color-semantic-border-default);
+	border-radius: 50rem;
+	font-size: 1.5rem;
+	font-weight: 400;
+	outline: none;
+
+	&::placeholder {
+		color: var(--color-semantic-text-tertiary);
+	}
+}
+
+.searchButton {
+	position: absolute;
+	right: 1.2rem;
+	top: 50%;
+	transform: translateY(-50%);
+	padding: 0;
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--color-semantic-icon-tertiary);
+	transition: color 0.2s ease;
+}
+
+.searchIcon {
+	pointer-events: none;
+}
+
+// 메인 컨테이너
+.boardContainer {
+	max-width: 102.4rem;
+	min-height: calc(100vh - 10rem);
+	margin: 0 auto;
+	display: flex;
+	gap: 4rem;
+}
+
+// 사이드바
+.sidebar {
+	width: 14.7rem;
+	flex-shrink: 0;
+	background-color: #fff;
+	border-radius: 0.8rem;
+}
+
+// 메인 콘텐츠
+.mainContent {
+	flex: 1;
+	min-width: 0;
+	margin-bottom: 5rem;
+
+	@media (max-width: 611px) {
+		display: flex;
+		flex-direction: column;
+	}
+}
+
+
+.postList {
+	display: flex;
+	flex-direction: column;
+	gap: 2.8rem;
+	margin-bottom: 7rem;
+}
+
+// 게시글 아이템
+.postItem {
+	display: flex;
+	gap: 2rem;
+	padding: 0 2rem;
+	background-color: #fff;
+	border-radius: 0.8rem;
+	cursor: pointer;
+}
+
+.postContent {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+	min-width: 0;
+}
+
+.postTitle {
+	font-size: var(--title-S-size);
+	font-weight: var(--title-S-weight);
+	color: var(--color-semantic-text-primary);
+	margin: 0;
+	word-break: keep-all;
+}
+
+.postText {
+	font-size: var(--body-S-size);
+	font-weight: var(--body-S-weight);
+	color: var(--color-semantic-text-primary);
+	margin: 0;
+	word-break: keep-all;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.postMetrics {
+	display: flex;
+	gap: 1.6rem;
+	align-items: center;
+}
+
+.metricItem {
+	display: flex;
+	align-items: center;
+	gap: 0.2rem;
+	color: #6c757d;
+}
+
+.metricLikeButton {
+	display: flex;
+	align-items: center;
+	gap: 0.2rem;
+	margin: 0;
+	padding: 0;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	font: inherit;
+	color: #6c757d;
+
+	&:focus-visible {
+		outline: 2px solid var(--color-semantic-border-default, #ccc);
+		outline-offset: 2px;
+		border-radius: 0.2rem;
+	}
+}
+
+.metricIcon {
+	font-size: 1.6rem;
+}
+
+.metricCount {
+	font-size: 1.4rem;
+	font-weight: 400;
+	color: var(--color-semantic-text-secondary);
+}
+
+.postImage {
+	width: 8.1rem;
+	height: 8.1rem;
+	flex-shrink: 0;
+	border-radius: 0.8rem;
+	overflow: hidden;
+	background-color: var(--color-semantic-bg-neutral-soft);
+}
+
+.image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.imagePlaceholder {
+	width: 100%;
+	height: 100%;
+	background-color: var(--color-semantic-bg-neutral-soft);
+}
+
+// 글쓰기 FAB
+.writeFab {
+	position: fixed;
+	bottom: 3rem;
+	right: 3rem;
+	width: 4.8rem;
+	height: 4.8rem;
+	border-radius: 50%;
+	border: none;
+	background-color: var(--color-semantic-bg-brand);
+	color: var(--color-semantic-text-inverse);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 100;
+
+}
+
+.writeFabIcon {
+	width: 3.6rem;
+	height: 3.6rem;
+	filter: brightness(0) invert(1);
+}
+
+// 빈 상태
+.emptyState {
+	text-align: center;
+	padding: 6rem 2rem;
+	color: #6c757d;
+	font-size: 1.6rem;
+}
+
+
+.mobileInfiniteFooter {
+	width: 100%;
+}
+
+.mobileInfiniteText {
+	margin: 1.2rem 0 0;
+	text-align: center;
+	font-size: 1.4rem;
+	color: var(--color-semantic-text-secondary);
+}
+
+.mobileInfiniteTrigger {
+	width: 100%;
+	height: 1px;
+}
+
+.writePage {
+	min-height: 100vh;
+	padding: 2.2rem 0;
+	background: var(--color-semantic-bg-page);
+	box-sizing: border-box;
+
+	@media (max-width: 1025px) {
+		padding: 2.4rem 1.6rem;
+	}
+}
+
+.writeForm {
+	max-width: 102.4rem;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 2.4rem;
+
+	@media (max-width: 611px) {
+		gap: 2.2rem;
+	}
+}
+
+.visuallyHidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+.writeFieldGroup {
+	width: 100%;
+}
+
+.writeCategoryDropdown {
+	position: relative;
+	width: 100%;
+}
+
+.writeCategoryTrigger {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1.2rem;
+	padding: 1.2rem 1.6rem;
+	border: 1px solid var(--color-semantic-border-default);
+	border-radius: 1rem;
+	font-size: 1.6rem;
+	font-weight: 400;
+	background-color: #fff;
+	cursor: pointer;
+	outline: none;
+	box-sizing: border-box;
+	text-align: left;
+	font-family: inherit;
+	color: var(--color-semantic-text-primary);
+}
+
+.writeCategoryTriggerText {
+	flex: 1;
+	min-width: 0;
+}
+
+.writeCategoryChevron {
+	flex-shrink: 0;
+	display: block;
+	width: 2rem;
+	height: 2rem;
+	align-self: center;
+	color: var(--color-primitive-gray-400);
+	transition: transform 0.2s ease;
+}
+
+.writeCategoryTriggerOpen .writeCategoryChevron {
+	transform: rotate(180deg);
+}
+
+.writeCategoryTrigger.writeCategoryPlaceholder {
+	color: var(--color-semantic-text-secondary);
+}
+
+.writeCategoryList {
+	position: absolute;
+	z-index: 50;
+	left: 0;
+	right: 0;
+	top: calc(100% + 0.4rem);
+	margin: 0;
+	padding: 0.4rem 0.8rem;
+	list-style: none;
+	background: #fff;
+	border: 1px solid var(--color-semantic-border-default);
+	border-radius: 0.8rem;
+	box-shadow: 0rem 0.2rem 0.5rem rgba(0, 0, 0, 0.1);
+	box-sizing: border-box;
+}
+
+.writeCategoryItem {
+	margin: 0;
+	padding: 0;
+}
+
+.writeCategoryOption {
+	display: block;
+	width: 100%;
+	padding: 0.8rem 1.2rem;
+	border: none;
+	background: transparent;
+	font-size: 1.5rem;
+	font-weight: 500;
+	color: var(--color-semantic-text-primary);
+	text-align: left;
+	cursor: pointer;
+	font-family: inherit;
+	box-sizing: border-box;
+}
+
+.writeCategoryOptionSelected {
+	background: var(--grey-100, #f0f4ff);
+	font-weight: 500;
+	color: var(--primary-color-dark, var(--grey-900));
+}
+
+.writeEditorCard {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid var(--color-primitive-gray-300);
+	border-radius: 1rem;
+	overflow: hidden;
+	background: #fff;
+	padding-top: 1.6rem;
+}
+
+.writeTitleInput {
+	flex: 0 0 auto;
+	display: block;
+	width: 100%;
+	margin-bottom: 0;
+	border: none;
+	font-size: 1.9rem;
+	font-weight: 600;
+	color: var(--color-semantic-text-primary);
+	outline: none;
+	box-sizing: border-box;
+	padding-left: 2rem;
+
+	&::placeholder {
+		color: var(--color-semantic-text-placeholder);
+	}
+}
+
+/* Chromium autofill 기본 하이라이트(파란 배경) 제거 */
+.writeTitleInput:-webkit-autofill,
+.writeTitleInput:-webkit-autofill:hover,
+.writeTitleInput:-webkit-autofill:focus,
+.writeTitleInput:-webkit-autofill:active {
+	-webkit-text-fill-color: var(--color-semantic-text-primary);
+	transition: background-color 9999s ease-in-out 0s;
+	box-shadow: 0 0 0 1000px #fff inset;
+}
+
+.writeContentStack {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	width: 100%;
+}
+
+.writeEditorColumn {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	width: 100%;
+	min-height: 0;
+	gap: 0;
+}
+
+/* 본문·이미지·이어쓰기·업로드가 같은 “내용 입력” 블록으로 보이도록 한 영역 */
+.writeContentField {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	width: 100%;
+	min-height: 50rem;
+	box-sizing: border-box;
+	padding: 1rem 0 0;
+	background-color: var(--color-semantic-bg-page);
+}
+
+.writeImageParagraph {
+	position: relative;
+	display: inline-block;
+	max-width: calc(100% - 4rem);
+	margin: 0 2rem;
+	padding: 0;
+	flex-shrink: 0;
+	align-self: flex-start;
+	box-sizing: border-box;
+	vertical-align: top;
+}
+
+.writeImagePreviewImg {
+	width: 33.3rem;
+	height: 42.8rem;
+	max-width: 100%;
+	object-fit: cover;
+	display: block;
+	background: var(--color-primitive-gray-100);
+}
+
+.writeImagePreviewRemove {
+	position: absolute;
+	top: -1rem;
+	right: -1rem;
+	z-index: 1;
+	width: 2.8rem;
+	height: 2.8rem;
+	padding: 0;
+	border: none;
+	border-radius: 50%;
+	font-size: 1.8rem;
+	line-height: 1;
+	color: #fff;
+	background: rgba(0, 0, 0, 0.7);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.writeImagePreviewRemoveIcon {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.writeContentInput {
+	width: 100%;
+	min-height: 14rem;
+	flex-shrink: 0;
+	padding: 0 2rem;
+	border: none;
+	font-size: 1.5rem;
+	font-weight: 400;
+	line-height: 1.5;
+	color: var(--color-semantic-text-primary);
+	resize: none;
+	outline: none;
+	box-sizing: border-box;
+	font-family: inherit;
+	background-color: transparent;
+	overflow: hidden;
+
+	&::placeholder {
+		color: var(--color-semantic-text-placeholder);
+	}
+}
+
+.writeContentInputPrimary {
+	min-height: 22rem;
+	padding-top: 0.2rem;
+}
+
+/* 이미지 첨부 시: 큰 min-height 없이 줄·문단 높이만큼만 (JS scrollHeight와 함께 사용) */
+.writeContentInputPrimary.writeContentInputPrimaryWithMedia {
+	min-height: 2.4rem;
+}
+
+.writeContentInputFollowUp {
+	min-height: 2.4rem;
+	padding-top: 1rem;
+}
+
+.writeImageToolbar {
+	position: relative;
+	z-index: 5;
+	isolation: isolate;
+	display: flex;
+	flex-shrink: 0;
+	justify-content: flex-end;
+	align-items: center;
+	padding: 1.2rem 2rem;
+	margin-top: auto;
+	border-top: 1px solid var(--color-primitive-gray-200);
+	background-color: var(--color-semantic-bg-page);
+}
+
+/* display:none이면 programmatic click이 막히는 브라우저 대비: 화면 밖에 두고 버튼에서 click() 호출 */
+.writeFileInputHidden {
+	position: fixed;
+	left: -10000px;
+	top: 0;
+	width: 1px;
+	height: 1px;
+	margin: 0;
+	padding: 0;
+	opacity: 0;
+	overflow: hidden;
+	pointer-events: none;
+	border: 0;
+	clip: rect(0, 0, 0, 0);
+}
+
+.writeImageButton {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.6rem;
+	border: none;
+	background: transparent;
+	font-size: 1.5rem;
+	color: var(--color-primitive-gray-600);
+	cursor: pointer;
+	font-family: inherit;
+}
+
+.writeImageIcon {
+	width: 2rem;
+	height: 2rem;
+	flex-shrink: 0;
+}
+
+.writeActions {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 1.2rem;
+	margin-top: 0.4rem;
+}
+
+.writeConfirmButton {
+	padding: 1.1rem 2.35rem;
+	border: none;
+	border-radius: 0.8rem;
+	font-size: 1.5rem;
+	font-weight: 500;
+	cursor: pointer;
+	background-color: var(--color-semantic-bg-brand);
+	color: var(--color-semantic-text-inverse);
+
+	&:disabled {
+		opacity: 0.65;
+		cursor: not-allowed;
+	}
+}
+
+.writeCancelButton {
+	padding: 1.1rem 2.35rem;
+	border: 1px solid var(--color-semantic-border-default);
+	border-radius: 0.8rem;
+	font-size: 1.5rem;
+	font-weight: 500;
+	cursor: pointer;
+	background: #fff;
+	color: var(--color-semantic-text-primary);
+
+	&:disabled {
+		opacity: 0.65;
+		cursor: not-allowed;
+	}
+}
+
+@media (max-width: 1024px) and (min-width: 612px) {
+	.boardContainer {
+		padding: 0 2.4rem;
+	}
+}
+
+@media (max-width: 611px) {
+	.boardContainer {
+		display: block;
+		padding: 0 1.6rem;
+		box-sizing: border-box;
+	}
+
+	.sidebar {
+		display: none;
+	}
+
+	.postList {
+		gap: 3.05rem;
+	}
+
+	.postItem {
+		padding: 0;
+		gap: 1.2rem;
+	}
+
+}

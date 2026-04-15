@@ -4,6 +4,8 @@ import styles from "@/styles/Login.module.scss";
 import classNames from "classnames/bind";
 import { useState } from "react";
 import { postLogin } from "../../lib/apis/authOrganization";
+import { getMyIdentifier, parseMyIdentifierUserId } from "../../lib/apis/account";
+import { applyLoginResponseTokens } from "../../lib/store/userStore";
 import { useUserStore } from "../../lib/store/userStore";
 import { useRouter } from "next/router";
 
@@ -12,7 +14,7 @@ const cn = classNames.bind(styles);
 export default function OrgLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setIsVerified, setUser, setUserType } = useUserStore();
+  const { setUser, setUserId, setUserType, checkAuthStatus } = useUserStore();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,16 +32,29 @@ export default function OrgLoginPage() {
       const isSuccess = res && res.status >= 200 && res.status < 300;
       
       if (isSuccess) {
-        // 사용자 정보 저장 (기관 로그인 응답에 사용자 정보가 있다면)
+        const tokenState = applyLoginResponseTokens(res.data);
+        if (!tokenState.hasRefreshToken) {
+          console.warn(
+            "[auth] organization login 응답에 refreshToken이 없습니다."
+          );
+        }
         if (res.data?.user) {
           setUser(res.data.user);
+        }
+        setUserId(null);
+
+        try {
+          const myIdentifierRes = await getMyIdentifier();
+          const nextUserId = parseMyIdentifierUserId(myIdentifierRes?.data ?? null);
+          if (nextUserId) setUserId(nextUserId);
+        } catch (error) {
+          console.error("[auth] getMyIdentifier failed:", error);
         }
         
         // 사용자 타입을 기관으로 설정
         setUserType('organization');
         
-        // 인증 상태 업데이트
-        setIsVerified(true);
+        await checkAuthStatus({ force: true });
         router.push("/");
       } else {
         alert("로그인 실패!");

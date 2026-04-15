@@ -229,10 +229,6 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
 
   return (
     <div className={cn("dateTimeSelector")}>
-      <label className={cn("dateTimeLabel")}>
-        날짜 및 시간 <span className={cn("required")}>(필수)</span>
-      </label>
-      
       <div className={cn("calendarContainer")}>
         <Calendar
           locale="ko-KR"
@@ -241,6 +237,27 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
           value={selectedDate}
           tileDisabled={({ date }) => isPastDate(date) || !isAvailableDay(date)}
           className={cn("customCalendar")}
+          prev2Label={null}
+          next2Label={null}
+          prevLabel={
+            <img
+              src="/arrow_left_M.svg"
+              alt="이전 달"
+              className={cn("calendarNavArrow", "calendarNavArrowPrev")}
+            />
+          }
+          nextLabel={
+            <img
+              src="/arrow_right_L.svg"
+              alt="다음 달"
+              className={cn("calendarNavArrow", "calendarNavArrowNext")}
+            />
+          }
+          formatMonthYear={(locale, date) => {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, "0");
+            return `${year}.${month}`;
+          }}
           formatDay={(locale, date) => {
             return date.getDate().toString();
           }}

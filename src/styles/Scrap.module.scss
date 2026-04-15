@@ -1,0 +1,225 @@
+.scrapMain {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+/* 소통방 `boardContainer` + `mainContent`와 동일한 역할: 데스크톱은 패스스루, 모바일에서 폭·패딩 정렬 */
+.scrapBoardShell {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.scrapMainContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+/* 소통방 `mobileCategoryBar`와 동일한 pill 바 (모바일만) */
+.scrapMobileBar {
+  display: none;
+}
+
+.scrapMobileBarIcon {
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-primitive-gray-800);
+  flex-shrink: 0;
+}
+
+.scrapMobileBarLabel {
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--color-primitive-gray-800);
+  font-family: inherit;
+}
+
+.postList {
+  display: flex;
+  flex-direction: column;
+  gap: 2.8rem;
+  min-width: 0;
+}
+
+.postItem {
+  display: flex;
+  gap: 1.2rem;
+  background-color: #fff;
+  border-radius: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+
+  &:hover {
+    background-color: var(--grey-100);
+  }
+}
+
+.postContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  overflow: hidden;
+}
+
+.postTitle {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--primary-color-dark);
+  margin: 0;
+  word-break: keep-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.postText {
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--grey-700);
+  margin: 0;
+  word-break: keep-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.postMetrics {
+  display: flex;
+  gap: 1.6rem;
+  align-items: center;
+}
+
+.metricItem {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  color: var(--grey-500);
+}
+
+.metricIcon {
+  flex-shrink: 0;
+}
+
+.metricCount {
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--grey-700);
+}
+
+.postImage {
+  width: 8.1rem;
+  min-width: 8.1rem;
+  height: 8.1rem;
+  flex-shrink: 0;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  background-color: var(--grey-200);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.imagePlaceholder {
+  width: 100%;
+  height: 100%;
+  background-color: var(--grey-200);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 10rem 0;
+  color: var(--color-primitive-gray-800);
+  font-size: 1.7rem;
+  font-weight: 500;
+}
+
+@media (max-width: 611px) {
+  .scrapMain {
+    padding: 2.8rem 0;
+  }
+
+  .scrapBoardShell {
+    max-width: 102.4rem;
+    margin: 0 auto;
+  }
+
+  .scrapMainContent {
+    margin-bottom: 0;
+  }
+
+  .scrapMobileBar {
+    display: inline-flex;
+    width: fit-content;
+    margin-bottom: 1.8rem;
+    margin-left: auto;
+    gap: 0.2rem;
+    align-items: center;
+    padding: 0.6rem 0.8rem;
+    border-radius: 50rem;
+    color: var(--color-primitive-gray-800);
+    background-color: var(--color-primitive-gray-200);
+  }
+
+  .postList {
+    gap: 2.8rem;
+    margin-bottom: 2rem;
+  }
+
+  .postItem {
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 0;
+    gap: 1.2rem;
+  }
+
+  .postTitle {
+    font-size: var(--title-S-size);
+    font-weight: var(--title-S-weight);
+    color: var(--color-semantic-text-primary);
+  }
+
+  .postText {
+    font-size: var(--body-S-size);
+    font-weight: var(--body-S-weight);
+    color: var(--color-semantic-text-primary);
+  }
+
+  .postMetrics {
+    gap: 0.8rem;
+  }
+
+  .metricItem {
+    color: #6c757d;
+  }
+
+  .metricCount {
+    font-size: 1.4rem;
+    color: var(--color-semantic-text-secondary);
+  }
+
+  .postImage {
+    width: 8.1rem;
+    min-width: 8.1rem;
+    height: 8.1rem;
+  }
+
+  .emptyState {
+    padding: 6rem 2rem;
+    color: #6c757d;
+    font-size: 1.6rem;
+    font-weight: 400;
+  }
+}

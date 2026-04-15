@@ -3,13 +3,11 @@ import classNames from "classnames/bind";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getPosts } from "@/lib/apis/helpStory";
+import { getPosts, parsePostsListBody } from "@/lib/apis/helpStory";
 import { IoIosArrowForward } from "react-icons/io";
 import { isAuthenticated } from "@/lib/utils/auth";
-import NotificationListModal from "@/components/Modal/NotificationListModal";
 
 // 이미지들
-import mainImage from "@/public/Hero-image.svg";
 import home1 from "@/public/home1.svg";
 import home2 from "@/public/home2.svg";
 import home3 from "@/public/home3.svg";
@@ -25,31 +23,18 @@ import story from "@/public/story.svg";
 
 const cn = classNames.bind(styles);
 
-interface StoryPost {
-  postId: string;
-  title: string;
-  content: string;
-  writerName: string;
-  imageUrls: string[];
-  createdAt: string;
-}
-
 export default function Home() {
   const [activeButton, setActiveButton] = useState(0);
   const [storyList, setStoryList] = useState<Array<{
     postId: string;
     title: string;
     content: string;
+    viewCount: number;
     date: string;
     img: string | typeof story;
   }>>([]);
   const [storyLoading, setStoryLoading] = useState(true);
   const router = useRouter();
-  
-  // 알림 모달 상태
-  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
-  const [isNotificationModalClosing, setIsNotificationModalClosing] = useState(false);
-  const [isNotificationModalOpening, setIsNotificationModalOpening] = useState(false);
 
   const handleHelp = async () => {
     const authenticated = await isAuthenticated();
@@ -133,14 +118,15 @@ export default function Home() {
         setStoryLoading(true);
         const response = await getPosts();
         
-        if (response && response.data) {
-          const postsData: StoryPost[] = response.data.posts || [];
+        if (response?.data) {
+          const { posts: postsData } = parsePostsListBody(response.data);
           
           // 최신 몇 개만 홈페이지에 표시 (최대 4개)
           const latestPosts = postsData.slice(0, 4).map((post) => ({
             postId: post.postId,
             title: post.title,
             content: post.content,
+            viewCount: post.viewCount,
             date: formatDate(post.createdAt),
             img: post.imageUrls && post.imageUrls.length > 0 && isValidImageUrl(post.imageUrls[0])
               ? post.imageUrls[0]
@@ -161,38 +147,6 @@ export default function Home() {
 
     fetchStories();
   }, []);
-
-  // 알림 모달 열기 이벤트 리스너
-  useEffect(() => {
-    const handleOpenNotificationModal = () => {
-      setIsNotificationModalOpen(true);
-      setTimeout(() => {
-        setIsNotificationModalOpening(true);
-      }, 10);
-    };
-
-    if (typeof window !== 'undefined') {
-      window.addEventListener('openNotificationModal', handleOpenNotificationModal);
-    }
-
-    return () => {
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('openNotificationModal', handleOpenNotificationModal);
-      }
-    };
-  }, []);
-
-  // 알림 모달 닫기 핸들러
-  const handleCloseNotificationModal = () => {
-    setIsNotificationModalClosing(true);
-    setIsNotificationModalOpening(false);
-    
-    setTimeout(() => {
-      setIsNotificationModalOpen(false);
-      setIsNotificationModalClosing(false);
-      setIsNotificationModalOpening(false);
-    }, 300);
-  };
 
   // 버튼별 렌더링
   const renderContent = () => {
@@ -258,98 +212,93 @@ export default function Home() {
 
   return (
     <div className={cn("home")}>
-      <div className={cn("container")}>
-        {/* 1페이지 */}
-        <div className={cn("homePage")}>
-          <div className={cn("homePage1Content")}>
-            <p className={cn("homePage1Title")}>
-              달성군 이웃을 위한 <br /> 무료 방문 서비스
-            </p>
-            <Image src={mainImage} className={cn("homePage1Image")} alt="메인 이미지" width={250} height={329} />
-          </div>
-          <button className={cn("homePage1Button")} onClick={handleHelp}>
-            도움 요청하기
-          </button>
-        </div>
+      {/* 1페이지 */}
+      <div className={cn("homePage")}>
+        <div className={cn("homePage1Hero")} />
+        <p className={cn("homePage1Title")}>
+          <span className={cn("homePage1TitleLine1", "homePage1TitleDesktop")}>
+            달성군 생활밀착형 플랫폼
+            <br />
+            디에스헬퍼
+          </span>
+          <span className={cn("homePage1TitleLine1", "homePage1TitleCompact")}>
+            달성군 생활밀착형
+            <br />
+            플랫폼
+            <br />
+            디에스헬퍼
+          </span>
+        </p>
+      </div>
 
-        {/* 2페이지 */}
-        <div className={cn("homePage2")}>
-          <div className={cn("homePageWrapper")}>
-            <p className={cn("title")}>이용 안내</p>
-            <div className={cn("homePageContent")}>
-              <div className={cn("homePageButton")}>
-                {guideButtons.map((text, i) => (
-                  <button
-                    key={i}
-                    className={cn("homePageButtonItem", { active: activeButton === i })}
-                    onClick={() => setActiveButton(i)}
-                  >
-                    {text}
-                  </button>
-                ))}
-              </div>
-              {renderContent()}
-            </div>
-          </div>
-        </div>
-
-        {/* 3페이지 */}
-        <div className={cn("homePage3")}>
-          <div className={cn("homePageWrapper")}>
-            <p className={cn("title")}>도와드린 이야기</p>
-            {storyLoading ? (
-              <div className={cn("storyLoading")}>
-                <p>도와드린 이야기를 불러오는 중...</p>
-              </div>
-            ) : storyList.length > 0 ? (
-              <>
-                <ul className={cn("storyList")}>
-                  {storyList.map((s, i) => (
-                    <li key={i} onClick={() => handleStoryClick(s.postId)}>
-                      <div>
-                        <p className={cn("storyTitle")}>{s.title}</p>
-                        <span className={cn("storyContent")}>{s.content}</span>
-                        <span className={cn("storyDate")}>{s.date}</span>
-                      </div>
-                      <div className={cn("storyImage")}>
-                        {typeof s.img === 'string' && isValidImageUrl(s.img) ? (
-                          <Image
-                            src={s.img}
-                            alt="도와드린 이야기"
-                            width={240}
-                            height={180}
-                            className={cn("image")}
-                          />
-                        ) : (
-                          <div className={cn("placeholderImage")}>
-                            <span>이미지 없음</span>
-                          </div>
-                        )}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                <button className={cn("moreStoriesButton")} onClick={handleMoreStories}>
-                  더보기 <IoIosArrowForward className={cn("moreStoriesArrow")} />
+      {/* 2페이지 */}
+      <div className={cn("homePage2")}>
+        <div className={cn("homePageWrapper")}>
+          <p className={cn("title")}>이용 안내</p>
+          <div className={cn("homePageContent")}>
+            <div className={cn("homePageButton")}>
+              {guideButtons.map((text, i) => (
+                <button
+                  key={i}
+                  className={cn("homePageButtonItem", { active: activeButton === i })}
+                  onClick={() => setActiveButton(i)}
+                >
+                  {text}
                 </button>
-                
-              </>
-            ) : (
-              <div className={cn("storyEmpty")}>
-                <p>아직 도와드린 이야기가 없습니다.</p>
-              </div>
-            )}
+              ))}
+            </div>
+            {renderContent()}
           </div>
         </div>
       </div>
-      
-      {/* 알림 모달 */}
-      <NotificationListModal
-        isOpen={isNotificationModalOpen}
-        isClosing={isNotificationModalClosing}
-        isOpening={isNotificationModalOpening}
-        onClose={handleCloseNotificationModal}
-      />
+
+      {/* 3페이지 */}
+      <div className={cn("homePage3")}>
+        <div className={cn("homePageWrapper")}>
+          <p className={cn("title")}>도와드린 이야기</p>
+          {storyLoading ? (
+            <div className={cn("storyLoading")}>
+              <p>도와드린 이야기를 불러오는 중...</p>
+            </div>
+          ) : storyList.length > 0 ? (
+            <>
+              <ul className={cn("storyList")}>
+                {storyList.map((s, i) => (
+                  <li key={i} onClick={() => handleStoryClick(s.postId)}>
+                    <div className={cn("storyTextBox")}>
+                      <p className={cn("storyTitle")}>{s.title}</p>
+                      <div className={cn("storyContent")}>
+                        <span className={cn("storyDate")}>{s.date}</span>
+                        <span className={cn("storyView")}>조회 {s.viewCount}</span>
+                      </div>
+                    </div>
+                    <div className={cn("storyImage")}>
+                      {typeof s.img === 'string' && isValidImageUrl(s.img) ? (
+                        <Image
+                          src={s.img}
+                          alt="도와드린 이야기"
+                          width={240}
+                          height={180}
+                          className={cn("image")}
+                        />
+                      ) : (
+                        <div className={cn("placeholderImage")}></div>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <button className={cn("moreStoriesButton")} onClick={handleMoreStories}>
+                더보기 <IoIosArrowForward className={cn("moreStoriesArrow")} />
+              </button>
+            </>
+          ) : (
+            <div className={cn("storyEmpty")}>
+              <p>아직 도와드린 이야기가 없습니다.</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

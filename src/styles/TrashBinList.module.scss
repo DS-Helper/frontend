@@ -1,0 +1,271 @@
+$pageMinHeight: calc(100vh - 6rem);
+
+.pageRoot {
+  box-sizing: border-box;
+}
+
+.desktopOnlyMessage {
+  display: none;
+}
+
+.mobileMain {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: $pageMinHeight;
+  height: $pageMinHeight;
+}
+
+.mapShell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+
+.mapErrorBanner {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 1rem 1.4rem;
+  font-size: var(--caption-size);
+  font-weight: var(--caption-weight);
+  line-height: 1.45;
+  color: var(--color-semantic-text-danger);
+  background: var(--color-semantic-bg-danger-soft);
+  border-bottom: 1px solid var(--color-semantic-border-danger);
+}
+
+.mapContainer {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.bottomSheetBackdrop {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  z-index: 20;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: rgba(47, 59, 53, 0.35);
+  cursor: pointer;
+}
+
+.bottomSheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 21;
+  padding: 2.4rem 1.6rem 5.6rem;
+  box-sizing: border-box;
+  border-radius: 2.4rem 2.4rem 0 0;
+  background: var(--color-semantic-bg-page);
+  box-shadow: 0 -0.4rem 2.4rem rgba(47, 59, 53, 0.12);
+}
+
+.bottomSheetSrTitle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.bottomSheetTopRow {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1.6rem;
+}
+
+.bottomSheetThumbWrap {
+  flex-shrink: 0;
+  width: 9rem;
+  height: 9rem;
+  padding: 0;
+  border: none;
+  border-radius: 0.6rem;
+  overflow: hidden;
+  background: var(--color-semantic-bg-neutral-soft);
+  cursor: zoom-in;
+  display: block;
+}
+
+.bottomSheetThumb {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bottomSheetTextCol {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.bottomSheetBadge {
+  align-self: flex-start;
+  padding: 0.4rem 0.8rem;
+  border-radius: 50rem;
+  font-size: var(--label-S-size);
+  font-weight: var(--label-S-weight);
+  line-height: 1.2;
+  color: var(--color-semantic-text-inverse);
+  background: var(--color-semantic-bg-brand);
+}
+
+.bottomSheetDescription {
+  margin: 0;
+  font-size: var(--body-M-size);
+  font-weight: var(--body-M-weight);
+  line-height: 1.45;
+  color: var(--color-primitive-gray-700);
+}
+
+.bottomSheetDirections {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 4.8rem;
+  border: none;
+  border-radius: 1rem;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--color-semantic-text-inverse);
+  background: var(--color-semantic-bg-brand);
+  cursor: pointer;
+  padding: 1.1rem 0;
+}
+
+.mapTapSheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 21;
+  padding: 2rem 1.6rem 5.6rem;
+  box-sizing: border-box;
+  border-radius: 2.4rem 2.4rem 0 0;
+  background: var(--color-semantic-bg-page);
+  box-shadow: 0 -0.4rem 2.4rem rgba(47, 59, 53, 0.12);
+}
+
+.mapTapSheetTitle {
+  margin: 0 0 0.8rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--color-primitive-gray-600);
+}
+
+.mapTapSheetAddress {
+  margin: 0 0 0.6rem;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-semantic-bg-brand);
+  word-break: keep-all;
+}
+
+.mapTapSheetDistance {
+  margin: 0 0 1.2rem;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--color-primitive-gray-700);
+}
+
+.mapTapSheetMeta {
+  margin: 0 0 1.6rem;
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: var(--color-primitive-gray-700);
+}
+
+/* 썸네일 클릭 → 전체 화면 이미지 모달 */
+.imagePreviewRoot {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.6rem;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.imagePreviewBackdrop {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.imagePreviewFrame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: min(100%, calc(100vw - 3.2rem));
+  pointer-events: auto;
+}
+
+.imagePreviewImageWrap {
+  position: relative;
+  width: 100%;
+  max-height: min(72vh, 85dvh);
+  border-radius: 0.6rem;
+  overflow: hidden;
+  line-height: 0;
+  box-shadow: 0 0.8rem 3.2rem rgba(0, 0, 0, 0.28);
+}
+
+.imagePreviewImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(72vh, 85dvh);
+  object-fit: contain;
+  border-radius: 1.2rem;
+  background: var(--color-primitive-gray-800);
+}
+
+@media (min-width: 612px) {
+  .pageRoot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: $pageMinHeight;
+  }
+
+  .desktopOnlyMessage {
+    display: block;
+    margin: 0;
+    text-align: center;
+    font-size: 1.7rem;
+    font-weight: 500;
+    color: var(--color-primitive-gray-800);
+  }
+
+  .mobileMain {
+    display: none;
+  }
+}

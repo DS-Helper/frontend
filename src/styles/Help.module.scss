@@ -52,12 +52,13 @@
 }
 
 .title {
-  font-size: 4rem;
-  font-weight: 700;
+  font-size: var(--Display-size);
+  font-weight: var(--Display-weight);
   text-align: center;
 
   @media (max-width: 611px) {
-    font-size: 3.2rem;
+    font-size: var(--title-L-size);
+    font-weight: var(--title-L-weight);
     text-align: left;
     padding: 0 2rem;
   }
@@ -72,13 +73,14 @@
 
   @media (max-width: 611px) {
     align-items: flex-start;
-    padding: 0 2rem;
+    padding: 0 1.6rem;
   }
 }
 
 .secondTitle {
-  font-size: 2.0rem;
-  font-weight: 600;
+  font-size: var(--body-L-size);
+  font-weight: var(--body-L-weight);
+  color: var(--color-semantic-text-primary);
 }
 
 .list {
@@ -101,8 +103,8 @@
       cursor: pointer;
       position: relative;
       transition: all 0.2s ease;
-      background-color: var(--grey-200);
-      border-radius: 0.4rem;
+      border: 1px solid var(--color-semantic-border-default);
+      border-radius: 0.5rem;
       flex-shrink: 0;
       margin-top: 0.1rem;
 
@@ -113,7 +115,7 @@
         left: 50%;
         width: 0.6rem;
         height: 1rem;
-        border: solid var(--grey-500);
+        border: solid #fff;
         border-width: 0 0.2rem 0.2rem 0;
         transform: translate(-50%, -60%) rotate(45deg);
         opacity: 0.6;
@@ -124,19 +126,19 @@
       }
 
       &:checked {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
+        background-color: var(--color-semantic-bg-brand);
+        border-color: var(--color-semantic-text-brand);
 
         &::before {
-          border-color: #fff;
+          border-color: var(--color-semantic-text-inverse);
           opacity: 1;
         }
       }
     }
 
     p {
-      font-size: 1.7rem;
-      font-weight: 400;
+      font-size: var(--body-M-size);
+      font-weight: var(--body-M-weight);
       line-height: 150%;
       margin: 0;
     }
@@ -148,11 +150,18 @@
 }
 
 .nextButton {
-  padding: 1.4rem 17rem;
-  background-color: var(--primary-color);
-  border-radius: 1.4rem;
-  color: #fff;
+  width: 100%;
+  max-width: 35rem;
+  padding: 1.4rem 0;
+  background-color: var(--color-semantic-bg-brand);
+  border-radius: 1rem;
+  color: var(--color-semantic-text-inverse);
   margin: 5rem 0 8rem;
+}
+
+.nextButtonDisabled {
+  background-color: var(--color-semantic-bg-disabled);
+  color: var(--color-semantic-text-disabled);
 }
 
 .bannerWrapper {

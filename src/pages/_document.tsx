@@ -4,29 +4,34 @@ export default function Document() {
   return (
     <Html lang="ko">
       <Head>
-        {/* GTM */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
-(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-W9SFJS2J');
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-W9SFJS2J');
             `,
           }}
         />
         {/* 기본 META 태그 */}
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         
         <meta name="theme-color" content="#0DBA53" />
+
         <link rel="canonical" href="https://www.dshelper.kr/" />
         <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css"
+          crossOrigin="anonymous"
+        />
+        
       </Head>
       <body>
-        {/* GTM */}
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-W9SFJS2J"

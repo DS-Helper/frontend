@@ -4,7 +4,7 @@
   background-color: #fff;
   padding: 1.8rem 4.8rem;
   color: var(--grey-800);
-  border-bottom: 1px solid var(--grey-200);
+  border-bottom: 1px solid #eee;
   display: flex;
   align-items: center;
   position: fixed;
@@ -26,7 +26,6 @@
 
 .headerLogo {
   width: 10rem;
-  margin-right: 17rem;
 
   img {
     cursor: pointer;
@@ -62,15 +61,17 @@
 
 .userMenuIconBell, 
 .userMenuIconMenu {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3rem;
+  height: 3rem;
+  color: var(--color-semantic-icon-tertiary);
 }
 
 .login {
   padding: 0.6rem 2rem;
-  border: 1px solid var(--grey-300);
+  border: 1px solid var(--color-semantic-border-default);
   border-radius: 0.5rem;
-  font-size: 1.5rem;
-  color: var(--grey-800);
+  font-size: var(--label-M-size);
+  font-weight: var(--label-M-weight);
+  color: var(--color-semantic-text-primary);
   white-space: nowrap;
 }

@@ -1,0 +1,225 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+}
+
+.modalBox {
+  background-color: #fff;
+  border-radius: 1.2rem;
+  max-width: 48rem;
+  width: 100%;
+  padding: 7.8rem 2.4rem 2.4rem;
+  position: relative;
+
+  &.modalBoxSuccess {
+    max-width: 37.5rem;
+    padding: 5.2rem 2.4rem 3.6rem;
+  }
+}
+
+.closeButton {
+  position: absolute;
+  top: 1.2rem;
+  right: 2.4rem;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+  border: none;
+  background: none;
+  line-height: 1;
+  color: var(--grey-500);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    color: var(--grey-700);
+  }
+}
+
+.closeIcon {
+  display: block;
+}
+
+.title {
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: var(--grey-800);
+  margin-bottom: 1.8rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.input {
+  width: 100%;
+  padding: 1.4rem 1.8rem;
+  font-size: 1.7rem;
+  color: #222;
+  background-color: #fff;
+  border: 1px solid var(--grey-300);
+  border-radius: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  margin-bottom: 1.2rem;
+
+  &::placeholder {
+    color: var(--grey-500);
+  }
+
+  &:focus {
+    border-color: var(--primary-color);
+  }
+}
+
+.helperText {
+  font-size: 1.7rem;
+  color: var(--grey-600);
+  line-height: 1.4;
+  margin-bottom: 4.2rem;
+
+  .formCode & {
+    margin-bottom: 1.2rem;
+  }
+}
+
+.resendRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4.2rem;
+}
+
+.resendButton {
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 1.7rem;
+  color: #222;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:disabled {
+    color: var(--grey-400);
+    cursor: not-allowed;
+  }
+}
+
+.timer {
+  font-size: 1.7rem;
+  font-weight: 500;
+  color: var(--red-color);
+
+  &.expired {
+    color: var(--grey-500);
+  }
+}
+
+.submitButton {
+  width: 100%;
+  padding: 1rem 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: #fff;
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 0.7rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: var(--primary-color-dark);
+  }
+}
+
+// 인증 완료 성공 화면
+.successContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.successIcon {
+  width: 6.4rem;
+  height: 6.4rem;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+}
+
+.successCheckmark {
+  width: 6.4rem;
+  height: 6.4rem;
+  object-fit: contain;
+}
+
+.successTitle {
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: var(--grey-800);
+  margin-bottom: 4.2rem;
+  text-align: center;
+}
+
+@media (max-width: 611px) {
+  .overlay {
+    padding: 1.6rem;
+  }
+
+  .modalBox {
+    padding: 2rem 2.4rem 2.4rem;
+  }
+
+  .title {
+    font-size: 1.7rem;
+    margin-bottom: 1.6rem;
+  }
+
+  .input {
+    font-size: 1.4rem;
+  }
+
+  .helperText {
+    font-size: 1.2rem;
+  }
+
+  .resendButton {
+    font-size: 1.4rem;
+  }
+
+  .timer {
+    font-size: 1.4rem;
+  }
+
+  .submitButton {
+    font-size: 1.5rem;
+  }
+
+  .successIcon {
+    width: 6.4rem;
+    height: 6.4rem;
+    margin-bottom: 1.6rem;
+  }
+
+  .successTitle {
+    font-size: 1.7rem;
+    margin-bottom: 2.4rem;
+  }
+}

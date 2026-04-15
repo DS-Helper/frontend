@@ -40,7 +40,7 @@ export default function CompletePage() {
           <h1 className={cn("completeTitle")}>도움 요청이 접수되었어요</h1>
           <p className={cn("completeMessage")}>
             헬퍼가 예약 내용을 확인한 후 확정 여부를 알려드릴게요. 
-            확정되면 알림을 보내드릴 예정이에요.
+            <br />확정되면 알림을 보내드릴 예정이에요.
           </p>
           <div className={cn("imageBox")}>
             <Image src={image} alt="도움 요청 접수 완료" className={cn("completeImage")} />

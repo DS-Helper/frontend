@@ -2,7 +2,6 @@
   max-width: 57rem;
   margin: 0 auto;
   padding: 7rem 2rem 17.8rem;
-  background-color: #ffffff;
 
   @media (max-width: 611px) {
     padding: 7rem 2rem 10.6rem;
@@ -17,14 +16,12 @@
 .error {
   text-align: center;
   padding: 6rem 0;
-  color: var(--grey-600);
   font-size: 1.7rem;
 }
 
 .article {
   max-width: 80rem;
   margin: 0 auto;
-  background-color: #fff;
 }
 
 .header {
@@ -34,28 +31,32 @@
 
 .title {
   font-size: 4.6rem;
-  color: #222222;
   line-height: 1.4;
   margin-bottom: 1.8rem;
   word-break: keep-all;
 
   @media (max-width: 611px) {
-    font-size: 3.2rem;
+    font-size: var(--title-XL-size);
+    font-weight: var(--title-XL-weight);
   }
 }
 
 .date {
   display: block;
   font-size: 1.7rem;
-  color: var(--grey-800);
   font-weight: 400;
+
+  @media (max-width: 611px) {
+    font-size: var(--caption-size);
+    font-weight: var(--caption-weight);
+  }
 }
 
 .imageWrapper {
   width: 100%;
   margin-bottom: 2.8rem;
   overflow: hidden;
-  background-color: var(--grey-200);
+  background-color: var(--color-semantic-bg-neutral-soft);
 
   @media (max-width: 611px) {
     margin-bottom: 3rem;
@@ -75,14 +76,13 @@
 
 .contentText {
   font-size: 1.7rem;
-  color: var(--grey-800);
   line-height: 1.8;
   white-space: pre-wrap;
   word-wrap: break-word;
 
   @media (max-width: 611px) {
-    font-size: 1.5rem;
-    line-height: 1.7;
+    font-size: var(--body-M-size);
+    font-weight: var(--body-M-weight);
   }
 }
 
@@ -102,26 +102,14 @@
   align-items: center;
   justify-content: center;
   gap: 0.8rem;
-  padding: 1.2rem 2.4rem;
-  background-color: var(--primary-color-soft);
-  color: var(--primary-color);
+  padding: 0.8rem 1.2rem;
+  background-color: var(--color-primitive-primary-100);
+  color: var(--color-primitive-primary-500);
   border: none;
-  border-radius: 1.2rem;
-  font-size: 1.6rem;
+  border-radius: 0.7rem;
+  font-size: 1.5rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: var(--primary-color);
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(13, 186, 83, 0.3);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
 
   @media (max-width: 611px) {
     padding: 1rem 2rem;
@@ -131,8 +119,8 @@
 }
 
 .shareIcon {
-  width: 2rem;
-  height: 2rem;
+  width: 3rem;
+  height: 3rem;
 
   @media (max-width: 611px) {
     width: 1.6rem;
@@ -145,8 +133,8 @@
   bottom: 3rem;
   left: 50%;
   transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.8);
-  color: #fff;
+  background-color: var(--color-semantic-bg-enabled);
+  color: var(--color-semantic-text-inverse);
   padding: 1.2rem 2.4rem;
   border-radius: 1.2rem;
   font-size: 1.4rem;
