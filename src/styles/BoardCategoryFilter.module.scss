@@ -111,6 +111,10 @@
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
 }
 
 .mobileCategoryConfirmButtonActive {

@@ -4,7 +4,10 @@ import styles from "@/styles/Modify.module.scss";
 import Image from "next/image"
 import classNames from "classnames/bind";
 import DateTimeSelector from "@/components/Calendar/DateTimeSelector";
-import { postPersonalReservation } from "@/lib/apis/reservationUser";
+import {
+  getPersonalReservation,
+  postPersonalReservation,
+} from "@/lib/apis/reservationUser";
 import { postOrganizationReservation } from "@/lib/apis/reservationOrg";
 import { useUserStore } from "@/lib/store/userStore";
 import { loadDaumPostcodeScript } from "@/lib/daum/loadPostcodeScript";
@@ -248,6 +251,23 @@ export default function ModifyPage() {
 
     if (!hasErrors) {
       try {
+        if (type === "personal") {
+          const reservationCheckRes = await getPersonalReservation({
+            params: { page: 0, size: 1 },
+          });
+          const existingReservations =
+            reservationCheckRes?.data?.content ??
+            reservationCheckRes?.data ??
+            [];
+          if (
+            Array.isArray(existingReservations) &&
+            existingReservations.length > 0
+          ) {
+            alert("도움 요청한 내역이 있습니다.");
+            return;
+          }
+        }
+
         // visitDate는 이미 YYYY-MM-DD 형식이므로 그대로 사용
         const formattedVisitDate = visitDate;
 

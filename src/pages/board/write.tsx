@@ -10,6 +10,8 @@ import { BsCardImage } from "react-icons/bs";
 import { IoIosArrowDown, IoMdClose } from "react-icons/io";
 
 const cn = classNames.bind(styles);
+const MAX_UPLOAD_IMAGE_SIZE_MB = 10;
+const MAX_UPLOAD_IMAGE_SIZE_BYTES = MAX_UPLOAD_IMAGE_SIZE_MB * 1024 * 1024;
 
 /** POST /boards 응답에서 생성된 게시글 id 추출 (백엔드 필드명 차이 대응) */
 function getCreatedBoardIdFromResponse(body: unknown): string | null {
@@ -158,8 +160,14 @@ export default function BoardWritePage() {
       input.value = "";
       return;
     }
+    const selectedFile = list[0];
+    if (selectedFile.size > MAX_UPLOAD_IMAGE_SIZE_BYTES) {
+      alert(`이미지는 ${MAX_UPLOAD_IMAGE_SIZE_MB}MB 이하만 업로드할 수 있습니다.`);
+      input.value = "";
+      return;
+    }
     // input.value를 비우면 FileList가 즉시 비워져, 배치된 setState 업데이터가 빈 목록을 읽을 수 있음 (textarea 포커스 시 특히 잘 재현됨)
-    const added = [list[0]];
+    const added = [selectedFile];
     input.value = "";
     setExistingImageUrl(null);
     setImageFiles(added);
