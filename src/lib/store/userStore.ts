@@ -8,7 +8,7 @@ import { getCheckAuth as getOrgCheckAuth } from "../apis/authOrganization";
 const DEV_MOCK_LOGGED_IN_INDIVIDUAL = false;
 
 /** 모의 로그인 시 API `Authorization`에 실릴 access/refresh 값 */
-const DEV_MOCK_PLACEHOLDER_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjU1YTE1NTI0LTU0MjQtNDQyNS1iMzY0LWU3MGZlYzM5MTBjOSIsInJvbGUiOiJVU0VSIiwidHlwZSI6IlBFUlNPTkFMIiwidG9rZW5UeXBlIjoiYWNjZXNzVG9rZW4iLCJpYXQiOjE3NzYyMjQ2MzksImV4cCI6MTc3NjIyODIzOX0._BanaSMNrJ0v7D7jA-xB9LGj5E3Npa3w0N8YdYqj3XA";
+const DEV_MOCK_PLACEHOLDER_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjU1YTE1NTI0LTU0MjQtNDQyNS1iMzY0LWU3MGZlYzM5MTBjOSIsInJvbGUiOiJVU0VSIiwidHlwZSI6IlBFUlNPTkFMIiwidG9rZW5UeXBlIjoiYWNjZXNzVG9rZW4iLCJpYXQiOjE3NzYyMzM2ODcsImV4cCI6MTc3NjIzNzI4N30.cUybd7eILIcge6jcqbYxSu6WNAWqksYWLQGVlj5iKDA";
 
 interface UserState {
   user: User | null;
@@ -26,7 +26,7 @@ interface UserState {
 
 type UserPersistedSlice = Pick<
   UserState,
-  "user" | "userId" | "isVerified" | "userType"
+  "user" | "userId" | "isVerified" | "userType" | "accessToken" | "refreshToken"
 >;
 
 function normalizeToken(value: unknown): string | null {
@@ -116,6 +116,8 @@ export const useUserStore = create(
         userId: state.userId,
         isVerified: state.isVerified,
         userType: state.userType,
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
       }),
       onRehydrateStorage: () => () => {
         if (DEV_MOCK_LOGGED_IN_INDIVIDUAL) {
