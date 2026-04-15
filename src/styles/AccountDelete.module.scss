@@ -1,0 +1,158 @@
+.page {
+  min-height: calc(100vh - 6rem);
+  display: flex;
+  justify-content: center;
+  padding-top: 7rem;
+  background: var(--color-semantic-bg-page);
+}
+
+.panel {
+  width: 100%;
+  max-width: 53.8rem;
+  background: var(--color-semantic-bg-page);
+  color: #38393f;
+}
+
+.title {
+  margin-bottom: 4.7rem;
+  font-size: var(--Display-size);
+  font-weight: var(--Display-weight);
+}
+
+.section {
+  margin-bottom: 2.4rem;
+}
+
+.sectionTitle {
+  margin-bottom: 1.2rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--color-primitive-gray-800);
+}
+
+.list {
+  margin: 0;
+  list-style: none;
+  font-weight: 400;
+  font-size: 1.6rem;
+  line-height: 1.6;
+  color: var(--color-primitive-gray-800);
+
+  li {
+    position: relative;
+    padding-left: 1.6rem;
+  }
+
+  li::before {
+    content: "·";
+    position: absolute;
+    left: 0.4rem;
+    top: 0;
+    font-weight: 700;
+    color: currentcolor;
+  }
+}
+
+.retentionNotice {
+  padding-left: 1.6rem;
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--color-semantic-bg-brand);
+}
+
+.deleteButton {
+  width: 100%;
+  padding: 1.35rem 0;
+  border: none;
+  border-radius: 1rem;
+  background: var(--color-semantic-bg-danger-soft);
+  color: var(--color-semantic-text-danger);
+  font-size: 1.6rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.loadingText {
+  margin: 3.2rem 0 0;
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--color-semantic-text-secondary);
+}
+
+.confirmOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.6rem;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+}
+
+.confirmDialog {
+  width: 100%;
+  max-width: 37.5rem;
+  background: #ffffff;
+  border-radius: 1.2rem;
+  padding: 2.4rem;
+  box-sizing: border-box;
+}
+
+.confirmTitle {
+  margin-bottom: 0.8rem;
+  font-size: var(--title-L-size);
+  font-weight: var(--title-L-weight);
+  line-height: 1.4;
+  color: var(--color-semantic-text-primary);
+}
+
+.confirmDescription {
+  margin-bottom: 3rem;
+  font-size: var(--body-M-size);
+  font-weight: var(--body-M-weight);
+  line-height: 1.4;
+  color: var(--color-semantic-text-secondary);
+}
+
+.confirmActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.confirmDeleteButton,
+.confirmCancelButton {
+  border-radius: 1rem;
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 1.15rem 0;
+}
+
+.confirmDeleteButton {
+  border: none;
+  background: var(--color-semantic-bg-danger-soft);
+  color: var(--color-semantic-text-danger);
+}
+
+.confirmCancelButton {
+  border: 1px solid var(--color-semantic-border-default);
+  background: var(--color-semantic-bg-page);
+  color: var(--color-semantic-text-primary);
+}
+
+@media (max-width: 611px) {
+  .page {
+    padding: 3.2rem 1.6rem;
+  }
+
+  .confirmDialog {
+    max-width: 34.3rem;
+  }
+}
+

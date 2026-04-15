@@ -13,6 +13,8 @@ import { IoMdClose } from "react-icons/io";
 import editIcon from "@/public/boardPencilIcon.svg";
 
 const cn = classNames.bind(styles);
+const HIDDEN_PROFILE_EMAILS = new Set(["juacheon@gmail.com"]);
+const HIDDEN_PROFILE_PHONES = new Set(["010-0000-0000"]);
 
 export default function AccountPage() {
   const router = useRouter();
@@ -262,8 +264,14 @@ export default function AccountPage() {
   }, [myInfo?.birthyear, genderText]);
 
   const displayName = myInfo?.name?.trim() || "사용자";
-  const displayEmail = myInfo?.email?.trim() ?? "";
-  const displayPhone = myInfo?.phoneNumber?.trim() ?? "";
+  const rawEmail = myInfo?.email?.trim() ?? "";
+  const rawPhone = myInfo?.phoneNumber?.trim() ?? "";
+  const normalizedPhoneDigits = rawPhone.replace(/\D/g, "");
+  const displayEmail = HIDDEN_PROFILE_EMAILS.has(rawEmail.toLowerCase()) ? "" : rawEmail;
+  const displayPhone =
+    HIDDEN_PROFILE_PHONES.has(rawPhone) || normalizedPhoneDigits === "01000000000"
+      ? ""
+      : rawPhone;
   const profileImageSrc = myInfo?.profileImageUrl?.trim() || "/userIconMypage.svg";
 
   return (
