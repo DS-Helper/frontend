@@ -1,28 +1,77 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
-import styles from "@/components/oauth/OAuthCallbackLayout.module.scss";
+import { useUserStore } from "@/lib/store/userStore";
+import { getLogin } from "@/lib/apis/authUser";
 
-/**
- * 예전 redirect URI(`/oauth/kakao/login`)로 돌아오는 요청을 `/kakao/callback`으로 넘깁니다.
- */
-export default function KakaoLoginLegacyRedirectPage() {
+export default function KakaoLoginPage() {
   const router = useRouter();
+  const { setIsVerified } = useUserStore();
+
+  const handleKakaoLogin = useCallback(async (code: string) => {
+    try {
+      // getLogin API 호출 (code를 파라미터로 전달)
+      const response = await getLogin({ code });
+      
+      if (response && response.data) {
+        const data = response.data;
+        
+        if (data.token) {
+          // 사용자 정보 저장
+          if (data.user) {
+            const { setUser, setUserType } = useUserStore.getState();
+            setUser(data.user);
+            setUserType('individual');
+          }
+          
+          // 인증 상태 업데이트 (Zustand persist로 자동 저장됨)
+          setIsVerified(true);
+          
+          alert('카카오 로그인 성공!');
+          router.push('/');
+        } else {
+          throw new Error(data.message || '로그인에 실패했습니다.');
+        }
+      } else {
+        throw new Error('로그인 요청에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('로그인 처리 중 오류:', error);
+      alert('로그인 처리 중 오류가 발생했습니다.');
+      router.push('/login');
+    }
+  }, [router, setIsVerified]);
 
   useEffect(() => {
-    if (!router.isReady) return;
-    console.log("[kakao legacy login-url] asPath", router.asPath);
-    const qIndex = router.asPath.indexOf("?");
-    const query = qIndex >= 0 ? router.asPath.slice(qIndex) : "";
-    console.log("[kakao legacy login-url] redirectQuery", query);
+    // URL에서 authorization code 추출
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const error = urlParams.get('error');
 
-    void router.replace(`/kakao/callback${query}`);
-  }, [router.isReady, router.asPath, router]);
+    if (error) {
+      alert('카카오 로그인에 실패했습니다.');
+      router.push('/login');
+      return;
+    }
+
+    if (code) {
+      handleKakaoLogin(code);
+    } else {
+      // code가 없으면 로그인 페이지로 리다이렉트
+      router.push('/login');
+    }
+  }, [router, handleKakaoLogin]);
 
   return (
-    <div className={styles.wrap}>
-      <p className={styles.message}>로그인 처리 페이지로 이동 중…</p>
+    <div style={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      height: '100vh',
+      fontSize: '18px'
+    }}>
+      카카오 로그인 처리 중...
     </div>
   );
 }

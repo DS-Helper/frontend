@@ -10,7 +10,6 @@ import { IoChevronDown } from "react-icons/io5";
 import Image from 'next/image';
 import mapIcon from "@/public/mapIcon.svg";
 import calendarIcon from "@/public/calendarIcon.svg";
-import clockIcon from "@/public/HelpListClockIcon.svg";
  
 const cn = classNames.bind(styles);
 const detailCn = classNames.bind(detailStyles);
@@ -396,7 +395,7 @@ export default function HelpListPage() {
           {/* 데이터가 없을 때 */}
           {!isApiLoading && filteredRequests.length === 0 && (
             <div className={cn("emptyState")}>
-              <p>예약이 없습니다.</p>
+              <p>해당 상태의 예약이 없습니다.</p>
             </div>
           )}
           
@@ -433,9 +432,7 @@ export default function HelpListPage() {
 
                 {/* 시간 정보 */}
                 <div className={cn("timeInfo")}>
-                  <span className={cn("clockIcon")}>
-                    <Image width={24} height={24} alt="시계" src={clockIcon} />
-                  </span>
+                  <span className={cn("clockIcon")}>🕐</span>
                   <span className={cn("timeRange")}>
                     {formatTime(request.startTime || '')} ~ {formatTime(request.endTime || '')}
                   </span>
@@ -488,6 +485,13 @@ export default function HelpListPage() {
               스크롤 감지 영역 (더 많은 데이터 로딩 중...)
             </div>
           )}
+          
+          {/* 더 이상 로드할 항목이 없을 때 */}
+          {!hasMorePages && filteredRequests.length > 0 && (
+            <div className={cn("endMessage")}>
+              모든 도움 요청을 불러왔습니다.
+            </div>
+          )}
         </div>
       </main>
       
@@ -525,6 +529,7 @@ export default function HelpListPage() {
 
                   {/* 메인 콘텐츠 */}
                   <div className={detailCn("mainContent")}>
+                    {/* 날짜 및 시간 */}
                     <section className={detailCn("infoSection", "infoDate")}>
                       <h3 className={detailCn("sectionTitle")}>날짜 및 시간</h3>
                       <div className={detailCn("infoRow")}>

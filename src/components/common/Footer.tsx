@@ -14,7 +14,7 @@ export default function Footer() {
           <li>대표: 신인호</li>
         </ul>
         <p className={cn("footerTitle")}>연락처</p>
-        <ul className={cn("footerInfo", "footerInfoContact")}>
+        <ul className={cn("footerInfo")}>
           <li>전화번호 : 010-5250-9548</li>
           <li>이메일 : dshelper77@gmail.com</li>
         </ul>

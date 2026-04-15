@@ -52,13 +52,12 @@
 }
 
 .title {
-  font-size: var(--Display-size);
-  font-weight: var(--Display-weight);
+  font-size: 4rem;
+  font-weight: 700;
   text-align: center;
 
   @media (max-width: 611px) {
-    font-size: var(--title-L-size);
-    font-weight: var(--title-L-weight);
+    font-size: 3.2rem;
     text-align: left;
     padding: 0 2rem;
   }
@@ -73,14 +72,13 @@
 
   @media (max-width: 611px) {
     align-items: flex-start;
-    padding: 0 1.6rem;
+    padding: 0 2rem;
   }
 }
 
 .secondTitle {
-  font-size: var(--body-L-size);
-  font-weight: var(--body-L-weight);
-  color: var(--color-semantic-text-primary);
+  font-size: 2.0rem;
+  font-weight: 600;
 }
 
 .list {
@@ -103,8 +101,8 @@
       cursor: pointer;
       position: relative;
       transition: all 0.2s ease;
-      border: 1px solid var(--color-semantic-border-default);
-      border-radius: 0.5rem;
+      background-color: var(--grey-200);
+      border-radius: 0.4rem;
       flex-shrink: 0;
       margin-top: 0.1rem;
 
@@ -115,7 +113,7 @@
         left: 50%;
         width: 0.6rem;
         height: 1rem;
-        border: solid #fff;
+        border: solid var(--grey-500);
         border-width: 0 0.2rem 0.2rem 0;
         transform: translate(-50%, -60%) rotate(45deg);
         opacity: 0.6;
@@ -126,19 +124,19 @@
       }
 
       &:checked {
-        background-color: var(--color-semantic-bg-brand);
-        border-color: var(--color-semantic-text-brand);
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
 
         &::before {
-          border-color: var(--color-semantic-text-inverse);
+          border-color: #fff;
           opacity: 1;
         }
       }
     }
 
     p {
-      font-size: var(--body-M-size);
-      font-weight: var(--body-M-weight);
+      font-size: 1.7rem;
+      font-weight: 400;
       line-height: 150%;
       margin: 0;
     }
@@ -150,18 +148,11 @@
 }
 
 .nextButton {
-  width: 100%;
-  max-width: 35rem;
-  padding: 1.4rem 0;
-  background-color: var(--color-semantic-bg-brand);
-  border-radius: 1rem;
-  color: var(--color-semantic-text-inverse);
+  padding: 1.4rem 17rem;
+  background-color: var(--primary-color);
+  border-radius: 1.4rem;
+  color: #fff;
   margin: 5rem 0 8rem;
-}
-
-.nextButtonDisabled {
-  background-color: var(--color-semantic-bg-disabled);
-  color: var(--color-semantic-text-disabled);
 }
 
 .bannerWrapper {

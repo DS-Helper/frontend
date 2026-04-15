@@ -1,16 +1,12 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "@/styles/Modify.module.scss";
 import Image from "next/image"
 import classNames from "classnames/bind";
 import DateTimeSelector from "@/components/Calendar/DateTimeSelector";
-import {
-  getPersonalReservation,
-  postPersonalReservation,
-} from "@/lib/apis/reservationUser";
+import { postPersonalReservation } from "@/lib/apis/reservationUser";
 import { postOrganizationReservation } from "@/lib/apis/reservationOrg";
-import { useUserStore } from "@/lib/store/userStore";
-import { loadDaumPostcodeScript } from "@/lib/daum/loadPostcodeScript";
+import { useUserStore } from "@/lib/store/userStore"; 
 
 const cn = classNames.bind(styles);
 
@@ -19,17 +15,6 @@ import house from "@/public/helpModify_house.svg"
 import male from "@/public/reservate_male.svg"
 import female from "@/public/reservate_female.svg"
 import both from "@/public/reservate_both.svg"
-
-function formatAddressFromDaumPostcode(data: {
-  userSelectedType: "R" | "J";
-  roadAddress: string;
-  jibunAddress: string;
-  buildingName: string;
-}): string {
-  const line = data.userSelectedType === "R" ? data.roadAddress : data.jibunAddress;
-  const building = data.buildingName?.trim();
-  return building ? `${line} ${building}` : line;
-}
 
 export default function ModifyPage() {
   const router = useRouter();
@@ -41,18 +26,13 @@ export default function ModifyPage() {
   const [organizationName, setOrganizationName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
-  const [detailAddress, setDetailAddress] = useState("");
   const [requirement, setRequirement] = useState("");
-  const [recipientNumber, setRecipientNumber] = useState(1);
+  const [recipientNumber, setRecipientNumber] = useState("");
   const [note, setNote] = useState("");
   const [visitDate, setVisitDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [showErrors, setShowErrors] = useState(false);
-
-  const [postcodeOpenError, setPostcodeOpenError] = useState<string | null>(null);
-  const [postcodeLayerOpen, setPostcodeLayerOpen] = useState(false);
-  const postcodeEmbedRef = useRef<HTMLDivElement | null>(null);
 
   // 사용자 타입에 따라 자동으로 개인/기관 선택
   useEffect(() => {
@@ -62,66 +42,6 @@ export default function ModifyPage() {
       setType('personal');
     }
   }, [userType]);
-
-  useEffect(() => {
-    if (!postcodeLayerOpen) return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setPostcodeLayerOpen(false);
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [postcodeLayerOpen]);
-
-  useEffect(() => {
-    if (!postcodeLayerOpen) return;
-    const host = postcodeEmbedRef.current;
-    if (!host) return;
-
-    let cancelled = false;
-    host.innerHTML = "";
-
-    void (async () => {
-      try {
-        setPostcodeOpenError(null);
-        await loadDaumPostcodeScript();
-        if (cancelled || !host) return;
-        const Postcode = window.daum?.Postcode;
-        if (!Postcode) {
-          throw new Error("우편번호 서비스를 불러오지 못했습니다.");
-        }
-        new Postcode({
-          oncomplete: (data) => {
-            setPostcodeOpenError(null);
-            setAddress(formatAddressFromDaumPostcode(data));
-            setPostcodeLayerOpen(false);
-          },
-          onclose: () => {
-            if (!cancelled) setPostcodeLayerOpen(false);
-          },
-          width: "100%",
-          height: 480,
-          animation: false,
-        }).embed(host);
-      } catch (e) {
-        if (!cancelled) {
-          setPostcodeOpenError(
-            e instanceof Error ? e.message : "우편번호 창을 열 수 없습니다.",
-          );
-          setPostcodeLayerOpen(false);
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-      host.innerHTML = "";
-    };
-  }, [postcodeLayerOpen]);
-
-  const openDaumPostcode = () => {
-    setPostcodeOpenError(null);
-    setPostcodeLayerOpen(true);
-  };
 
   // 휴대폰 번호 포맷팅 함수
   const formatPhoneNumber = (value: string) => {
@@ -157,33 +77,16 @@ export default function ModifyPage() {
   };
 
   // 도움받는 사람 수 검증 함수
-  const validateRecipientNumber = (number: number): boolean => {
-    // 1 이상의 정수인지 확인
-    return Number.isInteger(number) && number > 0;
+  const validateRecipientNumber = (number: string): boolean => {
+    // 숫자만 있고 1 이상의 정수인지 확인
+    return /^\d+$/.test(number) && parseInt(number) > 0;
   };
 
-  const getSelectedMinutes = (start: string, end: string): number => {
-    const parse = (time: string): number | null => {
-      const [hh, mm] = time.split(":");
-      const h = Number(hh);
-      const m = Number(mm);
-      if (!Number.isFinite(h) || !Number.isFinite(m)) return null;
-      return h * 60 + m;
-    };
-    const startMinutes = parse(start);
-    const endMinutes = parse(end);
-    if (startMinutes == null || endMinutes == null) return 0;
-    return endMinutes - startMinutes;
-  };
-
-  // 도움받는 사람 수 증감 핸들러 (최소 1명)
-  const handleRecipientCountChange = (type: "increase" | "decrease") => {
-    setRecipientNumber((prev) => {
-      if (type === "decrease") {
-        return Math.max(1, prev - 1);
-      }
-      return prev + 1;
-    });
+  // 숫자만 입력 가능한 핸들러
+  const handleNumberOnlyChange = (value: string, setter: (value: string) => void) => {
+    // 숫자만 추출
+    const numbers = value.replace(/\D/g, '');
+    setter(numbers);
   };
 
   // 달력 변경 시 validation 상태 초기화
@@ -211,18 +114,6 @@ export default function ModifyPage() {
     
   };
 
-  const isFormValid =
-    name.trim() !== "" &&
-    phoneNumber.trim() !== "" &&
-    validatePhoneNumber(phoneNumber) &&
-    address.trim() !== "" &&
-    requirement.trim() !== "" &&
-    validateRecipientNumber(recipientNumber) &&
-    visitDate.trim() !== "" &&
-    startTime.trim() !== "" &&
-    endTime.trim() !== "" &&
-    (type !== "org" || organizationName.trim() !== "");
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -238,42 +129,16 @@ export default function ModifyPage() {
       return;
     }
 
-    if (getSelectedMinutes(startTime, endTime) < 30) {
-      alert("시간은 30분 이상 선택해주세요.");
-      return;
-    }
-
     // 검증 통과 후 에러 상태 표시
     setShowErrors(true);
 
     // 필수 필드 검증 (특이사항은 선택 필드)
-    const hasErrors = !isFormValid;
+    const hasErrors = !name || !phoneNumber || !address || !requirement || !recipientNumber || (type === 'org' && !organizationName);
 
     if (!hasErrors) {
       try {
-        if (type === "personal") {
-          const reservationCheckRes = await getPersonalReservation({
-            params: { page: 0, size: 1 },
-          });
-          const existingReservations =
-            reservationCheckRes?.data?.content ??
-            reservationCheckRes?.data ??
-            [];
-          if (
-            Array.isArray(existingReservations) &&
-            existingReservations.length > 0
-          ) {
-            alert("도움 요청한 내역이 있습니다.");
-            return;
-          }
-        }
-
         // visitDate는 이미 YYYY-MM-DD 형식이므로 그대로 사용
         const formattedVisitDate = visitDate;
-
-        const fullAddress = detailAddress.trim()
-          ? `${address} ${detailAddress.trim()}`
-          : address;
 
         const payload = type === 'personal' 
           ? {
@@ -282,10 +147,10 @@ export default function ModifyPage() {
               visitDate: formattedVisitDate,
               startTime,
               endTime,
-              address: fullAddress,
+              address,
               requirement,
               recipientGenderType,
-              recipientNumber: String(recipientNumber),
+              recipientNumber,
               note,
             }
           : {
@@ -295,10 +160,10 @@ export default function ModifyPage() {
               visitDate: formattedVisitDate,
               startTime,
               endTime,
-              address: fullAddress,
+              address,
               requirement,
               recipientGenderType,
-              recipientNumber: String(recipientNumber),
+              recipientNumber,
               note,
             };
   
@@ -343,37 +208,37 @@ export default function ModifyPage() {
       <main className={cn("main")}>
         <h2 className={cn("title")}>정보 입력</h2>
 
-        {/* 개인/기관 선택 */}
-        <div className={cn("toggleGroup")}>
-          <button
-            type="button"
-            onClick={() => setType("personal")}
-            disabled={userType === 'organization'}
-            className={`${cn("toggleButton")} ${
-              type === "personal" ? cn("active") : ""} 
-              ${userType === 'organization' ? cn("disabled") : ""}`}
-          >
-            <Image src={people} width={80} height={80} alt='개인 회원' className={cn("buttonImage")} />
-            <p className={cn("toggleLabel")}>개인</p>
-            <span className={cn("toggleDescription")}>당사자가 아닌, 보호자도 신청 가능!</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setType("org")}
-            disabled={userType === 'individual'}
-            className={`${cn("toggleButton")} ${
-              type === "org" ? cn("active") : ""} 
-              ${userType === 'individual' ? cn("disabled") : ""}`}
-          >
-            <Image src={house} width={80} height={80} alt="기관 회원" className={cn("buttonImage")} />
-            <p className={cn("toggleLabel")}>기관</p>
-          </button>
-        </div>
-
         {/* 달력 자리 - form 밖으로 이동 */}
         <DateTimeSelector onChange={handleDateTimeChange} />
 
         <form onSubmit={handleSubmit} className={cn("form")}>
+          {/* 개인/기관 선택 */}
+          <div className={cn("toggleGroup")}>
+            <button
+              type="button"
+              onClick={() => setType("personal")}
+              disabled={userType === 'organization'}
+              className={`${cn("toggleButton")} ${
+                type === "personal" ? cn("active") : ""} 
+                ${userType === 'organization' ? cn("disabled") : ""}`}
+            >
+              <Image src={people} width={80} height={80} alt='개인 회원' className={cn("buttonImage")} />
+              <p className={cn("toggleLabel")}>개인</p>
+              <span className={cn("toggleDescription")}>당사자가 아닌, 보호자도 신청 가능!</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setType("org")}
+              disabled={userType === 'individual'}
+              className={`${cn("toggleButton")} ${
+                type === "org" ? cn("active") : ""} 
+                ${userType === 'individual' ? cn("disabled") : ""}`}
+            >
+              <Image src={house} width={80} height={80} alt="기관 회원" className={cn("buttonImage")} />
+              <p className={cn("toggleLabel")}>기관</p>
+            </button>
+          </div>
+
           {/* 입력 필드 */}
           <div className={cn("inputGroup")}>
             <label>이름 <span className={cn("required")}>*</span></label>
@@ -384,7 +249,7 @@ export default function ModifyPage() {
           {/* 기관 이름 필드 (기관 사용자만 표시) */}
           {type === 'org' && (
             <div className={cn("inputGroup")}>
-              <label>기관 이름 <span className={cn("required")}>*</span></label>
+              <label>기관 이름 <span className={cn("required")}>^</span></label>
               <input 
                 type="text"
                 value={organizationName} 
@@ -409,35 +274,8 @@ export default function ModifyPage() {
 
           <div className={cn("inputGroup")}>
             <label>방문 주소 <span className={cn("required")}>*</span></label>
-            <input
-              type="text"
-              value={address}
-              readOnly
-              onClick={openDaumPostcode}
-              placeholder="주소 검색"
-              title="우편번호 검색"
-              aria-label="우편번호 검색 열기"
-              className={`${cn("addressReadonlyInput")} ${
-                showErrors && !address ? cn("error") : ""
-              }`}
-            />
-            {showErrors && !address && (
-              <p className={cn("errorMsg")}>주소를 입력해주세요.</p>
-            )}
-            {postcodeOpenError && (
-              <p className={cn("errorMsg")} role="alert">
-                {postcodeOpenError}
-              </p>
-            )}
-          </div>
-
-          <div className={cn("inputGroup")}>
-            <label>상세 주소</label>
-            <input
-              type="text"
-              value={detailAddress}
-              onChange={(e) => setDetailAddress(e.target.value)}
-            />
+            <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} className={showErrors && !address ? cn("error") : undefined} />
+            {showErrors && !address && <p className={cn("errorMsg")}>주소를 입력해주세요.</p>}
           </div>
 
           {/* 도움 요청 내용 */}
@@ -479,29 +317,13 @@ export default function ModifyPage() {
           {/* 사람 수 */}
           <div className={cn("inputGroup")}>
             <label>도움 받는 사람 수 <span className={cn("required")}>*</span></label>
-            <div className={cn("recipientCountControl")}>
-              <button
-                type="button"
-                className={cn("countButton")}
-                onClick={() => handleRecipientCountChange("increase")}
-                aria-label="도움 받는 사람 수 증가"
-              >
-                +
-              </button>
-              <span className={cn("countValue")} aria-live="polite">
-                {recipientNumber}
-              </span>
-              <button
-                type="button"
-                className={cn("countButton")}
-                onClick={() => handleRecipientCountChange("decrease")}
-                disabled={recipientNumber <= 1}
-                aria-label="도움 받는 사람 수 감소"
-              >
-                -
-              </button>
-            </div>
-            {showErrors && recipientNumber < 1 && <p className={cn("errorMsg")}>도움 받는 사람 수를 입력해주세요.</p>}
+            <input 
+              type="text" 
+              value={recipientNumber} 
+              onChange={(e) => handleNumberOnlyChange(e.target.value, setRecipientNumber)} 
+              className={showErrors && !recipientNumber ? cn("error") : undefined} 
+            />
+            {showErrors && !recipientNumber && <p className={cn("errorMsg")}>도움 받는 사람 수를 입력해주세요.</p>}
           </div>
 
           {/* 특이사항 */}
@@ -514,50 +336,11 @@ export default function ModifyPage() {
             />
           </div>
 
-          <button
-            type="submit"
-            className={cn("submitBtn", { disabled: !isFormValid })}
-            disabled={!isFormValid}
-          >
+          <button type="submit" className={cn("submitBtn")}>
             예약하기
           </button>
         </form>
       </main>
-
-      {postcodeLayerOpen && (
-        <div
-          className={cn("postcodeLayerBackdrop")}
-          role="presentation"
-          onClick={() => setPostcodeLayerOpen(false)}
-        >
-          <div
-            className={cn("postcodeLayerPanel")}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="postcodeLayerTitle"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className={cn("postcodeLayerHeader")}>
-              <h3 id="postcodeLayerTitle" className={cn("postcodeLayerTitle")}>
-                주소 검색
-              </h3>
-              <button
-                type="button"
-                className={cn("postcodeLayerClose")}
-                onClick={() => setPostcodeLayerOpen(false)}
-                aria-label="닫기"
-              >
-                ×
-              </button>
-            </div>
-            <div
-              ref={postcodeEmbedRef}
-              className={cn("postcodeEmbedHost")}
-              aria-label="우편번호 검색"
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

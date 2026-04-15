@@ -11,7 +11,6 @@
   width: 33%;
   height: 100%;
   background-color: #fff;
-  border: 1px solid var(--color-primitive-gray-300);
   position: fixed;
   top: 0;
   right: 0;
@@ -41,7 +40,7 @@
   display: flex;
   align-items: center;
   cursor: pointer;
-  color: var(--color-semantic-icon-secondary);
+  color: var(--grey-600);
 }
 
 .sidebarHeaderCloseIcon {
@@ -63,11 +62,11 @@
     height: 5.2rem;
     background-color: #fff;
     padding: 1.3rem 3.6rem;
-    color: var(--color-semantic-text-primary);
+    color: var(--grey-800);
   }
 
   li:first-child {
-    color: var(--color-semantic-text-brand);
+    color: var(--primary-color);
     font-weight: 600;
   }
 }

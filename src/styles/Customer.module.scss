@@ -1,143 +1,147 @@
-.customer {
+.customer{
     width: 100%;
-    min-height: 100vh;
-    height: auto;
     max-width: 57rem;
     margin: 0 auto;
-    padding-top: 7rem;
+    padding: 10rem 0 12rem;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
 
     @media (max-width: 611px) {
-        padding: 0 1.6rem;
+        padding: 2.4rem 2rem 8rem;
     }
 }
 
-.background {
+.background{
     background-color: #fff;
 }
 
-.title {
-    font-size: 3.2rem;
+.title{
+    color: #000;
+    font-size: 3.0rem;
     font-weight: 700;
-    margin-bottom: 1.6rem;
+    margin-bottom: 2rem;
 
     @media (max-width: 611px) {
-        display: none;
+        font-size: 3.2rem;
     }
 }
 
-.tabMenu {
-    width: 100%;
+.tabMenu{
     display: flex;
+    gap: 2rem;
 }
 
-.tab {
-    width: 50%;
-    font-size: 1.5rem;
+.tab{
+    font-size: 2rem;
     padding: 1rem 2.4rem;
     border: none;
     background: none;
     cursor: pointer;
-    color: var(--color-semantic-text-tertiary);
-    border-bottom: 1px solid var(--color-semantic-border-subtle);
+    color: #999;
+    border-bottom: 1px solid transparent;
 
     @media (max-width: 611px) {
         font-size: 1.7rem;
     }
 
-    &.active {
-        color: var(--color-semantic-text-primary);
-        border-bottom: 1px solid var(--color-semantic-border-focus);
-        font-weight: 600;
+    &.active{
+        color: #000;
+        border-bottom: 2px solid #000;
+        font-weight: bold;
     }
 }
 
-.tabContent {
+.tabContent{
     width: 100%;
-    max-width: 80rem;
-    margin-bottom: 12rem;
+    max-width: 80rem; // 탭 컨텐츠 폭 제한
 }
 
-.emptyBox {
+.emptyBox{
     text-align: center;
     padding: 20rem 0;
 }
 
-.emptyMessage {
-    font-size: 1.7rem;
-    font-weight: 600;
-    color: #8F8D8D;
+.emptyMessage{
+    font-size: 1.5rem;
+    color: #777;
     text-align: center;
 }
 
-.loadingBox {
+.loadingBox{
     text-align: center;
     padding: 20rem 0;
 }
 
-.loadingMessage {
+.loadingMessage{
     font-size: 1.5rem;
+    color: #666;
     text-align: center;
 }
 
-.errorMessage {
+.errorBox{
+    text-align: center;
+    padding: 20rem 0;
+}
+
+.errorMessage{
     font-size: 1.5rem;
-    color: var(--color-semantic-text-danger);
+    color: #e74c3c;
     text-align: center;
     margin-bottom: 1rem;
 }
 
-.registerForm {
+.retryBtn{
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.6rem;
+    border-radius: 0.4rem;
+    font-size: 1.4rem;
+    cursor: pointer;
+    
+    &:hover{
+        background-color: #2980b9;
+    }
+}
+
+.registerForm{
     display: flex;
     flex-direction: column;
     gap: 2.4rem;
-    margin-top: 2.4rem;
 }
 
-.formGroupLabel {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.4rem;
-}
-
-.requiredIcon {
-    color: var(--color-semantic-text-danger);
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-.formGroup {
+.formGroup{
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
 
-    label:not(.inquiryFormLabel) {
-        font-weight: var(--label-M-weight);
-        font-size: var(--label-M-size);
+    label{
+        font-weight: 500;
+        font-size: 1.7rem;
+        color: #525151;
     }
 }
 
-.CustomSelectWrapper {
+.CustomSelectWrapper{
     position: relative;
     width: 100%;
 }
 
-.customSelectWrapper {
+.customSelectWrapper{
     position: relative;
     width: 100%;
 }
 
-.customSelect {
+.customSelect{
     appearance: none;
     width: 100%;
     padding: 1.4rem 4rem 1.4rem 1.2rem; // 오른쪽 패딩 추가하여 아이콘 공간 확보
-    font-family: inherit;
     font-size: 1.7rem;
+    font-family: inherit;
     font-weight: 400;
     line-height: 1.5;
-    border: 1px solid var(--color-semantic-border-default);
+    border: 1px solid #d1d1d1;
     border-radius: 1rem;
     background: #fff;
     color: #222222;
@@ -149,184 +153,83 @@
         border-color: #999;
     }
 
-    &.customSelectPlaceholder {
-        color: transparent;
+    option{
+         font-size: 1.7rem;
+         color: #222222;
+         padding: 1.2rem;
     }
 
-    option {
+    // textarea에 대한 스타일
+    &[type="textarea"],
+    &textarea {
+        font-family: inherit;
         font-size: 1.7rem;
-        color: #222222;
-        padding: 1.2rem;
+        font-weight: 400;
+        line-height: 1.5;
+        resize: vertical;
+        min-height: 10rem;
     }
-
 }
 
-// 문의 내용: 문의 유형 선택과 같은 1행 높이로 시작, 입력 줄 수만큼 자동 확장
+// textarea 전용 스타일
 textarea.customSelect {
+    font-family: inherit;
     font-size: 1.7rem;
     font-weight: 400;
     line-height: 1.5;
-    padding: 1.4rem 1.2rem;
-    min-height: calc(1.4rem * 2 + 1.7rem * 1.5);
-    max-height: 70vh;
-    resize: none;
-    overflow-y: hidden;
+    padding: 1.4rem 1.2rem; // textarea는 아이콘이 없으므로 오른쪽 패딩 조정
+    resize: vertical;
+    min-height: 10rem;
+
+    &::placeholder {
+        font-family: inherit;
+        font-size: 1.7rem;
+        font-weight: 400;
+        color: #999;
+    }
 }
 
 .selectIcon {
     position: absolute;
     top: 50%;
-    right: 1.9rem;
+    right: 1.2rem;
     transform: translateY(-50%);
-    width: 2.5rem;
-    height: 2.5rem;
-    color: var(--color-semantic-icon-secondary);
+    width: 3rem;
+    height: 3rem;
+    color: var(--grey-400);
     pointer-events: none;
     z-index: 1;
 }
 
-.inquiryFormLabel {
-    position: relative;
-    display: inline-block;
-    padding-right: 0.8rem;
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: #5c5c5c;
-    line-height: 1.3;
-}
 
-.inquiryRequiredMark {
-    position: absolute;
-    top: 0;
-    right: 0;
-    transform: translate(90%, -0.15em);
-    font-size: 1.1rem;
-    line-height: 1;
-    font-weight: 600;
-}
-
-.inquiryTypeField {
-    position: relative;
-    z-index: 3;
-}
-
-.inquiryTypeTrigger {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    min-height: 5.2rem;
-    padding: 1.4rem 1.4rem 1.4rem 1.6rem;
-    font-family: inherit;
-    font-size: 1.7rem;
-    font-weight: 400;
-    line-height: 1.5;
-    color: #222222;
-    background: #fff;
-    border: 1px solid #d1d1d1;
-    border-radius: 1rem;
-    box-sizing: border-box;
-    cursor: pointer;
-    text-align: left;
-}
-
-.inquiryTypeTriggerPlaceholder .inquiryTypeTriggerText {
-    color: transparent;
-}
-
-.inquiryTypeTriggerText {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.inquiryTypeChevron {
-    flex-shrink: 0;
-    width: 2.4rem;
-    height: 2.4rem;
-    margin-left: 0.6rem;
-    color: var(--color-semantic-icon-secondary);
-    transition: transform 0.2s ease;
-}
-
-.inquiryTypeChevronOpen {
-    transform: rotate(180deg);
-}
-
-.inquiryTypeList {
-    position: absolute;
-    top: calc(100% + 0.35rem);
-    left: 0;
-    right: 0;
-    margin: 0;
-    padding: 0.8rem 0.4rem;
-    list-style: none;
-    background: #fff;
-    border: 1px solid #d1d1d1;
-    border-radius: 0.8rem;
-    box-shadow: 0 0.4rem 2rem rgba(0, 0, 0, 0.07);
-    box-sizing: border-box;
-    z-index: 20;
-}
-
-.inquiryTypeOption {
-    display: block;
-    width: 100%;
-    padding: 0.8rem 1.2rem;
-    font-family: inherit;
-    font-size: 1.7rem;
-    font-weight: 500;
-    line-height: 1.4;
-    text-align: left;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    color: var(--color-semantic-text-primary);
-}
-
-.inquiryTypeOptionActive {
-    background: #f3f3f3;
-    font-weight: 500;
-}
-
-.inquiryList {
+.inquiryList{
     list-style: none;
     padding: 0;
     margin: 0;
     width: 100%;
-    display: flex;
+    display:flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-.inquiryItem {
-    padding: 2.4rem 0;
+.inquiryItem{
+    padding: 2.8rem 0;
     border-bottom: 1px solid #eee;
     display: flex;
     flex-direction: column;
-
-    .status {
+    gap: 1rem;
+    
+    .status{
         width: fit-content;
         font-size: 1.3rem;
         font-weight: bold;
         padding: 0.4rem 0.8rem;
-        border-radius: 0.4rem;
-
-        &.waiting {
-            background-color: var(--color-semantic-bg-neutral-strong);
-            color: var(--color-semantic-text-inverse);
-            margin-bottom: 0.8rem;
-        }
-
-        &.done {
-            background-color: var(--color-semantic-bg-brand);
-            color: var(--color-semantic-text-inverse);
-        }
+        border-radius: 0.7rem;
+        &.waiting { background-color: #aeaeae; color: #fff;}
+        &.done { background-color: #0dba53; color: #fff;}
     }
 
-    .content {
+    .content{
         font-size: 1.7rem;
         color: #000;
         line-height: 1.5;
@@ -334,27 +237,26 @@ textarea.customSelect {
         display: flex;
         flex-wrap: wrap;
         gap: 0.4rem;
-
+        
         .contentText {
             flex: 1;
-            min-width: 0;
-            margin-bottom: 0.2rem;
+            min-width: 0; // flex item이 축소될 수 있도록
         }
-
+        
         //더보기 버튼
-        a.moreLink {
-            color: #666;
-            font-size: 1.7rem;
-            cursor: pointer;
+        a.moreLink { 
+            color: #666; 
+            font-size: 1.7rem; 
+            cursor: pointer; 
             text-decoration: underline;
             white-space: nowrap; // "더보기" 텍스트는 줄바꿈 방지
             flex-shrink: 0; // "더보기"는 축소되지 않도록
-
-            &:hover {
+            
+            &:hover{ 
                 color: #333;
             }
         }
-
+        
         // 한 줄로 제한 (더보기 버튼이 있을 때)
         &.truncated {
             .contentText {
@@ -364,18 +266,15 @@ textarea.customSelect {
             }
         }
     }
-
-    .dateTime {
+    
+    .dateTime{
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 1.2rem;
     }
-
-    .date,
-    .time {
-        font-size: var(--caption-size);
-        font-weight: var(--caption-weight);
-        color: var(--color-semantic-text-tertiary);
+    .date, .time{
+        font-size: 1.5rem;
+        color: #737272;
     }
 }
 
@@ -470,6 +369,7 @@ textarea.customSelect {
 }
 
 .answerModalText {
+    font-family: inherit;
     white-space: pre-wrap;
     word-wrap: break-word;
     font-size: 1.7rem;
@@ -478,38 +378,37 @@ textarea.customSelect {
     margin: 0;
 }
 
-.modalOverlay {
+.modalOverlay{
     position: fixed;
-    top: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    top: 0; bottom: 0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.5);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9999;
 }
 
-.moreBtn {
-    margin-left: 0.4rem;
-    color: #0075ff;
-    cursor: pointer;
-    font-weight: 500;
+.moreBtn{
+    margin-left:0.4rem;
+    color:#0075ff;
+    cursor:pointer;
+    font-weight:500;
 
-    &:hover {
-        text-decoration: underline;
+    &:hover{
+        text-decoration:underline;
     }
 }
 
-.pagination {
+.pagination{
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 0.6rem;
     margin-top: 1.6rem;
 
-    button {
+    button{
         width: 3.6rem;
         height: 3.6rem;
         background-color: #fff;
@@ -519,147 +418,117 @@ textarea.customSelect {
         transition: all 0.2s ease;
 
         //호버 효과 
-        &:hover:not(:disabled) {
+        &:hover:not(:disabled){
             border-color: #666;
             color: #000;
         }
 
         // 비활성화 상태 : 더이상 넘길 페이지가 없을 때 
-        &:disabled {
+        &:disabled{
             opacity: 0.4;
             cursor: not-allowed;
         }
 
-        &.active {
-            color: #fff;
+        &.active{
+            color:#fff;
             font-weight: bold;
         }
     }
 }
 
-.imageWrapper {
-    margin-top: 1rem;
-    width: min(100%, 426px);
-
+.imageWrapper{
+    margin-top: 0.8rem;
+    
     .inquiryImage {
-        width: 100%;
-        max-width: 426px;
+        width: 200px;
         height: auto;
         object-fit: contain;
     }
 }
 
-.contentInput {
-    width: 100%;
+.contentInput{
+    width:100%;
     max-width: 57rem;
     min-height: 7.6rem;
-    padding: 1.6rem;
-    font-size: 1.7rem;
+    padding:1.6rem;
+    font-size:1.7rem;
     line-height: 1rem;
     border: 1px solid #d1d1d1;
-    border-radius: 0 0 1.2rem rgba(0, 0, 0, 0.12);
+    border-radius: 0 0 1.2rem rgba(0,0,0,0.12);
     color: #3C3B3B;
 
-    &:focus {
+    &:focus{
         outline: none;
-        border-color: #999;
+        border-color:#999;
     }
-
-    &::placeholder {
+    &::placeholder{
         color: #999;
     }
 }
 
-.imageUploadArea {
+.imageUploadArea{
     display: flex;
-    gap: 1.2rem;
+    gap: 1.6rem; // 이미지 슬롯 사이 간격
+    margin-top:1.6rem; // 폼 그룹 내 간격
 }
 
-.imageSlot {
-    border-radius: 1rem;
+.imageSlot{
+    border-radius: 1.6rem;
     width: 16.3rem;
     height: 12rem;
+    background-color: #f7f7f7;
     overflow: hidden;
-    position: relative;
-    border: 1px solid #D5D5D5;
+    position:relative;
+    border:1px solid #e1e1e1;
 }
-
-.uploadLabel {
-    display: flex;
-    align-items: center;
+.uploadLabel{
+    display:flex;
+    align-items:center;
     justify-content: center;
     width: 100%;
     height: 100%;
     cursor: pointer;
-}
-
-.uploadPlusCircle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    width: 3.5rem;
-    height: 3.5rem;
-    box-sizing: border-box;
-    border: none;
-    border-radius: 50%;
-    flex-shrink: 0;
-
-    &::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        background: center / 100% 100% no-repeat;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='none' stroke='%23D5D5D5' stroke-width='2' stroke-dasharray='10 12' stroke-linecap='round'/%3E%3C/svg%3E");
-        pointer-events: none;
+    
+    .plusIcon{
+        font-size: 3rem;
+        color: #aeaeae;    
     }
 }
-
-.plusIcon {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    font-size: 4rem;
-    font-weight: 50;
-    line-height: 0;
-    color: #D5D5D5;
-    transform: translateY(-0.06em);
-}
-
-.hiddenFileInput {
+.hiddenFileInput{
     display: none; // 실제 파일 input 숨김
 }
 
-.imagePreview {
+.imagePreview{
     position: relative;
     width: 100%;
-    height: 100%;
-
-    img {
+    height:100%;
+    
+    img{
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
 }
 
-.removeImageBtn {
+.removeImageBtn{
     position: absolute;
 }
 
-.submitBtn {
+.submitBtn{
     width: 100%;
-    padding: 1.35rem;
-    font-size: 1.6rem;
-    font-weight: 500;
-    color: var(--color-semantic-text-inverse);
-    background-color: var(--color-semantic-bg-brand);
-    border-radius: 1rem;
-    margin-top: 5.6rem;
+    padding:1.6rem;
+    font-size: 1.7rem;
+    font-weight: bold;
+    color: white;
+    background-color: #0dba53;
+    border-radius: 1.6rem;
+
+    &:hover:not(.disabled){
+        background-color: #09a347;
+    }
+
+    &.disabled{
+        background-color: #e1e1e1;
+        color: #999;
+    }
 }

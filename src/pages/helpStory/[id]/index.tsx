@@ -6,7 +6,7 @@ import classNames from "classnames/bind";
 import styles from "./HelpStoryDetail.module.scss";
 import { getPost } from "@/lib/apis/helpStory";
 import Image from "next/image";
-import shareIcon from "@/public/shareIcon.svg";
+import { IoShareOutline } from "react-icons/io5";
 
 const cn = classNames.bind(styles);
 
@@ -221,8 +221,8 @@ export default function HelpStoryDetailPage() {
 
           <div className={cn("shareSection")}>
             <button className={cn("shareButton")} onClick={handleShare}>
-              <Image src={shareIcon} alt="공유하기" className={cn("shareIcon")} width={30} height={30} />
-              <span className={cn("shareButtonText")}>공유하기</span>
+              <IoShareOutline className={cn("shareIcon")} />
+              공유하기
             </button>
           </div>
         </article>

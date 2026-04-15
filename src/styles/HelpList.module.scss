@@ -1,10 +1,5 @@
 .helpListPage {
   min-height: 100vh;
-  position: relative;
-
-  @media (max-width: 611px) {
-    padding: 0 1.6rem;
-  }
 }
 
 // 탭 네비게이션
@@ -16,6 +11,7 @@
 .tabContainer {
   max-width: 57rem;
   margin: 0 auto;
+  padding: 0 2rem;
   display: flex;
   gap: 0;
 
@@ -28,17 +24,21 @@
   background: none;
   border: none;
   padding: 1.6rem 2.4rem;
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: var(--color-semantic-text-tertiary);
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: #6c757d;
   cursor: pointer;
   position: relative;
   transition: color 0.2s ease;
   flex: 1;
   
+  &:hover {
+    color: #495057;
+  }
+  
   &.active {
+    color: #222;
     font-weight: 600;
-    color: var(--color-semantic-text-primary);
     
     &::after {
       content: '';
@@ -47,7 +47,7 @@
       left: 0;
       right: 0;
       height: 0.1rem;
-      background-color: var(--color-semantic-border-focus);
+      background-color: #222;
       border-radius: 0.2rem 0.2rem 0 0;
     }
   }
@@ -57,6 +57,7 @@
 .mainContent {
   max-width: 57rem;
   margin: 0 auto;
+  padding: 2.4rem 2rem;
 
   @media (max-width: 611px) {
     max-width: 100%;
@@ -72,9 +73,13 @@
 .helpCard {
   background: #fff;
   border-radius: 1.2rem;
-  padding: 3.2rem 0;
+  padding: 3.2rem 2.4rem;
   border-bottom: 1px solid #e9ecef;
   transition: box-shadow 0.2s ease;
+  
+  &:hover {
+    box-shadow: 0 0.4rem 1.2rem rgba(0, 0, 0, 0.08);
+  }
 }
 
 .cardHeader {
@@ -90,58 +95,60 @@
 }
 
 .date {
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   font-weight: 900;
+  color: #222;
 }
 
 .dayOfWeek {
-  font-size: 1.6rem;
-  color: var(--color-semantic-text-tertiary);
+  font-size: 1.7rem;
+  color: var(--grey-500);
 }
 
 .statusTag {
-  padding: 0.2rem 0.8rem;
-  border-radius: 50rem;
-  font-size: var(--label-S-size);
-  font-weight: var(--label-S-weight);
-  color: var(--color-semantic-text-inverse);
+  padding: 0.2rem 1.2rem;
+  border-radius: 2rem;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: #fff;
   
   &.scheduled {
-    background-color: var(--color-semantic-bg-brand);
+    background-color: var(--primary-color);
   }
   
   &.completed {
-    background-color: var(--color-semantic-bg-neutral-strong);
+    background-color: var(--grey-500);
   }
   
   &.cancelled {
-    background-color: var(--color-semantic-bg-neutral-soft);
-    color: var(--color-semantic-text-tertiary);
+    background-color: var(--grey-200);
+    color: var(--grey-500);
   }
 }
 
 .contentText {
-  font-size: 1.6rem;
+  font-size: 1.7rem;
+  color: var(--grey-800);
   margin: 0;
   word-break: keep-all;
 }
 
 .timeInfo {
   display: flex;
-  align-items: flex-end;
-  gap: 0.4rem;
+  align-items: center;
+  gap: 0.8rem;
   padding: 1rem 0;
   border-radius: 0.8rem;
 }
 
 .clockIcon {
-  width: 2.4rem;
-  height: 2.4rem;
+  font-size: 1.6rem;
+  color: #6c757d;
 }
 
 .timeRange {
   font-size: 1.5rem;
-  color: var(--color-semantic-text-secondary);
+  color: #495057;
   font-weight: 500;
 }
 
@@ -154,7 +161,7 @@
 .viewDetailsButton,
 .cancelButton {
   padding: 0.8rem 2.2rem;
-  border-radius: 0.8rem;
+  border-radius: 1rem;
   font-size: 1.5rem;
   font-weight: 500;
   cursor: pointer;
@@ -163,14 +170,15 @@
 }
 
 .viewDetailsButton {
-  background-color: var(--color-semantic-bg-page);
-  border-color: var(--color-semantic-border-default);
+  background-color: #fff;
+  border-color: var(--grey-300);
+  color: #222;
 }
 
 .cancelButton {
-  background-color: var(--color-semantic-bg-danger-soft);
+  background-color: #FFEBED;
   border: none;
-  color: var(--color-semantic-text-danger);
+  color: var(--red-color);
 }
 
 // 무한 스크롤 관련 스타일
@@ -181,15 +189,15 @@
   justify-content: center;
   padding: 3rem 0;
   gap: 1.6rem;
-  color: var(--color-semantic-text-tertiary);
+  color: var(--grey-600);
   font-size: 1.5rem;
 }
 
 .spinner {
   width: 3rem;
   height: 3rem;
-  border: 0.3rem solid var(--color-semantic-border-default);
-  border-top: 0.3rem solid var(--color-semantic-bg-brand);
+  border: 0.3rem solid var(--grey-200);
+  border-top: 0.3rem solid var(--primary-color);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -208,7 +216,7 @@
 .endMessage {
   text-align: center;
   padding: 3rem 0;
-  color: var(--color-semantic-text-tertiary);
+  color: var(--grey-500);
   font-size: 1.5rem;
   font-weight: 500;
   margin-top: 1rem;
@@ -222,7 +230,7 @@
 }
 
 .organizationTag {
-  background-color: var(--color-semantic-bg-brand);
+  background-color: var(--primary-color);
   color: white;
   padding: 0.4rem 0.8rem;
   border-radius: 0.6rem;
@@ -240,7 +248,7 @@
   
   p {
     font-size: 1.8rem;
-    color: var(--color-semantic-text-tertiary);
+    color: var(--grey-600);
     font-weight: 500;
   }
 }
@@ -248,11 +256,7 @@
 .emptyState {
   font-size: 1.8rem;
   text-align: center;
-  color: var(--color-semantic-text-tertiary);
+  color: var(--grey-300);
   font-weight: 500;
   margin-top: 2rem;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 10rem;
 }

@@ -1,25 +1,79 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
-import styles from "@/components/oauth/OAuthCallbackLayout.module.scss";
+import { useUserStore } from "@/lib/store/userStore";
+import { naverLogin } from "@/lib/apis/authUser";
 
-/**
- * 예전 redirect URI(`/oauth/naver/login`)로 돌아오는 요청을 `/naver/callback`으로 넘깁니다.
- */
-export default function NaverLoginLegacyRedirectPage() {
+export default function NaverLoginPage() {
   const router = useRouter();
+  const { setIsVerified } = useUserStore();
+
+  const handleNaverLogin = useCallback(async (code: string, state: string) => {
+    try {
+      // naverLogin API 호출 (code와 state를 파라미터로 전달)
+      const response = await naverLogin({ code, state });
+      
+      if (response && response.data) {
+        const data = response.data;
+        
+        if (data.token) {
+          // 사용자 정보 저장
+          if (data.user) {
+            const { setUser, setUserType } = useUserStore.getState();
+            setUser(data.user);
+            setUserType('individual');
+          }
+          
+          // 인증 상태 업데이트 (Zustand persist로 자동 저장됨)
+          setIsVerified(true);
+          
+          alert('네이버 로그인 성공!');
+          router.push('/');
+        } else {
+          throw new Error(data.message || '로그인에 실패했습니다.');
+        }
+      } else {
+        throw new Error('로그인 요청에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('로그인 처리 중 오류:', error);
+      alert('로그인 처리 중 오류가 발생했습니다.');
+      router.push('/login');
+    }
+  }, [router, setIsVerified]);
 
   useEffect(() => {
-    if (!router.isReady) return;
-    const qIndex = router.asPath.indexOf("?");
-    const query = qIndex >= 0 ? router.asPath.slice(qIndex) : "";
-    void router.replace(`/naver/callback${query}`);
-  }, [router.isReady, router.asPath, router]);
+    // URL에서 authorization code와 state 추출
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const state = urlParams.get('state');
+    const error = urlParams.get('error');
+
+    if (error) {
+      alert('네이버 로그인에 실패했습니다.');
+      router.push('/login');
+      return;
+    }
+
+    if (code && state) {
+      handleNaverLogin(code, state);
+    } else {
+      // code나 state가 없으면 로그인 페이지로 리다이렉트
+      router.push('/login');
+    }
+  }, [router, handleNaverLogin]);
 
   return (
-    <div className={styles.wrap}>
-      <p className={styles.message}>로그인 처리 페이지로 이동 중…</p>
+    <div style={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      height: '100vh',
+      fontSize: '18px'
+    }}>
+      네이버 로그인 처리 중...
     </div>
   );
 }
+
