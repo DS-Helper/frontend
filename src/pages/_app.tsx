@@ -28,9 +28,11 @@ export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     // 하이드레이션이 완료되고 아직 인증 확인을 하지 않았을 때만 확인
     if (isHydrated && !hasCheckedAuth) {
-      checkAuthStatus();
       void (async () => {
         try {
+          await checkAuthStatus();
+          const { isVerified } = useUserStore.getState();
+          if (!isVerified) return;
           const myIdentifierRes = await getMyIdentifier();
           const nextUserId = parseMyIdentifierUserId(myIdentifierRes?.data ?? null);
           if (nextUserId) setUserId(nextUserId);

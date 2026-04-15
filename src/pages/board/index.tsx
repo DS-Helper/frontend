@@ -265,6 +265,10 @@ export default function BoardPage() {
     setIsMobileCategoryOpen(false);
   };
 
+  /** 시트에서 고른 값이 목록에 이미 적용된 필터와 같으면 확인을 비활성화(시각·클릭 모두) */
+  const hasMobileCategoryPendingChange =
+    mobileCategoryDraft !== selectedCategory;
+
   useEffect(() => {
     if (!isMobileCategoryOpen) return;
     const prev = document.body.style.overflow;
@@ -445,8 +449,9 @@ export default function BoardPage() {
             <button
               type="button"
               className={cf("mobileCategoryConfirmButton", {
-                mobileCategoryConfirmButtonActive: mobileCategoryDraft !== null,
+                mobileCategoryConfirmButtonActive: hasMobileCategoryPendingChange,
               })}
+              disabled={!hasMobileCategoryPendingChange}
               onClick={applyMobileCategory}
             >
               확인
