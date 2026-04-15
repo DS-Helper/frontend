@@ -4,7 +4,7 @@ import {
   resetUserSession,
 } from "../store/userStore";
 
-const testURL = process.env.NEXT_PUBLIC_TEST_API_URL;
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 function formatBearer(raw: string | null): string | undefined {
   if (!raw?.trim()) return undefined;
@@ -35,7 +35,7 @@ function tokenRawForRequestUrl(
 }
 
 export const instance: AxiosInstance = axios.create({
-  baseURL: testURL,
+  baseURL: apiBaseUrl,
   withCredentials: true,
 });
 
