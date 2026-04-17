@@ -73,6 +73,7 @@ export interface GetScrapsApiResponse {
 
 export interface GetMyIdentifierData {
   userId: string;
+  userRole?: string;
 }
 
 export interface GetMyIdentifierApiResponse {

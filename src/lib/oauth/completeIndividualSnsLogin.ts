@@ -1,6 +1,10 @@
 import type { NextRouter } from "next/router";
 import { applyLoginResponseTokens, useUserStore } from "@/lib/store/userStore";
-import { getMyIdentifier, parseMyIdentifierUserId } from "@/lib/apis/account";
+import {
+  getMyIdentifier,
+  parseMyIdentifierUserId,
+  parseMyIdentifierUserRole,
+} from "@/lib/apis/account";
 import type { User } from "@/types/userType";
 
 type LoginResponseData = {
@@ -36,16 +40,19 @@ export async function completeIndividualSnsLogin(
   }
 
   {
-    const { setUser, setUserId, setUserType } = useUserStore.getState();
+    const { setUser, setUserId, setUserRole, setUserType } = useUserStore.getState();
     if (data.user) setUser(data.user);
     setUserId(null);
+    setUserRole(null);
     setUserType("individual");
   }
 
   try {
     const myIdentifierRes = await getMyIdentifier();
     const nextUserId = parseMyIdentifierUserId(myIdentifierRes?.data ?? null);
+    const nextUserRole = parseMyIdentifierUserRole(myIdentifierRes?.data ?? null);
     if (nextUserId) useUserStore.getState().setUserId(nextUserId);
+    if (nextUserRole) useUserStore.getState().setUserRole(nextUserRole);
   } catch (error) {
     console.error("[auth] getMyIdentifier failed:", error);
   }
