@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { naverLogin } from "@/lib/apis/authUser";
 import { parseOAuthCallbackUrl } from "@/lib/oauth/parseOAuthCallbackUrl";
 import { completeIndividualSnsLogin } from "@/lib/oauth/completeIndividualSnsLogin";
-import styles from "@/components/oauth/OAuthCallbackLayout.module.scss";
+import styles from "../oauth/OAuthCallbackLayout.module.scss";
 
 const naverOAuthAttempted = new Set<string>();
 

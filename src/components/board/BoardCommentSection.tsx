@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import classNames from "classnames/bind";
 import Image from "next/image";
-import styles from "@/styles/Comment.module.scss";
+import styles from "../../styles/Comment.module.scss";
 import {
   deleteComment,
   getComments,
@@ -44,21 +44,21 @@ function CommentAvatar({ src, alt }: { src?: string; alt: string }) {
 
 function formatRelativeTime(dateLike: string): string {
   const raw = dateLike?.trim();
-  if (!raw) return "—";
+  if (!raw) return "??;
   const time = new Date(raw).getTime();
   if (!Number.isFinite(time)) return raw;
 
   const diffMs = Date.now() - time;
-  if (diffMs < 0) return "방금 전";
+  if (diffMs < 0) return "방금 ??;
 
   const minuteMs = 60 * 1000;
   const hourMs = 60 * minuteMs;
   const dayMs = 24 * hourMs;
 
-  if (diffMs < minuteMs) return "방금 전";
-  if (diffMs < hourMs) return `${Math.floor(diffMs / minuteMs)}분 전`;
-  if (diffMs < dayMs) return `${Math.floor(diffMs / hourMs)}시간 전`;
-  if (diffMs < 7 * dayMs) return `${Math.floor(diffMs / dayMs)}일 전`;
+  if (diffMs < minuteMs) return "방금 ??;
+  if (diffMs < hourMs) return `${Math.floor(diffMs / minuteMs)}�???;
+  if (diffMs < dayMs) return `${Math.floor(diffMs / hourMs)}?�간 ??;
+  if (diffMs < 7 * dayMs) return `${Math.floor(diffMs / dayMs)}????;
 
   const d = new Date(time);
   const yyyy = d.getFullYear();
@@ -108,7 +108,7 @@ function toBoardComment(
     raw.nickname ??
     writerObj.name ??
     authorObj.name ??
-    "익명";
+    "?�명";
   const avatarCandidates = [
     raw.userProfileImageUrl,
     raw.user_profile_image_url,
@@ -249,7 +249,7 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
       await loadComments();
     } catch (error) {
       console.error(error);
-      alert("댓글 등록에 실패했습니다. 다시 시도해 주세요.");
+      alert("?��? ?�록???�패?�습?�다. ?�시 ?�도??주세??");
     } finally {
       setCommentPosting(false);
     }
@@ -272,7 +272,7 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
       await loadComments();
     } catch (error) {
       console.error(error);
-      alert("대댓글 등록에 실패했습니다. 다시 시도해 주세요.");
+      alert("?�?��? ?�록???�패?�습?�다. ?�시 ?�도??주세??");
     } finally {
       setReplyPosting(false);
     }
@@ -285,7 +285,7 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    const ok = window.confirm("댓글을 삭제하시겠습니까?");
+    const ok = window.confirm("?��?????��?�시겠습?�까?");
     if (!ok) return;
     try {
       await deleteComment({ commentId });
@@ -297,7 +297,7 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
       await loadComments();
     } catch (error) {
       console.error(error);
-      alert("댓글 삭제에 실패했습니다. 다시 시도해 주세요.");
+      alert("?��? ??��???�패?�습?�다. ?�시 ?�도??주세??");
     }
   };
 
@@ -312,7 +312,7 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
       await loadComments();
     } catch (error) {
       console.error(error);
-      alert("댓글 수정에 실패했습니다. 다시 시도해 주세요.");
+      alert("?��? ?�정???�패?�습?�다. ?�시 ?�도??주세??");
     }
   };
 
@@ -322,7 +322,7 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
         <div className={cn("commentAvatar")}>
           <CommentAvatar
             src={comment.author.avatar}
-            alt={`${comment.author.name} 프로필`}
+            alt={`${comment.author.name} ?�로??}
           />
         </div>
         <div className={cn("commentMeta")}>
@@ -334,7 +334,7 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
           <button
             type="button"
             className={cn("commentMoreButton")}
-            aria-label="댓글 더보기"
+            aria-label="?��? ?�보�?
             aria-expanded={activeMenuCommentId === comment.id}
             onClick={() =>
               setActiveMenuCommentId((prev) => (prev === comment.id ? null : comment.id))
@@ -357,14 +357,14 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
                       setReplyDraft("");
                     }}
                   >
-                    수정
+                    ?�정
                   </button>
                   <button
                     type="button"
                     className={cn("commentMoreMenuItem", "danger")}
                     onClick={() => void handleDeleteComment(comment.id)}
                   >
-                    삭제
+                    ??��
                   </button>
                 </>
               ) : (
@@ -373,10 +373,10 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
                   className={cn("commentMoreMenuItem", "danger")}
                   onClick={() => {
                     setActiveMenuCommentId(null);
-                    alert("신고 기능은 준비 중입니다.");
+                    alert("?�고 기능?� 준�?중입?�다.");
                   }}
                 >
-                  신고
+                  ?�고
                 </button>
               )}
             </div>
@@ -389,13 +389,13 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
           onSubmit={(e) => void handleSubmitEdit(e, comment.id)}
         >
           <label htmlFor={`edit-input-${comment.id}`} className={cn("commentComposerSrOnly")}>
-            댓글 수정
+            ?��? ?�정
           </label>
           <input
             id={`edit-input-${comment.id}`}
             type="text"
             className={cn("commentComposerInput")}
-            placeholder="댓글을 수정해보세요."
+            placeholder="?��????�정?�보?�요."
             value={editingDraft}
             onChange={(e) => setEditingDraft(e.target.value)}
             maxLength={1000}
@@ -403,7 +403,7 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
           <button
             type="submit"
             className={cn("commentComposerIcon")}
-            aria-label="댓글 수정 등록"
+            aria-label="?��? ?�정 ?�록"
           >
             <Image
               src={editingDraft.trim() ? commentIconOn : commentIcon}
@@ -426,7 +426,7 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
             setReplyDraft("");
           }}
         >
-          답글 쓰기
+          ?��? ?�기
         </button>
       )}
       {!isReply && replyTargetId === comment.id && (
@@ -435,13 +435,13 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
           onSubmit={(e) => void handleSubmitReply(e)}
         >
           <label htmlFor={`reply-input-${comment.id}`} className={cn("commentComposerSrOnly")}>
-            대댓글 입력
+            ?�?��? ?�력
           </label>
           <input
             id={`reply-input-${comment.id}`}
             type="text"
             className={cn("commentComposerInput")}
-            placeholder="대댓글을 작성해보세요."
+            placeholder="?�?��????�성?�보?�요."
             value={replyDraft}
             onChange={(e) => setReplyDraft(e.target.value)}
             maxLength={1000}
@@ -450,7 +450,7 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
           <button
             type="submit"
             className={cn("commentComposerIcon")}
-            aria-label="대댓글 등록"
+            aria-label="?�?��? ?�록"
             disabled={replyPosting}
           >
             <Image
@@ -468,16 +468,16 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
 
   return (
     <section className={cn("commentsSection")}>
-      <h2 className={cn("commentsTitle")}>댓글</h2>
+      <h2 className={cn("commentsTitle")}>?��?</h2>
       <form className={cn("commentComposer")} onSubmit={(e) => void handleSubmitComment(e)}>
         <label htmlFor="board-comment-input" className={cn("commentComposerSrOnly")}>
-          댓글 입력
+          ?��? ?�력
         </label>
         <input
           id="board-comment-input"
           type="text"
           className={cn("commentComposerInput")}
-          placeholder="댓글을 작성해보세요."
+          placeholder="?��????�성?�보?�요."
           value={commentDraft}
           onChange={(e) => setCommentDraft(e.target.value)}
           maxLength={1000}
@@ -486,7 +486,7 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
         <button
           type="submit"
           className={cn("commentComposerIcon")}
-          aria-label="댓글 등록"
+          aria-label="?��? ?�록"
           disabled={commentPosting}
         >
           <Image
@@ -500,7 +500,7 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
       </form>
       <div className={cn("commentList")}>
         {commentsLoading ? (
-          <p className={cn("commentEmptyText")}>댓글을 불러오는 중...</p>
+          <p className={cn("commentEmptyText")}>?��???불러?�는 �?..</p>
         ) : topLevelComments.length > 0 ? (
           topLevelComments.map((comment) => (
             <div key={comment.id} className={cn("commentThread")}>
@@ -509,8 +509,8 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
             </div>
           ))
         ) : (
-          <p className={cn("commentEmptyText")}>아직 댓글이 없어요.
-            <br />첫 댓글을 남겨보세요!</p>
+          <p className={cn("commentEmptyText")}>?�직 ?��????�어??
+            <br />�??��????�겨보세??</p>
         )}
       </div>
     </section>

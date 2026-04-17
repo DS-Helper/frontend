@@ -1,4 +1,4 @@
-import styles from "@/styles/Home.module.scss";
+import styles from "../styles/Home.module.scss";
 import classNames from "classnames/bind";
 import Image from "next/image";
 import { useState, useEffect } from "react";
@@ -7,7 +7,7 @@ import { getPosts, parsePostsListBody } from "@/lib/apis/helpStory";
 import { IoIosArrowForward } from "react-icons/io";
 import { isAuthenticated } from "@/lib/utils/auth";
 
-// 이미지들
+// ?��?지??
 import home1 from "@/public/home1.svg";
 import home2 from "@/public/home2.svg";
 import home3 from "@/public/home3.svg";
@@ -51,45 +51,45 @@ export default function Home() {
 
   // 버튼 목록
   const guideButtons = [
-    "어떤 도움을 주나요?",
-    "누가 이용할 수 있나요?",
-    "어떻게 신청하나요?",
-    "언제 도와주나요?",
+    "?�떤 ?��???주나??",
+    "?��? ?�용?????�나??",
+    "?�떻�??�청?�나??",
+    "?�제 ?��?주나??",
   ];
 
-  // 안내 0번
+  // ?�내 0�?
   const helpList = [
-    { img: home1, title: "생활 돌봄 지원", desc: "장보기, 병원 동행, 집안 정리, 식사 동반 등" },
-    { img: home2, title: "정서적 돌봄", desc: "말벗, 산책 같이 가기 등" },
-    { img: home3, title: "아이돌봄 지원", desc: "잠깐 돌봄, 간단한 학습, 등하원 동행 등" },
-    { img: home4, title: "청년/성인 대상 지원", desc: "고립 청년 방문, 고민 나누기, 외출 동행" },
-    { img: home5, title: "기관/단체 대상 지원", desc: "복지관, 마을회관, 보육원 등" },
+    { img: home1, title: "?�활 ?�봄 지??, desc: "?�보�? 병원 ?�행, 집안 ?�리, ?�사 ?�반 ?? },
+    { img: home2, title: "?�서???�봄", desc: "말벗, ?�책 같이 가�??? },
+    { img: home3, title: "?�이?�봄 지??, desc: "?�깐 ?�봄, 간단???�습, ?�하???�행 ?? },
+    { img: home4, title: "�?��/?�인 ?�??지??, desc: "고립 �?�� 방문, 고�? ?�누�? ?�출 ?�행" },
+    { img: home5, title: "기�?/?�체 ?�??지??, desc: "복�?관, 마을?��?, 보육???? },
   ];
 
-  // 안내 1번
+  // ?�내 1�?
   const whoList = [
-    "혼자 사시는 어르신",
-    "도움이 필요한 청년",
-    "아이 케어가 필요한 맞벌이 부모님",
-    "이동이나 일상생활이 불편한 분",
-    "복지기관 · 마을회과 · 센터 등",
+    "?�자 ?�시???�르??,
+    "?��????�요??�?��",
+    "?�이 케?��? ?�요??맞벌??부모님",
+    "?�동?�나 ?�상?�활??불편??�?,
+    "복�?기�? · 마을?�과 · ?�터 ??,
   ];
 
-  // 안내 2번
+  // ?�내 2�?
   const howStartList = [
-    { img: howStart1, title: "먼저 로그인 해주세요!", desc: "도움을 요청하려면 로그인이 필요해요. 카카오, 네이버, 구글 중 편한 방법을 선택해 주세요. SNS 로그인이 어려우신 분은 로그인 하단에 있는 번호로 연락해 주세요." },
-    { img: howStart2, title: "도움을 신청해요", desc: "오른쪽 위 아이콘(≡) 을 누른 뒤, 도움 요청하기 메뉴를 선택해 주세요." },
-    { img: howStart3, title: "정보를 입력해주세요", desc: "신청자 유형을 선택하고, 도움을 받을 분의 정보와 일시, 그리고 요청 내용을 입력해 주세요." },
-    { img: howStart4, title: "요청 접수 완료!", desc: "신청자 유형을 선택하고, 도움을 받을 분의 정보와 일시, 그리고 요청 내용을 입력해 주세요." },
+    { img: howStart1, title: "먼�? 로그???�주?�요!", desc: "?��????�청?�려�?로그?�이 ?�요?�요. 카카?? ?�이�? 구�? �??�한 방법???�택??주세?? SNS 로그?�이 ?�려?�신 분�? 로그???�단???�는 번호�??�락??주세??" },
+    { img: howStart2, title: "?��????�청?�요", desc: "?�른�????�이�??? ???�른 ?? ?��? ?�청?�기 메뉴�??�택??주세??" },
+    { img: howStart3, title: "?�보�??�력?�주?�요", desc: "?�청???�형???�택?�고, ?��???받을 분의 ?�보?� ?�시, 그리�??�청 ?�용???�력??주세??" },
+    { img: howStart4, title: "?�청 ?�수 ?�료!", desc: "?�청???�형???�택?�고, ?��???받을 분의 ?�보?� ?�시, 그리�??�청 ?�용???�력??주세??" },
   ];
 
-  // 안내 3번
+  // ?�내 3�?
   const whenList = [
-    { img: calendar, title: "수/금 방문", desc: "수요일, 금요일에만 방문이 가능해요." },
-    { img: clock, title: "요청 가능 시간", desc: "오전 10시부터 오후 5시까지 요청할 수 있어요. 요청 순서에 따라 순차적으로 도와드려요." },
+    { img: calendar, title: "??�?방문", desc: "?�요?? 금요?�에�?방문??가?�해??" },
+    { img: clock, title: "?�청 가???�간", desc: "?�전 10?��????�후 5?�까지 ?�청?????�어?? ?�청 ?�서???�라 ?�차?�으�??��??�려??" },
   ];
 
-  // 날짜 포맷팅 함수
+  // ?�짜 ?�맷???�수
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('ko-KR', {
@@ -99,7 +99,7 @@ export default function Home() {
     }).replace(/\./g, '.').replace(/\s/g, '');
   };
 
-  // 이미지 URL 유효성 검증
+  // ?��?지 URL ?�효??검�?
   const isValidImageUrl = (url: string | null | undefined): boolean => {
     if (!url) return false;
     if (url.includes('null')) return false;
@@ -111,7 +111,7 @@ export default function Home() {
     }
   };
 
-  // 스토리 데이터 가져오기
+  // ?�토�??�이??가?�오�?
   useEffect(() => {
     const fetchStories = async () => {
       try {
@@ -121,7 +121,7 @@ export default function Home() {
         if (response?.data) {
           const { posts: postsData } = parsePostsListBody(response.data);
           
-          // 최신 몇 개만 홈페이지에 표시 (최대 4개)
+          // 최신 �?개만 ?�페?��????�시 (최�? 4�?
           const latestPosts = postsData.slice(0, 4).map((post) => ({
             postId: post.postId,
             title: post.title,
@@ -138,7 +138,7 @@ export default function Home() {
           setStoryList([]);
         }
       } catch (error) {
-        console.error('도와드린 이야기 조회 실패:', error);
+        console.error('?��??�린 ?�야�?조회 ?�패:', error);
         setStoryList([]);
       } finally {
         setStoryLoading(false);
@@ -148,7 +148,7 @@ export default function Home() {
     fetchStories();
   }, []);
 
-  // 버튼별 렌더링
+  // 버튼�??�더�?
   const renderContent = () => {
     switch (activeButton) {
       case 0:
@@ -212,29 +212,29 @@ export default function Home() {
 
   return (
     <div className={cn("home")}>
-      {/* 1페이지 */}
+      {/* 1?�이지 */}
       <div className={cn("homePage")}>
         <div className={cn("homePage1Hero")} />
         <p className={cn("homePage1Title")}>
           <span className={cn("homePage1TitleLine1", "homePage1TitleDesktop")}>
-            달성군 생활밀착형 플랫폼
+            ?�성�??�활밀착형 ?�랫??
             <br />
-            디에스헬퍼
+            ?�에?�헬??
           </span>
           <span className={cn("homePage1TitleLine1", "homePage1TitleCompact")}>
-            달성군 생활밀착형
+            ?�성�??�활밀착형
             <br />
-            플랫폼
+            ?�랫??
             <br />
-            디에스헬퍼
+            ?�에?�헬??
           </span>
         </p>
       </div>
 
-      {/* 2페이지 */}
+      {/* 2?�이지 */}
       <div className={cn("homePage2")}>
         <div className={cn("homePageWrapper")}>
-          <p className={cn("title")}>이용 안내</p>
+          <p className={cn("title")}>?�용 ?�내</p>
           <div className={cn("homePageContent")}>
             <div className={cn("homePageButton")}>
               {guideButtons.map((text, i) => (
@@ -252,13 +252,13 @@ export default function Home() {
         </div>
       </div>
 
-      {/* 3페이지 */}
+      {/* 3?�이지 */}
       <div className={cn("homePage3")}>
         <div className={cn("homePageWrapper")}>
-          <p className={cn("title")}>도와드린 이야기</p>
+          <p className={cn("title")}>?��??�린 ?�야�?/p>
           {storyLoading ? (
             <div className={cn("storyLoading")}>
-              <p>도와드린 이야기를 불러오는 중...</p>
+              <p>?��??�린 ?�야기�? 불러?�는 �?..</p>
             </div>
           ) : storyList.length > 0 ? (
             <>
@@ -276,7 +276,7 @@ export default function Home() {
                       {typeof s.img === 'string' && isValidImageUrl(s.img) ? (
                         <Image
                           src={s.img}
-                          alt="도와드린 이야기"
+                          alt="?��??�린 ?�야�?
                           width={240}
                           height={180}
                           className={cn("image")}
@@ -289,12 +289,12 @@ export default function Home() {
                 ))}
               </ul>
               <button className={cn("moreStoriesButton")} onClick={handleMoreStories}>
-                더보기 <IoIosArrowForward className={cn("moreStoriesArrow")} />
+                ?�보�?<IoIosArrowForward className={cn("moreStoriesArrow")} />
               </button>
             </>
           ) : (
             <div className={cn("storyEmpty")}>
-              <p>아직 도와드린 이야기가 없습니다.</p>
+              <p>?�직 ?��??�린 ?�야기�? ?�습?�다.</p>
             </div>
           )}
         </div>

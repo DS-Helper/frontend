@@ -1,6 +1,6 @@
 import React from "react";
 import classNames from "classnames/bind";
-import styles from "@/styles/Customer.module.scss";
+import styles from "../../styles/Customer.module.scss";
 
 const cn = classNames.bind(styles);
 
@@ -14,7 +14,7 @@ export default function AnswerModal({ answer, onClose }: AnswerModalProps) {
     <div className={cn("answerModalOverlay")} onClick={onClose}>
       <div className={cn("answerModalContent")} onClick={(e) => e.stopPropagation()}>
         <div className={cn("answerModalHeader")}>
-          <h2 className={cn("answerModalTitle")}>답변 내용</h2>
+          <h2 className={cn("answerModalTitle")}>?��? ?�용</h2>
           <button className={cn("answerModalCloseBtn")} onClick={onClose}>
             ×
           </button>

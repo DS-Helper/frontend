@@ -3,7 +3,7 @@
 import { FcGoogle } from "react-icons/fc";
 import classNames from "classnames/bind";
 import { getGoogleOAuthStartUrl } from "@/lib/apis/authUser";
-import styles from "@/styles/Login.module.scss";
+import styles from "../../styles/Login.module.scss";
 
 const cn = classNames.bind(styles);
 
@@ -18,7 +18,7 @@ export default function GoogleLoginButton({ onBeforeRedirect }: GoogleLoginButto
       window.location.href = await getGoogleOAuthStartUrl();
     } catch (error) {
       console.error(error);
-      alert("구글 로그인을 시작할 수 없습니다. 다시 시도해주세요.");
+      alert("구�? 로그?�을 ?�작?????�습?�다. ?�시 ?�도?�주?�요.");
     }
   };
 
@@ -29,7 +29,7 @@ export default function GoogleLoginButton({ onBeforeRedirect }: GoogleLoginButto
       onClick={() => void handleClick()}
     >
       <FcGoogle className={cn("icon")} />
-      구글 로그인
+      구�? 로그??
     </button>
   );
 }

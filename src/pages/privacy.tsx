@@ -1,4 +1,4 @@
-import styles from "@/styles/Terms.module.scss";
+import styles from "../styles/Terms.module.scss";
 import classNames from "classnames/bind";
 
 const cn = classNames.bind(styles);
@@ -6,31 +6,31 @@ const cn = classNames.bind(styles);
 export default function Privacy() {
   return (
     <div className={cn("termsContainer")}>
-      <h1 className={cn("termsTitle")}>개인정보 처리방침</h1>
+      <h1 className={cn("termsTitle")}>개인?�보 처리방침</h1>
       
       <div className={cn("termsContent")}>
         <h2 className={cn("termsSectionTitle")}>1. 총칙</h2>
         <p className={cn("termsText")}>
-          DS Helper(이하 &apos;서비스&apos;)는 개인정보 보호법 등 관계 법령을 준수하며 이용자의 개인정보를 안전하게 처리합니다.
+          DS Helper(?�하 &apos;?�비??apos;)??개인?�보 보호�???관�?법령??준?�하�??�용?�의 개인?�보�??�전?�게 처리?�니??
         </p>
       </div>
 
       <div className={cn("termsContent")}>
-        <h2 className={cn("termsSectionTitle")}>2. 수집 항목 및 수집 방법</h2>
+        <h2 className={cn("termsSectionTitle")}>2. ?�집 ??�� �??�집 방법</h2>
         <ol className={cn("termsList")}>
           <li className={cn("termsListItem")}>
-            <strong>가입/로그인</strong>: 카카오 고유 ID, 이름, 이메일, (설정 시) 연령대, 프로필 이미지(선택)
+            <strong>가??로그??/strong>: 카카??고유 ID, ?�름, ?�메?? (?�정 ?? ?�령?�, ?�로???��?지(?�택)
           </li>
           <li className={cn("termsListItem")}>
-            <strong>이용 단계</strong>: 도움요청 내용, 방문지 주소, 성별, 연락처(전화번호), 특이사항, 첨부 이미지(후기·문의), 이용 기록(접속IP/로그·쿠키)
+            <strong>?�용 ?�계</strong>: ?��??�청 ?�용, 방문지 주소, ?�별, ?�락�??�화번호), ?�이?�항, 첨�? ?��?지(?�기·문의), ?�용 기록(?�속IP/로그·쿠키)
           </li>
           <li className={cn("termsListItem")}>
-            <strong>수집 방법</strong>: 카카오 간편가입 연동, 이용자가 입력한 폼/업로드, 서비스 이용 과정에서 자동 생성
+            <strong>?�집 방법</strong>: 카카??간편가???�동, ?�용?��? ?�력?????�로?? ?�비???�용 과정?�서 ?�동 ?�성
           </li>
         </ol>
         <div className={cn("termsNote")}>
           <p className={cn("termsText")}>
-            민감정보(건강·종교 등)는 원칙적으로 수집하지 않습니다. 부득이 입력이 필요한 경우 별도 동의를 받고 최소 범위로 처리합니다.
+            민감?�보(건강·종교 ?????�칙?�으�??�집?��? ?�습?�다. 부?�이 ?�력???�요??경우 별도 ?�의�?받고 최소 범위�?처리?�니??
           </p>
         </div>
       </div>
@@ -38,123 +38,123 @@ export default function Privacy() {
       <div className={cn("termsContent")}>
         <h2 className={cn("termsSectionTitle")}>3. 처리 목적</h2>
         <ul className={cn("termsList")}>
-          <li className={cn("termsListItem")}>본인확인 및 계정관리, 서비스 제공과 헬퍼 배정/연락</li>
-          <li className={cn("termsListItem")}>문의/분쟁 대응, 고지·알림 전송</li>
-          <li className={cn("termsListItem")}>안전 확보, 부정이용/스팸 방지</li>
-          <li className={cn("termsListItem")}>서비스 품질 개선, 통계·분석(비식별 처리)</li>
-          <li className={cn("termsListItem")}>법령 상 의무 이행</li>
+          <li className={cn("termsListItem")}>본인?�인 �?계정관�? ?�비???�공�??�퍼 배정/?�락</li>
+          <li className={cn("termsListItem")}>문의/분쟁 ?�?? 고�?·?�림 ?�송</li>
+          <li className={cn("termsListItem")}>?�전 ?�보, 부?�이???�팸 방�?</li>
+          <li className={cn("termsListItem")}>?�비???�질 개선, ?�계·분석(비식�?처리)</li>
+          <li className={cn("termsListItem")}>법령 ???�무 ?�행</li>
         </ul>
       </div>
 
       <div className={cn("termsContent")}>
-        <h2 className={cn("termsSectionTitle")}>4. 보유 기간 및 파기</h2>
+        <h2 className={cn("termsSectionTitle")}>4. 보유 기간 �??�기</h2>
         <ul className={cn("termsList")}>
           <li className={cn("termsListItem")}>
-            <strong>원칙</strong>: 목적 달성 시 지체 없이 파기(회원 탈퇴 시 포함)
+            <strong>?�칙</strong>: 목적 ?�성 ??지�??�이 ?�기(?�원 ?�퇴 ???�함)
           </li>
           <li className={cn("termsListItem")}>
-            <strong>법령에 따른 예외 보관</strong>(해당 시)
+            <strong>법령???�른 ?�외 보�?</strong>(?�당 ??
             <ul className={cn("termsSubList")}>
-              <li className={cn("termsSubListItem")}>접속기록: 3개월(통신비밀보호법)</li>
-              <li className={cn("termsSubListItem")}>소비자 불만·분쟁처리 기록: 3년(전자상거래법)</li>
+              <li className={cn("termsSubListItem")}>?�속기록: 3개월(?�신비�?보호�?</li>
+              <li className={cn("termsSubListItem")}>?�비??불만·분쟁처리 기록: 3???�자?�거?�법)</li>
             </ul>
           </li>
           <li className={cn("termsListItem")}>
-            <strong>파기 방법</strong>: 전자파일은 복구 불가 방식으로 삭제, 출력물은 분쇄/소각
+            <strong>?�기 방법</strong>: ?�자?�일?� 복구 불�? 방식?�로 ??��, 출력물�? 분쇄/?�각
           </li>
         </ul>
       </div>
 
       <div className={cn("termsContent")}>
-        <h2 className={cn("termsSectionTitle")}>5. 제3자 제공</h2>
+        <h2 className={cn("termsSectionTitle")}>5. ?????�공</h2>
         <p className={cn("termsText")}>
-          법령 근거가 있거나 이용자가 동의한 범위를 넘어 제3자에게 제공하지 않습니다.
+          법령 근거가 ?�거???�용?��? ?�의??범위�??�어 ???�에�??�공?��? ?�습?�다.
         </p>
         <p className={cn("termsText")}>
-          범죄·안전 등 공익상 필요로 관계기관의 적법한 요구가 있는 경우에 한해 제공될 수 있습니다.
+          범죄·?�전 ??공익???�요�?관계기관???�법???�구가 ?�는 경우???�해 ?�공?????�습?�다.
         </p>
       </div>
 
       <div className={cn("termsContent")}>
-        <h2 className={cn("termsSectionTitle")}>6. 처리 위탁</h2>
+        <h2 className={cn("termsSectionTitle")}>6. 처리 ?�탁</h2>
         <p className={cn("termsText")}>
-          서비스 운영을 위해 다음 업무를 위탁할 수 있습니다. 위탁 시 계약을 통해 개인정보 보호 의무를 부과합니다.
+          ?�비???�영???�해 ?�음 ?�무�??�탁?????�습?�다. ?�탁 ??계약???�해 개인?�보 보호 ?�무�?부과합?�다.
         </p>
         <ul className={cn("termsList")}>
-          <li className={cn("termsListItem")}>클라우드/서버 호스팅, 모니터링</li>
-          <li className={cn("termsListItem")}>이메일·푸시·SMS 발송</li>
+          <li className={cn("termsListItem")}>?�라?�드/?�버 ?�스?? 모니?�링</li>
+          <li className={cn("termsListItem")}>?�메?�·푸?�·SMS 발송</li>
           <li className={cn("termsListItem")}>로그/보안 분석, 백업</li>
         </ul>
         <div className={cn("termsNote")}>
           <p className={cn("termsText")}>
-            수탁사 명칭/업무/보관장소는 홈페이지 공지 또는 본 방침의 부록에서 최신화합니다.
+            ?�탁??명칭/?�무/보�??�소???�페?��? 공�? ?�는 �?방침??부록에??최신?�합?�다.
           </p>
         </div>
       </div>
 
       <div className={cn("termsContent")}>
-        <h2 className={cn("termsSectionTitle")}>7. 국외 이전</h2>
+        <h2 className={cn("termsSectionTitle")}>7. �?�� ?�전</h2>
         <p className={cn("termsText")}>
-          현재 국외 이전이 필요한 경우가 없다면 &quot;없음&quot;으로 고지합니다.
+          ?�재 �?�� ?�전???�요??경우가 ?�다�?&quot;?�음&quot;?�로 고�??�니??
         </p>
         <p className={cn("termsText")}>
-          국외 이전이 발생하는 경우 이전 국가·일시·방법·보관기간·수탁자 정보를 사전 고지하고 필요한 동의를 받습니다.
-        </p>
-      </div>
-
-      <div className={cn("termsContent")}>
-        <h2 className={cn("termsSectionTitle")}>8. 이용자 권리 행사</h2>
-        <p className={cn("termsText")}>
-          이용자는 언제든지 개인정보의 열람, 정정, 삭제, 처리정지, 동의 철회를 요구할 수 있습니다.
-        </p>
-        <p className={cn("termsText")}>
-          앱/웹의 설정 또는 고객 문의를 통해 요청하실 수 있으며, 본인 확인 후 지체 없이 조치합니다.
+          �?�� ?�전??발생?�는 경우 ?�전 �??·?�시·방법·보�?기간·?�탁???�보�??�전 고�??�고 ?�요???�의�?받습?�다.
         </p>
       </div>
 
       <div className={cn("termsContent")}>
-        <h2 className={cn("termsSectionTitle")}>9. 아동의 개인정보</h2>
+        <h2 className={cn("termsSectionTitle")}>8. ?�용??권리 ?�사</h2>
         <p className={cn("termsText")}>
-          만 14세 미만 아동의 개인정보는 법정대리인 동의가 필요한 경우에 한해 처리합니다. 법정대리인은 열람·정정·삭제를 요청할 수 있습니다.
+          ?�용?�는 ?�제?��? 개인?�보???�람, ?�정, ??��, 처리?��?, ?�의 철회�??�구?????�습?�다.
+        </p>
+        <p className={cn("termsText")}>
+          ???�의 ?�정 ?�는 고객 문의�??�해 ?�청?�실 ???�으�? 본인 ?�인 ??지�??�이 조치?�니??
         </p>
       </div>
 
       <div className={cn("termsContent")}>
-        <h2 className={cn("termsSectionTitle")}>10. 쿠키 및 유사기술</h2>
+        <h2 className={cn("termsSectionTitle")}>9. ?�동??개인?�보</h2>
         <p className={cn("termsText")}>
-          서비스 품질 및 로그인 유지 등을 위해 쿠키를 사용할 수 있습니다. 브라우저 설정을 통해 저장을 거부하거나 삭제할 수 있으나, 일부 기능 이용에 제한이 있을 수 있습니다.
+          �?14??미만 ?�동??개인?�보??법정?�리인 ?�의가 ?�요??경우???�해 처리?�니?? 법정?�리인?� ?�람·?�정·??���??�청?????�습?�다.
         </p>
       </div>
 
       <div className={cn("termsContent")}>
-        <h2 className={cn("termsSectionTitle")}>11. 안전성 확보 조치</h2>
+        <h2 className={cn("termsSectionTitle")}>10. 쿠키 �??�사기술</h2>
+        <p className={cn("termsText")}>
+          ?�비???�질 �?로그???��? ?�을 ?�해 쿠키�??�용?????�습?�다. 브라?��? ?�정???�해 ?�?�을 거�??�거????��?????�으?? ?��? 기능 ?�용???�한???�을 ???�습?�다.
+        </p>
+      </div>
+
+      <div className={cn("termsContent")}>
+        <h2 className={cn("termsSectionTitle")}>11. ?�전???�보 조치</h2>
         <ul className={cn("termsList")}>
-          <li className={cn("termsListItem")}>전송구간 암호화(HTTPS), 저장 시 암호화(필요 시)</li>
-          <li className={cn("termsListItem")}>최소권한 접근통제, 접근기록 보관/점검</li>
-          <li className={cn("termsListItem")}>정기적 취약점 점검 및 로그 모니터링</li>
-          <li className={cn("termsListItem")}>임직원 보안 교육, 위탁사 관리·감독</li>
+          <li className={cn("termsListItem")}>?�송구간 ?�호??HTTPS), ?�?????�호???�요 ??</li>
+          <li className={cn("termsListItem")}>최소권한 ?�근?�제, ?�근기록 보�?/?��?</li>
+          <li className={cn("termsListItem")}>?�기??취약???��? �?로그 모니?�링</li>
+          <li className={cn("termsListItem")}>?�직??보안 교육, ?�탁??관�?�감??/li>
         </ul>
       </div>
 
       <div className={cn("termsContent")}>
-        <h2 className={cn("termsSectionTitle")}>12. 개인정보 보호책임자</h2>
+        <h2 className={cn("termsSectionTitle")}>12. 개인?�보 보호책임??/h2>
         <ul className={cn("termsList")}>
           <li className={cn("termsListItem")}>
-            <strong>책임자</strong>: 신인호
+            <strong>책임??/strong>: ?�인??
           </li>
           <li className={cn("termsListItem")}>
-            <strong>연락처</strong>: dlsgh3760@gmail.com / 010-5250-9548
+            <strong>?�락�?/strong>: dlsgh3760@gmail.com / 010-5250-9548
           </li>
         </ul>
         <p className={cn("termsText")}>
-          문의하시면 지체 없이 답변 및 처리해 드립니다. 또한 개인정보 분쟁이 해결되지 않는 경우 개인정보분쟁조정위원회, 개인정보보호위원회 등에 분쟁조정을 신청할 수 있습니다.
+          문의?�시�?지�??�이 ?��? �?처리???�립?�다. ?�한 개인?�보 분쟁???�결?��? ?�는 경우 개인?�보분쟁조정?�원?? 개인?�보보호?�원???�에 분쟁조정???�청?????�습?�다.
         </p>
       </div>
 
       <div className={cn("termsContent")}>
-        <h2 className={cn("termsSectionTitle")}>13. 고지 의무</h2>
+        <h2 className={cn("termsSectionTitle")}>13. 고�? ?�무</h2>
         <p className={cn("termsText")}>
-          본 방침이 변경되는 경우, 시행 7일 전(중요 변경은 14일 전) 공지합니다.
+          �?방침??변경되??경우, ?�행 7????중요 변경�? 14???? 공�??�니??
         </p>
       </div>
     </div>

@@ -1,5 +1,5 @@
-// 고객 문의 페이지
-import styles from '@/styles/Customer.module.scss';
+// 고객 문의 ?�이지
+import styles from "../styles/Customer.module.scss";
 import classNames from 'classnames/bind';
 import React, { useState, useEffect, ChangeEvent, useRef, useCallback } from "react";
 import { getInquiries, postInquiry } from '@/lib/apis/customer';
@@ -11,34 +11,34 @@ import AnswerModal from '@/components/Modal/AnswerModal';
 const cn = classNames.bind(styles);
 
 const INQUIRY_TYPE_OPTIONS = [
-    { value: "help", label: "도움 요청" },
-    { value: "uncomfortable", label: "서비스 이용 불편" },
-    { value: "proposal", label: "서비스 개선 제안" },
-    { value: "etc", label: "기타" },
+    { value: "help", label: "?��? ?�청" },
+    { value: "uncomfortable", label: "?�비???�용 불편" },
+    { value: "proposal", label: "?�비??개선 ?�안" },
+    { value: "etc", label: "기�?" },
 ] as const;
 
 export default function Customer(){
     const [activeTab, setActiveTab] = useState<"history" | "register">('history');
-    const [inquiryType, setInquiryType] = useState(""); //문의 타입
+    const [inquiryType, setInquiryType] = useState(""); //문의 ?�??
     const [inquiryTypeMenuOpen, setInquiryTypeMenuOpen] = useState(false);
     const inquiryTypeDropdownRef = useRef<HTMLDivElement>(null);
     const [content, setContent] = useState("");
     const inquiryContentRef = useRef<HTMLTextAreaElement>(null);
     const [images, setImages] = useState<string[]>([]); // 미리보기 URL 배열
-    const [imageFiles, setImageFiles] = useState<File[]>([]); // 실제 파일 객체 배열
+    const [imageFiles, setImageFiles] = useState<File[]>([]); // ?�제 ?�일 객체 배열
     
-    // API에서 가져온 문의 데이터
+    // API?�서 가?�온 문의 ?�이??
     const [inquiries, setInquiries] = useState<Inquiry[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    // 문의 내역 불러오기
+    // 문의 ?�역 불러?�기
     const fetchInquiries = async () => {
         setLoading(true);
         setError(null);
         try {
             const response = await getInquiries();
             if (response && response.data) {
-                // 배열인지 확인하고 안전하게 설정
+                // 배열?��? ?�인?�고 ?�전?�게 ?�정
                 const data = response.data;
                 let rawInquiries: any[] = [];
                 
@@ -49,58 +49,58 @@ export default function Customer(){
                 } else if (Array.isArray(data.items)) {
                     rawInquiries = data.items;
                 } else {
-                    console.error('예상하지 못한 응답 구조:', data);
+                    console.error('?�상?��? 못한 ?�답 구조:', data);
                     setInquiries([]);
-                    setError('문의 내역 데이터 형식이 올바르지 않습니다.');
+                    setError('문의 ?�역 ?�이???�식???�바르�? ?�습?�다.');
                     return;
                 }
                 
-                // API 응답을 Inquiry 형식으로 매핑
+                // API ?�답??Inquiry ?�식?�로 매핑
                 const mappedInquiries: Inquiry[] = rawInquiries.map((item: any) => {
-                    // 날짜와 시간 분리 (createdAt: "2025-11-09 22:20")
+                    // ?�짜?� ?�간 분리 (createdAt: "2025-11-09 22:20")
                     const createdAt = item.createdAt || item.date || '';
                     const [date, time] = createdAt.split(' ');
                     
-                    // 이미지 URL 처리
+                    // ?��?지 URL 처리
                     const imageUrl = item.imageUrls && item.imageUrls.length > 0 
                         ? item.imageUrls[0] 
                         : (item.image || undefined);
                     
                     return {
                         id: item.inquiryId || item.id,
-                        status: item.status || (item.reply ? "답변 보기" : "답변 대기"),
+                        status: item.status || (item.reply ? "?��? 보기" : "?��? ?��?),
                         content: item.content || '',
                         date: date || '',
                         time: time || '',
                         image: imageUrl,
                         imageUrls: item.imageUrls || [],
                         reply: item.reply || null,
-                        answer: item.reply?.content || item.answer || null, // 호환성을 위해 answer도 설정
+                        answer: item.reply?.content || item.answer || null, // ?�환?�을 ?�해 answer???�정
                     };
                 });
                 
                 setInquiries(mappedInquiries);
             } else {
                 setInquiries([]);
-                setError('문의 내역을 불러오는데 실패했습니다.');
+                setError('문의 ?�역??불러?�는???�패?�습?�다.');
             }
         } catch (err) {
             setInquiries([]);
-            setError('문의 내역을 불러오는 중 오류가 발생했습니다.');
-            console.error('문의 내역 불러오기 오류:', err);
+            setError('문의 ?�역??불러?�는 �??�류가 발생?�습?�다.');
+            console.error('문의 ?�역 불러?�기 ?�류:', err);
         } finally {
             setLoading(false);
         }
     };
 
-    // 컴포넌트 마운트 시 문의 내역 불러오기
+    // 컴포?�트 마운????문의 ?�역 불러?�기
     useEffect(() => {
         if (activeTab === 'history') {
             fetchInquiries();
         }
     }, [activeTab]);
 
-    // 답변 내용 모달
+    // ?��? ?�용 모달
     const [isModalOpen, setModalOpen] = useState(false);
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
     
@@ -108,7 +108,7 @@ export default function Customer(){
         console.log('openModal called with answer:', answer);
         if (!answer || answer.trim() === '') {
             console.log('Answer is empty, not opening modal');
-            return; // 답변 없는 경우 클릭 x
+            return; // ?��? ?�는 경우 ?�릭 x
         }
         console.log('Setting modal state');
         setSelectedAnswer(answer);
@@ -126,75 +126,75 @@ export default function Customer(){
         setError(null);
         
         try {
-            // FormData 생성
+            // FormData ?�성
             const formData = new FormData();
             
-            // dto 객체 생성 및 JSON 문자열로 변환
+            // dto 객체 ?�성 �?JSON 문자?�로 변??
             const dto = {
-                type: inquiryType === "help" ? "도움 요청" :
-                      inquiryType === "uncomfortable" ? "서비스 이용 불편" :
-                      inquiryType === "proposal" ? "서비스 개선 제안" :
-                      inquiryType === "etc" ? "기타" : inquiryType,
+                type: inquiryType === "help" ? "?��? ?�청" :
+                      inquiryType === "uncomfortable" ? "?�비???�용 불편" :
+                      inquiryType === "proposal" ? "?�비??개선 ?�안" :
+                      inquiryType === "etc" ? "기�?" : inquiryType,
                 content: content
             };
             
-            // dto를 JSON 문자열로 추가
+            // dto�?JSON 문자?�로 추�?
             formData.append('dto', JSON.stringify(dto));
             
-            // 이미지 파일 추가
+            // ?��?지 ?�일 추�?
             imageFiles.forEach((file) => {
                 formData.append('images', file);
             });
             
             const response = await postInquiry(formData);
-            console.log('문의 등록 응답:', response);
+            console.log('문의 ?�록 ?�답:', response);
             
-            // 응답이 있고 상태 코드가 200번대면 성공으로 간주
+            // ?�답???�고 ?�태 코드가 200번�?�??�공?�로 간주
             if (response && (response.status === 200 || response.status === 201)) {
-                alert('문의가 성공적으로 등록되었습니다.');
-                // 폼 초기화
+                alert('문의가 ?�공?�으�??�록?�었?�니??');
+                // ??초기??
                 setInquiryType('');
                 setContent('');
                 setImages([]);
                 setImageFiles([]);
-                // 문의 내역 탭으로 이동하고 데이터 새로고침
+                // 문의 ?�역 ??���??�동?�고 ?�이???�로고침
                 setActiveTab('history');
                 await fetchInquiries();
             } else {
-                setError('문의 등록에 실패했습니다.');
+                setError('문의 ?�록???�패?�습?�다.');
             }
         } catch (err) {
-            setError('문의 등록 중 오류가 발생했습니다.');
-            console.error('문의 등록 오류:', err);
+            setError('문의 ?�록 �??�류가 발생?�습?�다.');
+            console.error('문의 ?�록 ?�류:', err);
         } finally {
             setLoading(false);
         }
     };
 
     /*
-     <더보기>
-     expandedItems는 확장된 상태의 아이템 ID들을 저장하는 배열로 확장 여부 추적
-     기본은 43자까지만 표시 -> 클릭 시 전체 내용 -> 재클릭시 접힘
+     <?�보�?
+     expandedItems???�장???�태???�이??ID?�을 ?�?�하??배열�??�장 ?��? 추적
+     기본?� 43?�까지�??�시 -> ?�릭 ???�체 ?�용 -> ?�클�?�� ?�힘
     */
     const [expandedItems, setExpandedItems] = useState<(string | number)[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
     
-    /* 항목 확장/축소 토글 기능 구현 */
+    /* ??�� ?�장/축소 ?��? 기능 구현 */
     const itemToggle = (id: string | number) =>{
         setExpandedItems((prev) =>
             prev.includes(id) ? prev.filter((x)=>x!==id) : [...prev, id]
         );
     };
     
-    /*페이지네이션 처리*/
-    const indexOfLast = currentPage * itemsPerPage; // 현재 페이지에서 끝에 해당하는 배열 인덱스
-    const indexOfFirst = indexOfLast - itemsPerPage; // 현재 페이지의 첫 번째 항목 인덱스
-    const currentInquiries = inquiries.slice(indexOfFirst, indexOfLast); // 실제 현재 페이지에 보여줄 항목들의 배열
+    /*?�이지?�이??처리*/
+    const indexOfLast = currentPage * itemsPerPage; // ?�재 ?�이지?�서 ?�에 ?�당?�는 배열 ?�덱??
+    const indexOfFirst = indexOfLast - itemsPerPage; // ?�재 ?�이지??�?번째 ??�� ?�덱??
+    const currentInquiries = inquiries.slice(indexOfFirst, indexOfLast); // ?�제 ?�재 ?�이지??보여�???��?�의 배열
     
-    const totalPages = Math.ceil(inquiries.length / itemsPerPage); // 전체 페이지 수(마지막 페이지 번호)
+    const totalPages = Math.ceil(inquiries.length / itemsPerPage); // ?�체 ?�이지 ??마�?�??�이지 번호)
 
-    /* 이미지 선택 처리 */
+    /* ?��?지 ?�택 처리 */
     const handleImageUpload = (e: ChangeEvent<HTMLInputElement>, index: number) => {
         if (!e.target.files) return;
         const file = e.target.files[0];
@@ -212,7 +212,7 @@ export default function Customer(){
             return copy;
         });
     }
-    /* 이미지 삭제 처리 */
+    /* ?��?지 ??�� 처리 */
     const handleImageRemove = (index: number) => {
         setImages((prev) => {
             const copy = [...prev];
@@ -268,18 +268,18 @@ export default function Customer(){
         return () => window.removeEventListener("keydown", onKey);
     }, [inquiryTypeMenuOpen]);
 
-    /* 문의 내용 변경 처리 */
+    /* 문의 ?�용 변�?처리 */
     const handleContentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         setContent(e.target.value);
     };
 
-    /* 등록 버튼 활성화 여부 
-    inquiryType !== ""  :문의 유형이 선택됨
-    content.trim() !== "" : 내용이 공백이 아님 
+    /* ?�록 버튼 ?�성???��? 
+    inquiryType !== ""  :문의 ?�형???�택??
+    content.trim() !== "" : ?�용??공백???�님 
     */
     const isFormValid = inquiryType !== "" && content.trim() !== "";
     
-    // 문의 항목 컴포넌트
+    // 문의 ??�� 컴포?�트
     const InquiryItem = ({ item, isExpanded, onToggle, onOpenModal }: {
         item: Inquiry;
         isExpanded: boolean;
@@ -291,9 +291,9 @@ export default function Customer(){
 
         useEffect(() => {
             if (contentRef.current) {
-                // 텍스트가 한 줄을 넘어가는지 체크
+                // ?�스?��? ??줄을 ?�어가?��? 체크
                 const lineHeight = parseFloat(getComputedStyle(contentRef.current).lineHeight);
-                const isOverflowing = contentRef.current.scrollHeight > lineHeight * 1.5; // 약간의 여유를 둠
+                const isOverflowing = contentRef.current.scrollHeight > lineHeight * 1.5; // ?�간???�유�???
                 setIsLong(isOverflowing);
             }
         }, [item.content]);
@@ -302,19 +302,19 @@ export default function Customer(){
             <li className={cn("inquiryItem")}>
                 <span 
                     className={cn("status", 
-                        {waiting: item.status==="답변 대기", 
-                        done: item.status==="답변 보기"})}
+                        {waiting: item.status==="?��? ?��?, 
+                        done: item.status==="?��? 보기"})}
                     onClick={() => {
                         console.log('Status clicked, item:', item);
                         console.log('item.reply:', item.reply);
                         console.log('item.answer:', item.answer);
                         console.log('item.status:', item.status);
                         const answerContent = item.reply?.content || item.answer;
-                        if (item.status === "답변 보기" && answerContent) {
+                        if (item.status === "?��? 보기" && answerContent) {
                             onOpenModal(answerContent);
                         }
                     }}
-                    style={{ cursor: item.status === "답변 보기" ? 'pointer' : 'default' }}
+                    style={{ cursor: item.status === "?��? 보기" ? 'pointer' : 'default' }}
                 > 
                     {item.status}
                 </span>
@@ -325,17 +325,17 @@ export default function Customer(){
                     <span className={cn("contentText")}>{item.content}</span>
                     {isLong && (
                         <a onClick={() => onToggle(item.id)} className={cn("moreLink")}>
-                            {isExpanded ? " 접기" : " 더보기"}
+                            {isExpanded ? " ?�기" : " ?�보�?}
                         </a>
                     )}
                 </p>
 
-                {/* 이미지 표시*/}
+                {/* ?��?지 ?�시*/}
                 {item.image && (
                     <div className={cn("imageWrapper")}>
                         <Image 
                         src={item.image}
-                        alt="문의 이미지"
+                        alt="문의 ?��?지"
                         className={cn("inquiryImage")}
                         width={426}
                         height={213}
@@ -361,13 +361,13 @@ export default function Customer(){
                         className={cn("tab", {active: activeTab === "history"})}
                         onClick={() => setActiveTab("history")}
                     >
-                        문의 내역
+                        문의 ?�역
                     </button>
                     <button
                         className={cn("tab", {active: activeTab === "register"})}
                         onClick={() => setActiveTab("register")}
                     >
-                        문의 등록
+                        문의 ?�록
                     </button>
                 </div>
                 
@@ -375,11 +375,11 @@ export default function Customer(){
                     {activeTab === "history" && (
                         loading ? (
                             <div className={cn("loadingBox")}>
-                                <p className={cn("emptyMessage")}>문의 내역을 불러오는 중...</p>
+                                <p className={cn("emptyMessage")}>문의 ?�역??불러?�는 �?..</p>
                             </div>
                         ) : inquiries.length === 0 ? (
                             <div className={cn("emptyBox")}>
-                                <p className={cn("emptyMessage")}>문의하신 내역이 없어요.</p>
+                                <p className={cn("emptyMessage")}>문의?�신 ?�역???�어??</p>
                             </div>
                         ) : (
                         <>
@@ -430,7 +430,7 @@ export default function Customer(){
                             <div className={cn("formGroup")}>
                                 <div className={cn("formGroupLabel")}>
                                     <label id="inquiryTypeLabel" className={cn("inquiryFormLabel")}>
-                                        문의 유형
+                                        문의 ?�형
                                         <span className={cn("requiredIcon", "inquiryRequiredMark")} aria-hidden="true">
                                             *
                                         </span>
@@ -490,7 +490,7 @@ export default function Customer(){
                             </div>
                             <div className={cn("formGroup")}>
                                 <div className={cn("formGroupLabel")}>
-                                    <label>문의 내용</label>
+                                    <label>문의 ?�용</label>
                                     <span className={cn("requiredIcon")}>*</span>
                                 </div>
                                 <textarea
@@ -503,14 +503,14 @@ export default function Customer(){
                                 />
                             </div>
 
-                            {/* 관련 이미지 업로드 영영 추가 */}
+                            {/* 관???��?지 ?�로???�영 추�? */}
                             <div className={cn("formGroup")}>
-                                <label>관련 이미지</label>
+                                <label>관???��?지</label>
                                 <div className={cn("imageUploadArea")}>
                                     <div className={cn("imageSlot")}>
                                         {images[0] ? (
                                             <div className={cn("imagePreview")}>
-                                                <Image src={images[0]} alt="문의 이미지" width={100} height={100} />
+                                                <Image src={images[0]} alt="문의 ?��?지" width={100} height={100} />
                                                 <button
                                                     type="button"
                                                     className={cn("removeImageBtn")}
@@ -536,12 +536,12 @@ export default function Customer(){
                                     </div>
                                 </div>
                             </div>
-                            {/* 등록 버튼 추가 */}
+                            {/* ?�록 버튼 추�? */}
                             <button 
                             type="submit"
                             className={cn("submitBtn", {disabled: !isFormValid || loading})}
                             disabled={!isFormValid || loading}
-                            >{loading ? '등록 중...' : '등록하기'}</button>
+                            >{loading ? '?�록 �?..' : '?�록?�기'}</button>
                             {error && (
                                 <div className={cn("errorMessage")}>
                                     {error}
@@ -552,7 +552,7 @@ export default function Customer(){
                 </div>
             </div>
 
-            {/* 답변 내용 모달 */}
+            {/* ?��? ?�용 모달 */}
             {isModalOpen && selectedAnswer && (
                 <>
                     {console.log('Rendering AnswerModal, isModalOpen:', isModalOpen, 'selectedAnswer:', selectedAnswer)}

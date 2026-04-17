@@ -3,7 +3,7 @@
 import { SiNaver } from "react-icons/si";
 import classNames from "classnames/bind";
 import { getNaverOAuthStartUrl } from "@/lib/apis/authUser";
-import styles from "@/styles/Login.module.scss";
+import styles from "../../styles/Login.module.scss";
 
 const cn = classNames.bind(styles);
 
@@ -18,7 +18,7 @@ export default function NaverLoginButton({ onBeforeRedirect }: NaverLoginButtonP
       window.location.href = await getNaverOAuthStartUrl();
     } catch (error) {
       console.error(error);
-      alert("네이버 로그인을 시작할 수 없습니다. 다시 시도해주세요.");
+      alert("?�이�?로그?�을 ?�작?????�습?�다. ?�시 ?�도?�주?�요.");
     }
   };
 
@@ -29,7 +29,7 @@ export default function NaverLoginButton({ onBeforeRedirect }: NaverLoginButtonP
       onClick={() => void handleClick()}
     >
       <SiNaver className={cn("icon")} />
-      네이버 로그인
+      ?�이�?로그??
     </button>
   );
 }
