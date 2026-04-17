@@ -19,6 +19,7 @@ import house from "@/public/helpModify_house.svg"
 import male from "@/public/reservate_male.svg"
 import female from "@/public/reservate_female.svg"
 import both from "@/public/reservate_both.svg"
+import mapIconGray from "@/public/mapIconGray.svg"
 
 function formatAddressFromDaumPostcode(data: {
   userSelectedType: "R" | "J";
@@ -29,6 +30,14 @@ function formatAddressFromDaumPostcode(data: {
   const line = data.userSelectedType === "R" ? data.roadAddress : data.jibunAddress;
   const building = data.buildingName?.trim();
   return building ? `${line} ${building}` : line;
+}
+
+/** 서버 `reservationStatus`가 대기(진행 중)인 경우에만 true — 취소·완료·거절 등은 재신청 허용 */
+function isPersonalReservationPendingStatus(
+  status: string | undefined | null,
+): boolean {
+  const s = (status ?? "").trim();
+  return s === "REQUESTED" || s === "대기";
 }
 
 export default function ModifyPage() {
@@ -259,10 +268,12 @@ export default function ModifyPage() {
             reservationCheckRes?.data?.content ??
             reservationCheckRes?.data ??
             [];
-          if (
+          const hasPendingReservation =
             Array.isArray(existingReservations) &&
-            existingReservations.length > 0
-          ) {
+            existingReservations.some((item: { reservationStatus?: string }) =>
+              isPersonalReservationPendingStatus(item?.reservationStatus),
+            );
+          if (hasPendingReservation) {
             alert("도움 요청한 내역이 있습니다.");
             return;
           }
@@ -409,18 +420,29 @@ export default function ModifyPage() {
 
           <div className={cn("inputGroup")}>
             <label>방문 주소 <span className={cn("required")}>*</span></label>
-            <input
-              type="text"
-              value={address}
-              readOnly
-              onClick={openDaumPostcode}
-              placeholder="주소 검색"
-              title="우편번호 검색"
-              aria-label="우편번호 검색 열기"
-              className={`${cn("addressReadonlyInput")} ${
-                showErrors && !address ? cn("error") : ""
-              }`}
-            />
+            <div className={cn("addressSearchField")}>
+              <input
+                type="text"
+                value={address}
+                readOnly
+                onClick={openDaumPostcode}
+                placeholder="주소 검색"
+                title="우편번호 검색"
+                aria-label="우편번호 검색 열기"
+                className={`${cn("addressReadonlyInput")} ${
+                  showErrors && !address ? cn("error") : ""
+                }`}
+              />
+              <span className={cn("addressSearchIcon")} aria-hidden>
+                <Image
+                  src={mapIconGray}
+                  alt=""
+                  width={48}
+                  height={48}
+                  className={cn("addressSearchIconImage")}
+                />
+              </span>
+            </div>
             {showErrors && !address && (
               <p className={cn("errorMsg")}>주소를 입력해주세요.</p>
             )}
@@ -483,10 +505,11 @@ export default function ModifyPage() {
               <button
                 type="button"
                 className={cn("countButton")}
-                onClick={() => handleRecipientCountChange("increase")}
-                aria-label="도움 받는 사람 수 증가"
+                onClick={() => handleRecipientCountChange("decrease")}
+                disabled={recipientNumber <= 1}
+                aria-label="도움 받는 사람 수 감소"
               >
-                +
+                -
               </button>
               <span className={cn("countValue")} aria-live="polite">
                 {recipientNumber}
@@ -494,11 +517,10 @@ export default function ModifyPage() {
               <button
                 type="button"
                 className={cn("countButton")}
-                onClick={() => handleRecipientCountChange("decrease")}
-                disabled={recipientNumber <= 1}
-                aria-label="도움 받는 사람 수 감소"
+                onClick={() => handleRecipientCountChange("increase")}
+                aria-label="도움 받는 사람 수 증가"
               >
-                -
+                +
               </button>
             </div>
             {showErrors && recipientNumber < 1 && <p className={cn("errorMsg")}>도움 받는 사람 수를 입력해주세요.</p>}

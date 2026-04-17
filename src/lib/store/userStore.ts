@@ -5,10 +5,10 @@ import { getCheckAuth as getUserCheckAuth } from "../apis/authUser";
 import { getCheckAuth as getOrgCheckAuth } from "../apis/authOrganization";
 
 /** 로컬 UI 테스트: `false`로 두면 일반 동작. `true`면 로그인 없이 개인 회원 + Authorization용 고정 토큰(테스트 끝나면 `false`). */
-const DEV_MOCK_LOGGED_IN_INDIVIDUAL = false;
+const DEV_MOCK_LOGGED_IN_INDIVIDUAL = true;
 
 /** 모의 로그인 시 API `Authorization`에 실릴 access/refresh 값 */
-const DEV_MOCK_PLACEHOLDER_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjU1YTE1NTI0LTU0MjQtNDQyNS1iMzY0LWU3MGZlYzM5MTBjOSIsInJvbGUiOiJVU0VSIiwidHlwZSI6IlBFUlNPTkFMIiwidG9rZW5UeXBlIjoiYWNjZXNzVG9rZW4iLCJpYXQiOjE3NzYyMzU0MzAsImV4cCI6MTc3NjIzOTAzMH0.3RzDQJAQ8xOKU7kAw0gaSpEqS8RlR81MyTiyXZmnc-I";
+const DEV_MOCK_PLACEHOLDER_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEyY2IzYjNlLTFjMDYtNDU2Yy04NTExLWJhMzYxNDk2NTNmOCIsInJvbGUiOiJVU0VSIiwidHlwZSI6IlBFUlNPTkFMIiwidG9rZW5UeXBlIjoiYWNjZXNzVG9rZW4iLCJpYXQiOjE3NzYzODY0MzAsImV4cCI6MTc3NjM5MDAzMH0.WPpD9n5FqfzbhsK6p91Wr5ofYcNsLxQwewUeObxf2dw";
 
 interface UserState {
   user: User | null;

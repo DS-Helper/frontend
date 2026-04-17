@@ -800,6 +800,34 @@
   cursor: pointer;
 }
 
+.addressSearchField {
+  position: relative;
+  width: 100%;
+
+  .addressReadonlyInput {
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: calc(3rem + 1.6rem);
+  }
+}
+
+.addressSearchIcon {
+  position: absolute;
+  right: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.addressSearchIconImage {
+  width: 3rem;
+  height: 3rem;
+  object-fit: contain;
+}
+
 /* 우편번호 embed — fixed 뒷판 + flex 중앙 정렬 (open()은 레이아웃에 따라 모서리로 붙을 수 있음) */
 .postcodeLayerBackdrop {
   position: fixed;
