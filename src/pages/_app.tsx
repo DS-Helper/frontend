@@ -7,11 +7,15 @@ import Header from "@/components/common/Header"
 import Footer from "@/components/common/Footer"
 import NotificationListModal from "@/components/Modal/NotificationListModal";
 import { useUserStore } from "@/lib/store/userStore";
-import { getMyIdentifier, parseMyIdentifierUserId } from "@/lib/apis/account";
+import {
+  getMyIdentifier,
+  parseMyIdentifierUserId,
+  parseMyIdentifierUserRole,
+} from "@/lib/apis/account";
 
 export default function App({ Component, pageProps }: AppProps) {
   const [queryClient] = useState(() => new QueryClient());
-  const { checkAuthStatus, setUserId } = useUserStore();
+  const { checkAuthStatus, setUserId, setUserRole } = useUserStore();
   const [isHydrated, setIsHydrated] = useState(false);
   const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
   
@@ -35,7 +39,9 @@ export default function App({ Component, pageProps }: AppProps) {
           if (!isVerified) return;
           const myIdentifierRes = await getMyIdentifier();
           const nextUserId = parseMyIdentifierUserId(myIdentifierRes?.data ?? null);
+          const nextUserRole = parseMyIdentifierUserRole(myIdentifierRes?.data ?? null);
           if (nextUserId) setUserId(nextUserId);
+          if (nextUserRole) setUserRole(nextUserRole);
         } catch (error) {
           // 비로그인 상태에서는 자연스럽게 실패할 수 있어 조용히 무시
           console.debug("[auth] getMyIdentifier skipped:", error);
@@ -43,7 +49,7 @@ export default function App({ Component, pageProps }: AppProps) {
       })();
       setHasCheckedAuth(true);
     }
-  }, [isHydrated, hasCheckedAuth, checkAuthStatus, setUserId]);
+  }, [isHydrated, hasCheckedAuth, checkAuthStatus, setUserId, setUserRole]);
 
   // 알림 모달 열기 이벤트 리스너 (모든 페이지에서 작동)
   useEffect(() => {

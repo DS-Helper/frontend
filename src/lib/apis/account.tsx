@@ -44,6 +44,21 @@ export function parseMyIdentifierUserId(body: unknown): string | null {
   return normalized.length > 0 ? normalized : null;
 }
 
+/** `GET /user/my-identifier` 응답에서 userRole 추출 (`{ userRole }` / `{ data: { userRole } }` 모두 대응) */
+export function parseMyIdentifierUserRole(body: unknown): string | null {
+  if (body == null || typeof body !== "object" || Array.isArray(body)) return null;
+  const root = body as Record<string, unknown>;
+  const nested =
+    root.data != null && typeof root.data === "object" && !Array.isArray(root.data)
+      ? (root.data as Record<string, unknown>)
+      : null;
+
+  const raw = root.userRole ?? root.user_role ?? nested?.userRole ?? nested?.user_role;
+  if (raw == null) return null;
+  const normalized = String(raw).trim();
+  return normalized.length > 0 ? normalized : null;
+}
+
 export const getMyInfo = async () => {
   try {
     const res = await instance.get<AccountMyInfoResponse>("/user/my-info");
