@@ -1,5 +1,5 @@
 import classNames from "classnames/bind";
-import styles from "@/styles/BoardCategoryFilter.module.scss";
+import styles from "../styles/BoardCategoryFilter.module.scss";
 import { BoardCategory, BoardPostCategory, boardCategories } from "@/types/board";
 
 const cn = classNames.bind(styles);
@@ -14,7 +14,7 @@ export default function BoardCategoryFilter({
   onCategoryChange,
 }: BoardCategoryFilterProps) {
   const handleCategoryToggle = (category: BoardCategory) => {
-    if (category === "전체") {
+    if (category === "?�체") {
       onCategoryChange(null);
       return;
     }
@@ -36,7 +36,7 @@ export default function BoardCategoryFilter({
               <input
                 type="checkbox"
                 checked={
-                  category === "전체"
+                  category === "?�체"
                     ? selectedCategory === null
                     : selectedCategory === category
                 }
@@ -46,12 +46,12 @@ export default function BoardCategoryFilter({
               <div
                 className={cn("customCheckbox", {
                   checked:
-                    category === "전체"
+                    category === "?�체"
                       ? selectedCategory === null
                       : selectedCategory === category,
                 })}
               >
-                {(category === "전체"
+                {(category === "?�체"
                   ? selectedCategory === null
                   : selectedCategory === category) && (
                   <svg

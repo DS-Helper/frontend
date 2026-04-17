@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styles from "@/styles/Header.module.scss";
+import styles from "../../styles/Header.module.scss";
 import classNames from "classnames/bind";
 import Image from "next/image";
 import { useUserStore } from "@/lib/store/userStore";
@@ -53,7 +53,7 @@ export default function Header() {
               </div>
             </button>
           ) : (
-            <button className={cn("login")} onClick={() => router.push("/login")}>로그인</button>
+            <button className={cn("login")} onClick={() => router.push("/login")}>로그??/button>
           )}
         </div>
       </div>

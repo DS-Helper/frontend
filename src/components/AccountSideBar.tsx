@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import classNames from "classnames/bind";
-import styles from "@/styles/Account.module.scss";
+import styles from "../styles/Account.module.scss";
 
 type AccountTab = "profile" | "myPosts" | "scrap";
 
@@ -43,7 +43,7 @@ export default function AccountSideBar({ activeTab, onLogout }: AccountSideBarPr
           role="button"
           tabIndex={0}
         >
-          프로필
+          ?�로??
         </li>
         <li
           className={cn("navItem", { navItemActive: activeTab === "myPosts" })}
@@ -52,7 +52,7 @@ export default function AccountSideBar({ activeTab, onLogout }: AccountSideBarPr
           role="button"
           tabIndex={0}
         >
-          내 게시물
+          ??게시�?
         </li>
         <li
           className={cn("navItem", { navItemActive: activeTab === "scrap" })}
@@ -61,7 +61,7 @@ export default function AccountSideBar({ activeTab, onLogout }: AccountSideBarPr
           role="button"
           tabIndex={0}
         >
-          스크랩
+          ?�크??
         </li>
         <li
           className={cn("navItem")}
@@ -70,7 +70,7 @@ export default function AccountSideBar({ activeTab, onLogout }: AccountSideBarPr
           role="button"
           tabIndex={0}
         >
-          로그아웃
+          로그?�웃
         </li>
         <li
           className={cn("navItem")}
@@ -79,7 +79,7 @@ export default function AccountSideBar({ activeTab, onLogout }: AccountSideBarPr
           role="button"
           tabIndex={0}
         >
-          계정 삭제
+          계정 ??��
         </li>
       </ul>
     </aside>

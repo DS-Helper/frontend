@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import styles from "@/styles/Modify.module.scss";
+import styles from "../../styles/Modify.module.scss";
 import classNames from "classnames/bind";
 import NotificationModal from "@/components/Modal/Notification";
 import image from "@/public/reservation_com.svg"
@@ -11,18 +11,18 @@ export default function CompletePage() {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    // 페이지 진입 시 바로 모달 표시
+    // ?�이지 진입 ??바로 모달 ?�시
     setShowModal(true);
   }, []);
 
   const handleRequestNotifications = () => {
-    // 알림 권한 요청
+    // ?�림 권한 ?�청
     if ('Notification' in window) {
       Notification.requestPermission().then((permission) => {
         if (permission === 'granted') {
-          alert('알림이 허용되었습니다!');
+          alert('?�림???�용?�었?�니??');
         } else {
-          alert('알림이 거부되었습니다.');
+          alert('?�림??거�??�었?�니??');
         }
       });
     }
@@ -37,17 +37,17 @@ export default function CompletePage() {
     <div className={cn("container")}>
       <main className={cn("main")}>
         <div className={cn("completeContent")}>
-          <h1 className={cn("completeTitle")}>도움 요청이 접수되었어요</h1>
+          <h1 className={cn("completeTitle")}>?��? ?�청???�수?�었?�요</h1>
           <p className={cn("completeMessage")}>
-            헬퍼가 예약 내용을 확인한 후 확정 여부를 알려드릴게요. 
-            <br />확정되면 알림을 보내드릴 예정이에요.
+            ?�퍼가 ?�약 ?�용???�인?????�정 ?��?�??�려?�릴게요. 
+            <br />?�정?�면 ?�림??보내?�릴 ?�정?�에??
           </p>
           <div className={cn("imageBox")}>
-            <Image src={image} alt="도움 요청 접수 완료" className={cn("completeImage")} />
+            <Image src={image} alt="?��? ?�청 ?�수 ?�료" className={cn("completeImage")} />
           </div>
         </div>
 
-        {/* 알림 권한 요청 모달 */}
+        {/* ?�림 권한 ?�청 모달 */}
         {showModal && (
           <NotificationModal
             onRequest={handleRequestNotifications}

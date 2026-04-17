@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import classNames from "classnames/bind";
-import styles from "@/styles/PhoneVerifyModal.module.scss";
+import styles from "../../styles/PhoneVerifyModal.module.scss";
 import Image from "next/image";
 import { IoCloseOutline } from "react-icons/io5";
 
 const cn = classNames.bind(styles);
 
-/** 숫자만 추출 후 010-XXXX-XXXX / 010-XXX-XXXX 형식으로 자동 하이픈 포맷 */
+/** ?�자�?추출 ??010-XXXX-XXXX / 010-XXX-XXXX ?�식?�로 ?�동 ?�이???�맷 */
 function formatPhoneInput(value: string): string {
   const digits = value.replace(/\D/g, "").slice(0, 11);
   if (digits.length <= 3) return digits;
@@ -19,7 +19,7 @@ function formatPhoneInput(value: string): string {
   return digits.slice(0, 3) + "-" + digits.slice(3);
 }
 
-const TIMER_SECONDS = 3 * 60; // 3분
+const TIMER_SECONDS = 3 * 60; // 3�?
 
 function formatTimer(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -132,7 +132,7 @@ export default function PhoneVerifyModal({
             type="button"
             className={cn("closeButton")}
             onClick={handleClose}
-            aria-label="모달 닫기"
+            aria-label="모달 ?�기"
           >
             <IoCloseOutline size={30} className={cn("closeIcon")} />
           </button>
@@ -141,7 +141,7 @@ export default function PhoneVerifyModal({
         {step === "phone" ? (
           <>
             <h2 id="phoneVerifyTitle" className={cn("title")}>
-              전화번호를 입력해주세요!
+              ?�화번호�??�력?�주?�요!
             </h2>
             <form onSubmit={handleRequestCode} className={cn("form")}>
               <input
@@ -156,17 +156,17 @@ export default function PhoneVerifyModal({
                 aria-describedby="phoneVerifyDesc"
               />
               <p id="phoneVerifyDesc" className={cn("helperText")}>
-                카카오톡 알림톡으로 발송되며, 수신 불가 시 SMS로 대체됩니다.
+                카카?�톡 ?�림?�으�?발송?�며, ?�신 불�? ??SMS�??�체됩?�다.
               </p>
               <button type="submit" className={cn("submitButton")}>
-                인증번호 받기
+                ?�증번호 받기
               </button>
             </form>
           </>
         ) : step === "code" ? (
           <>
             <h2 id="codeVerifyTitle" className={cn("title")}>
-              인증번호를 입력해주세요!
+              ?�증번호�??�력?�주?�요!
             </h2>
             <form onSubmit={handleVerifySubmit} className={cn("form", "formCode")}>
               <input
@@ -182,7 +182,7 @@ export default function PhoneVerifyModal({
                 aria-describedby="codeVerifyDesc"
               />
               <p id="codeVerifyDesc" className={cn("helperText")}>
-                카카오톡 알림톡으로 발송되며, 수신 불가 시 SMS로 대체됩니다.
+                카카?�톡 ?�림?�으�?발송?�며, ?�신 불�? ??SMS�??�체됩?�다.
               </p>
               <div className={cn("resendRow")}>
                 <button
@@ -191,14 +191,14 @@ export default function PhoneVerifyModal({
                   onClick={handleResend}
                   disabled={secondsLeft <= 0}
                 >
-                  재전송
+                  ?�전??
                 </button>
                 <span className={cn("timer", { expired: secondsLeft <= 0 })}>
                   {formatTimer(secondsLeft)}
                 </span>
               </div>
               <button type="submit" className={cn("submitButton")}>
-                확인
+                ?�인
               </button>
             </form>
           </>
@@ -207,21 +207,21 @@ export default function PhoneVerifyModal({
             <div className={cn("successIcon")}>
               <Image
                 src="/profileCheck.svg"
-                alt="인증 완료"
+                alt="?�증 ?�료"
                 width={64}
                 height={64}
                 className={cn("successCheckmark")}
               />
             </div>
             <h2 id="successTitle" className={cn("successTitle")}>
-              인증이 완료되었습니다!
+              ?�증???�료?�었?�니??
             </h2>
             <button
               type="button"
               className={cn("submitButton")}
               onClick={handleClose}
             >
-              확인
+              ?�인
             </button>
           </div>
         )}

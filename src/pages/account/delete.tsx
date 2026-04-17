@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import classNames from "classnames/bind";
-import styles from "@/styles/AccountDelete.module.scss";
+import styles from "../../styles/AccountDelete.module.scss";
 import { useUserStore } from "@/lib/store/userStore";
 import { getMyInfo, parseAccountMyInfoResponse } from "@/lib/apis/account";
 
@@ -52,9 +52,9 @@ export default function AccountDeletePage() {
   }, [isVerified]);
 
   const loginTypeText = useMemo(() => {
-    if (selectedSocialLoginProvider === "kakao") return "카카오";
-    if (selectedSocialLoginProvider === "naver") return "네이버";
-    if (selectedSocialLoginProvider === "google") return "구글";
+    if (selectedSocialLoginProvider === "kakao") return "카카??;
+    if (selectedSocialLoginProvider === "naver") return "?�이�?;
+    if (selectedSocialLoginProvider === "google") return "구�?";
     const raw = user?.type?.trim() ?? "";
     if (!raw) return "";
     return raw;
@@ -70,14 +70,14 @@ export default function AccountDeletePage() {
 
   const handleConfirmDelete = () => {
     setDeleteConfirmOpen(false);
-    alert("계정 삭제 기능은 준비 중입니다.");
+    alert("계정 ??�� 기능?� 준�?중입?�다.");
   };
 
   if (isAuthChecking) {
     return (
       <main className={cn("page")}>
         <section className={cn("panel")}>
-          <p className={cn("loadingText")}>인증 정보를 확인하는 중...</p>
+          <p className={cn("loadingText")}>?�증 ?�보�??�인?�는 �?..</p>
         </section>
       </main>
     );
@@ -86,49 +86,49 @@ export default function AccountDeletePage() {
   return (
     <main className={cn("page")}>
       <section className={cn("panel")}>
-        <h1 className={cn("title")}>계정 삭제</h1>
+        <h1 className={cn("title")}>계정 ??��</h1>
 
         <div className={cn("section")}>
-          <h2 className={cn("sectionTitle")}>계정 정보</h2>
+          <h2 className={cn("sectionTitle")}>계정 ?�보</h2>
           <ul className={cn("list")}>
-            {name && <li>이름: {name}</li>}
-            {email && <li>로그인 계정: {email}</li>}
-            {loginTypeText && <li>로그인 방식: {loginTypeText}</li>}
+            {name && <li>?�름: {name}</li>}
+            {email && <li>로그??계정: {email}</li>}
+            {loginTypeText && <li>로그??방식: {loginTypeText}</li>}
           </ul>
         </div>
 
         <div className={cn("section")}>
-          <h2 className={cn("sectionTitle")}>삭제 안내</h2>
+          <h2 className={cn("sectionTitle")}>??�� ?�내</h2>
           <ul className={cn("list")}>
-            <li>계정을 삭제하면 디에스헬퍼 계정 및 연결된 사용자 데이터가 삭제됩니다.</li>
-            <li>삭제 후 계정 복구는 불가능합니다.</li>
+            <li>계정????��?�면 ?�에?�헬??계정 �??�결???�용???�이?��? ??��?�니??</li>
+            <li>??�� ??계정 복구??불�??�합?�다.</li>
           </ul>
         </div>
 
         <div className={cn("section")}>
-          <h2 className={cn("sectionTitle")}>삭제 정보</h2>
+          <h2 className={cn("sectionTitle")}>??�� ?�보</h2>
           <ul className={cn("list")}>
-            <li>디에스헬퍼 계정 정보</li>
-            <li>프로필 정보</li>
-            <li>SNS 로그인 연동 정보</li>
-            <li>도움 요청 내역에 포함된 정보</li>
-            <li>고객문의 내역에 포함된 정보</li>
-            <li>소통방 활동 정보 중 계정에 연결된 정보</li>
-            <li>알림 수신 이력 및 계정에 연결된 알림 정보</li>
+            <li>?�에?�헬??계정 ?�보</li>
+            <li>?�로???�보</li>
+            <li>SNS 로그???�동 ?�보</li>
+            <li>?��? ?�청 ?�역???�함???�보</li>
+            <li>고객문의 ?�역???�함???�보</li>
+            <li>?�통�??�동 ?�보 �?계정???�결???�보</li>
+            <li>?�림 ?�신 ?�력 �?계정???�결???�림 ?�보</li>
           </ul>
         </div>
 
         <div className={cn("section")}>
-          <h2 className={cn("sectionTitle")}>보관 정보</h2>
+          <h2 className={cn("sectionTitle")}>보�? ?�보</h2>
           <ul className={cn("list")}>
-            <li>계정 고유 식별값</li>
-            <li>고객문의 접수 및 답변 기록</li>
-            <li>신고 접수 및 처리 기록</li>
-            <li>계정 삭제 요청 처리 이력</li>
-            <li>서비스 접속 기록 및 보안 점검 기록</li>
+            <li>계정 고유 ?�별�?/li>
+            <li>고객문의 ?�수 �??��? 기록</li>
+            <li>?�고 ?�수 �?처리 기록</li>
+            <li>계정 ??�� ?�청 처리 ?�력</li>
+            <li>?�비???�속 기록 �?보안 ?��? 기록</li>
           </ul>
           <p className={cn("retentionNotice")}>
-            관련 법령 준수, 분쟁 대응, 보안 및 부정 이용 방지를 위해 해당정보는 1년동안 보관됩니다.
+            관??법령 준?? 분쟁 ?�?? 보안 �?부???�용 방�?�??�해 ?�당?�보??1?�동??보�??�니??
           </p>
         </div>
 
@@ -137,7 +137,7 @@ export default function AccountDeletePage() {
           className={cn("deleteButton")}
           onClick={handleDeleteClick}
         >
-          삭제
+          ??��
         </button>
       </section>
 
@@ -155,16 +155,16 @@ export default function AccountDeletePage() {
             onClick={(e) => e.stopPropagation()}
           >
             <h2 id="account-delete-confirm-title" className={cn("confirmTitle")}>
-              정말로 삭제하시겠습니까?
+              ?�말�???��?�시겠습?�까?
             </h2>
-            <p className={cn("confirmDescription")}>삭제 후 계정 복구는 불가능합니다.</p>
+            <p className={cn("confirmDescription")}>??�� ??계정 복구??불�??�합?�다.</p>
             <div className={cn("confirmActions")}>
               <button
                 type="button"
                 className={cn("confirmDeleteButton")}
                 onClick={handleConfirmDelete}
               >
-                삭제
+                ??��
               </button>
               <button
                 type="button"

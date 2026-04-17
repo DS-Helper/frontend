@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import classNames from "classnames/bind";
 import Image from "next/image";
-import styles from "@/styles/Account.module.scss";
-import scrapStyles from "@/styles/Scrap.module.scss";
+import styles from "../../styles/Account.module.scss";
+import scrapStyles from "";
 import AccountSideBar from "@/components/AccountSideBar";
 import { handleLogout } from "@/lib/utils/logout";
 import { BoardPost } from "@/types/board";
@@ -47,7 +47,7 @@ export default function MyPostsPage() {
       await handleLogout();
       router.push("/");
     } catch (error) {
-      console.error("로그아웃 중 오류:", error);
+      console.error("로그?�웃 �??�류:", error);
       router.push("/");
     }
   };
@@ -62,7 +62,7 @@ export default function MyPostsPage() {
             <div className={scrapCn("postList")}>
               {isLoading ? (
                 <div className={scrapCn("emptyState")}>
-                  <p>목록을 불러오는 중...</p>
+                  <p>목록??불러?�는 �?..</p>
                 </div>
               ) : myPosts.length > 0 ? (
                 myPosts.map((post) => (
@@ -86,7 +86,7 @@ export default function MyPostsPage() {
                         <div className={scrapCn("metricItem")}>
                           <Image
                             src={heartIcon}
-                            alt="좋아요"
+                            alt="좋아??
                             width={24}
                             height={24}
                             className={scrapCn("metricIcon")}
@@ -96,7 +96,7 @@ export default function MyPostsPage() {
                         <div className={scrapCn("metricItem")}>
                           <Image
                             src={commentIcon}
-                            alt="댓글"
+                            alt="?��?"
                             width={24}
                             height={24}
                             className={scrapCn("metricIcon")}
@@ -121,7 +121,7 @@ export default function MyPostsPage() {
                 ))
               ) : (
                 <div className={scrapCn("emptyState")}>
-                  <p>작성한 게시글이 없습니다.</p>
+                  <p>?�성??게시글???�습?�다.</p>
                 </div>
               )}
             </div>

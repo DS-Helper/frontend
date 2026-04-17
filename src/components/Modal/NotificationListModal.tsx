@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import classNames from "classnames/bind";
-import styles from "@/styles/NotificationListModal.module.scss";
+import styles from "../../styles/NotificationListModal.module.scss";
 import { IoChevronUp } from "react-icons/io5";
 import { FaCheck, FaTimes, FaBell, FaHeart } from "react-icons/fa";
 import Image from "next/image";
@@ -21,8 +21,8 @@ export interface Notification {
   id: string;
   type: NotificationType;
   message: string;
-  date: string; // MM.DD 형식
-  createdAt?: string; // ISO 날짜 문자열
+  date: string; // MM.DD ?�식
+  createdAt?: string; // ISO ?�짜 문자??
 }
 
 export default function NotificationListModal({
@@ -31,7 +31,7 @@ export default function NotificationListModal({
   isOpening,
   onClose,
 }: NotificationListModalProps) {
-  // 모달이 열릴 때 body 스크롤 방지
+  // 모달???�릴 ??body ?�크�?방�?
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -48,36 +48,36 @@ export default function NotificationListModal({
     onClose();
   };
 
-  // TODO: 실제 알림 데이터를 API에서 가져오는 로직 추가
-  // 예시 데이터 (테스트용)
+  // TODO: ?�제 ?�림 ?�이?��? API?�서 가?�오??로직 추�?
+  // ?�시 ?�이??(?�스?�용)
   const notifications: Notification[] = [
     // {
     //   id: '1',
     //   type: 'confirmed',
-    //   message: '오전 10시 도움 요청이 확정되었어요.',
+    //   message: '?�전 10???��? ?�청???�정?�었?�요.',
     //   date: '06.11',
     // },
     // {
     //   id: '2',
     //   type: 'cancelled',
-    //   message: '요청하신 오후 3시 도움 요청이 취소되었어요.',
+    //   message: '?�청?�신 ?�후 3???��? ?�청??취소?�었?�요.',
     //   date: '05.13',
     // },
     // {
     //   id: '3',
     //   type: 'upcoming',
-    //   message: '30분 뒤, DS 헬퍼가 요청하신 장소로 방문할 예정이에요.',
+    //   message: '30�??? DS ?�퍼가 ?�청?�신 ?�소�?방문???�정?�에??',
     //   date: '06.08',
     // },
     // {
     //   id: '4',
     //   type: 'completed',
-    //   message: '오늘 동행이 잘 마무리 되었어요. 다음에 또 도움이 필요하실 땐 언제든지 DS Helper 를 찾아주세요.',
+    //   message: '?�늘 ?�행????마무�??�었?�요. ?�음?????��????�요?�실 ???�제?��? DS Helper �?찾아주세??',
     //   date: '05.17',
     // },
   ];
 
-  // 날짜 포맷팅 함수 (MM.DD 형식)
+  // ?�짜 ?�맷???�수 (MM.DD ?�식)
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -86,7 +86,7 @@ export default function NotificationListModal({
     return `${month}.${day}`;
   };
 
-  // 알림 아이콘 렌더링
+  // ?�림 ?�이�??�더�?
   const renderNotificationIcon = (type: NotificationType) => {
     switch (type) {
       case 'confirmed':
@@ -130,17 +130,17 @@ export default function NotificationListModal({
             className={cn("modalContent", { closing: isClosing, opening: isOpening && !isClosing })} 
             onClick={(e) => e.stopPropagation()}
           >
-            {/* 헤더 */}
+            {/* ?�더 */}
             <div className={cn("header")}>
               <div className={cn("headerTitle")}>
-                <span className={cn("title")}>알림</span>
+                <span className={cn("title")}>?�림</span>
               </div>
               <button className={cn("closeButton")} onClick={handleCloseModal}>
                 <IoChevronUp size={20} className={cn("chevronIcon")} />
               </button>
             </div>
 
-            {/* 메인 콘텐츠 */}
+            {/* 메인 콘텐�?*/}
             <div className={cn("mainContent", { hasNotifications: notifications.length > 0 })}>
               {notifications.length === 0 ? (
                 <div className={cn("emptyState")}>
@@ -148,8 +148,8 @@ export default function NotificationListModal({
                     <Image src={mailbox} alt="mailbox" className={cn("mailboxImage")} width={122} height={150} />
                   </div>
                   <p className={cn("emptyMessage")}>
-                    아직 도착한 알림이 없어요. <br/>
-                    필요한 소식이 생기면 바로 알려드릴게요!
+                    ?�직 ?�착???�림???�어?? <br/>
+                    ?�요???�식???�기�?바로 ?�려?�릴게요!
                   </p>
                 </div>
               ) : (
@@ -172,7 +172,7 @@ export default function NotificationListModal({
                   </div>
                   <div className={cn("notificationFooter")}>
                     <p className={cn("footerMessage")}>
-                      알림은 받은 날로부터 7일 동안 보관돼요.
+                      ?�림?� 받�? ?�로부??7???�안 보�??�요.
                     </p>
                   </div>
                 </>

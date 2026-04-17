@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/router";
 import classNames from "classnames/bind";
-import styles from "@/styles/Board.module.scss";
-import filterStyles from "@/styles/BoardCategoryFilter.module.scss";
+import styles from "../../styles/Board.module.scss";
+import filterStyles from "";
 import searchIcon from "@/public/searchIcon.svg";
 import BoardCategoryFilter from "@/components/BoardCategoryFilter";
 import { BoardPost, BoardPostCategory, boardPostCategories } from "@/types/board";
@@ -77,7 +77,7 @@ export default function BoardPage() {
     [router]
   );
 
-  // URL 쿼리에서 카테고리/검색어 복원 (상세에서 돌아왔을 때)
+  // URL 쿼리?�서 카테고리/검?�어 복원 (?�세?�서 ?�아?�을 ??
   useEffect(() => {
     if (!router.isReady) return;
     const categoryFromQuery = getCategoryFromQuery(router.query);
@@ -89,7 +89,7 @@ export default function BoardPage() {
     setIsCategorySynced(true);
   }, [router.isReady, router.query]);
 
-  // 카테고리 변경 시 URL 반영 (다음에 상세 갔다 와도 유지되도록)
+  // 카테고리 변�???URL 반영 (?�음???�세 갔다 ?�???��??�도�?
   const handleCategoryChange = (category: BoardPostCategory | null) => {
     setSelectedCategory(category);
     setBoardPosts([]);
@@ -113,7 +113,7 @@ export default function BoardPage() {
     setCurrentPage(1);
   }, [isMobile]);
 
-  // API로 게시글 목록 조회 (일반/검색 공통)
+  // API�?게시글 목록 조회 (?�반/검??공통)
   useEffect(() => {
     if (!isCategorySynced) return;
 
@@ -265,7 +265,7 @@ export default function BoardPage() {
     setIsMobileCategoryOpen(false);
   };
 
-  /** 시트에서 고른 값이 목록에 이미 적용된 필터와 같으면 확인을 비활성화(시각·클릭 모두) */
+  /** ?�트?�서 고른 값이 목록???��? ?�용???�터?� 같으�??�인??비활?�화(?�각·?�릭 모두) */
   const hasMobileCategoryPendingChange =
     mobileCategoryDraft !== selectedCategory;
 
@@ -300,7 +300,7 @@ export default function BoardPage() {
         <form onSubmit={handleSearch} className={cn("searchForm")}>
           <input
             type="text"
-            placeholder="게시물의 제목을 입력해보세요."
+            placeholder="게시물의 ?�목???�력?�보?�요."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={cn("searchInput")}
@@ -336,7 +336,7 @@ export default function BoardPage() {
           <div className={cn("postList")}>
             {isLoading ? (
               <div className={cn("emptyState")}>
-                <p>목록을 불러오는 중...</p>
+                <p>목록??불러?�는 �?..</p>
               </div>
             ) : paginatedPosts.length > 0 ? (
               paginatedPosts.map((post) => (
@@ -360,7 +360,7 @@ export default function BoardPage() {
                       <button
                         type="button"
                         className={cn("metricLikeButton")}
-                        aria-label="좋아요"
+                        aria-label="좋아??
                         onClick={(e) => void handleLikeClick(e, post.id)}
                         onKeyDown={(e) => e.stopPropagation()}
                       >
@@ -396,7 +396,7 @@ export default function BoardPage() {
               ))
             ) : (
               <div className={cn("emptyState")}>
-                <p>게시글이 없습니다.</p>
+                <p>게시글???�습?�다.</p>
               </div>
             )}
           </div>
@@ -409,9 +409,9 @@ export default function BoardPage() {
           )}
           {isMobile && (
             <div className={cn("mobileInfiniteFooter")} aria-live="polite">
-              {isFetchingMore && <p className={cn("mobileInfiniteText")}>게시글을 더 불러오는 중...</p>}
+              {isFetchingMore && <p className={cn("mobileInfiniteText")}>게시글????불러?�는 �?..</p>}
               {!hasMore && boardPosts.length > 0 && (
-                <p className={cn("mobileInfiniteText")}>모든 게시글을 불러왔습니다.</p>
+                <p className={cn("mobileInfiniteText")}>모든 게시글??불러?�습?�다.</p>
               )}
               <div ref={loadMoreTriggerRef} className={cn("mobileInfiniteTrigger")} aria-hidden />
             </div>
@@ -423,9 +423,9 @@ export default function BoardPage() {
         type="button"
         className={cn("writeFab")}
         onClick={() => router.push("/board/write")}
-        aria-label="글쓰기"
+        aria-label="글?�기"
       >
-        <Image src={boardPencilIcon} alt="글쓰기" className={cn("writeFabIcon")} width={36} height={36} />
+        <Image src={boardPencilIcon} alt="글?�기" className={cn("writeFabIcon")} width={36} height={36} />
       </button>
 
       {isMobileCategoryOpen && (
@@ -439,7 +439,7 @@ export default function BoardPage() {
             className={cf("mobileCategorySheet")}
             role="dialog"
             aria-modal="true"
-            aria-label="카테고리 선택"
+            aria-label="카테고리 ?�택"
             onClick={(e) => e.stopPropagation()}
           >
             <BoardCategoryFilter
@@ -454,7 +454,7 @@ export default function BoardPage() {
               disabled={!hasMobileCategoryPendingChange}
               onClick={applyMobileCategory}
             >
-              확인
+              ?�인
             </button>
           </div>
         </div>
