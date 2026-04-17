@@ -58,7 +58,7 @@ function formatRelativeTime(dateLike: string): string {
 export default function BoardDetailPage() {
   const router = useRouter();
   const { id } = router.query;
-  const { userId } = useUserStore();
+  const { userId, userRole } = useUserStore();
   const [post, setPost] = useState<BoardPostDetail | null>(null);
   const [postWriterId, setPostWriterId] = useState<string>("");
   const [showToast, setShowToast] = useState(false);
@@ -81,6 +81,8 @@ export default function BoardDetailPage() {
     normalizedMyId !== "" &&
     normalizedPostWriterId !== "" &&
     normalizedMyId === normalizedPostWriterId;
+  const isAdmin = String(userRole ?? "").trim().toUpperCase() === "ADMIN";
+  const canDeletePost = isAuthor || isAdmin;
 
   // 메뉴 외부 클릭 시 닫기
   useEffect(() => {
@@ -360,9 +362,16 @@ export default function BoardDetailPage() {
                       </button>
                     </>
                   ) : (
-                    <button type="button" className={cn("moreMenuItem", "danger")} onClick={handleReport}>
-                      신고
-                    </button>
+                    <>
+                      <button type="button" className={cn("moreMenuItem", "danger")} onClick={handleReport}>
+                        신고
+                      </button>
+                      {canDeletePost && (
+                        <button type="button" className={cn("moreMenuItem", "danger")} onClick={() => void handleDelete()}>
+                          삭제
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
               )}

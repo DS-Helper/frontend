@@ -163,7 +163,7 @@ interface BoardCommentSectionProps {
 }
 
 export default function BoardCommentSection({ boardId }: BoardCommentSectionProps) {
-  const { userId } = useUserStore();
+  const { userId, userRole } = useUserStore();
   const [comments, setComments] = useState<BoardComment[]>([]);
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [commentDraft, setCommentDraft] = useState("");
@@ -283,6 +283,8 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
     if (normalizedMyId === "") return false;
     return normalizedMyId === String(comment.author.id ?? "").trim();
   };
+  const isAdmin = String(userRole ?? "").trim().toUpperCase() === "ADMIN";
+  const canDeleteComment = (comment: BoardComment): boolean => isCommentAuthor(comment) || isAdmin;
 
   const handleDeleteComment = async (commentId: string) => {
     const ok = window.confirm("댓글을 삭제하시겠습니까?");
@@ -368,16 +370,27 @@ export default function BoardCommentSection({ boardId }: BoardCommentSectionProp
                   </button>
                 </>
               ) : (
-                <button
-                  type="button"
-                  className={cn("commentMoreMenuItem", "danger")}
-                  onClick={() => {
-                    setActiveMenuCommentId(null);
-                    alert("신고 기능은 준비 중입니다.");
-                  }}
-                >
-                  신고
-                </button>
+                <>
+                  <button
+                    type="button"
+                    className={cn("commentMoreMenuItem", "danger")}
+                    onClick={() => {
+                      setActiveMenuCommentId(null);
+                      alert("신고 기능은 준비 중입니다.");
+                    }}
+                  >
+                    신고
+                  </button>
+                  {canDeleteComment(comment) && (
+                    <button
+                      type="button"
+                      className={cn("commentMoreMenuItem", "danger")}
+                      onClick={() => void handleDeleteComment(comment.id)}
+                    >
+                      삭제
+                    </button>
+                  )}
+                </>
               )}
             </div>
           )}

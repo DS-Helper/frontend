@@ -13,6 +13,7 @@ const DEV_MOCK_PLACEHOLDER_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEyY2IzYjNlLTF
 interface UserState {
   user: User | null;
   userId: string | null;
+  userRole: string | null;
   isVerified: boolean;
   userType: "individual" | "organization" | null;
   accessToken: string | null;
@@ -20,6 +21,7 @@ interface UserState {
   selectedSocialLoginProvider: "kakao" | "naver" | "google" | null;
   setUser: (user: User | null) => void;
   setUserId: (userId: string | null) => void;
+  setUserRole: (userRole: string | null) => void;
   setIsVerified: (isVerified: boolean) => void;
   setUserType: (userType: "individual" | "organization" | null) => void;
   setSelectedSocialLoginProvider: (
@@ -30,7 +32,7 @@ interface UserState {
 
 type UserPersistedSlice = Pick<
   UserState,
-  "user" | "userId" | "isVerified" | "userType" | "accessToken" | "selectedSocialLoginProvider"
+  "user" | "userId" | "userRole" | "isVerified" | "userType" | "accessToken" | "selectedSocialLoginProvider"
 >;
 
 function normalizeToken(value: unknown): string | null {
@@ -44,6 +46,7 @@ export const useUserStore = create(
     (set, get) => ({
       user: null,
       userId: null,
+      userRole: null,
       isVerified: false,
       userType: DEV_MOCK_LOGGED_IN_INDIVIDUAL ? "individual" : null,
       accessToken: DEV_MOCK_LOGGED_IN_INDIVIDUAL
@@ -55,6 +58,7 @@ export const useUserStore = create(
       selectedSocialLoginProvider: null,
       setUser: (user) => set({ user }),
       setUserId: (userId) => set({ userId }),
+      setUserRole: (userRole) => set({ userRole }),
       setIsVerified: (isVerified) => set({ isVerified }),
       setUserType: (userType) => set({ userType }),
       setSelectedSocialLoginProvider: (selectedSocialLoginProvider) =>
@@ -99,6 +103,7 @@ export const useUserStore = create(
               isVerified: false,
               user: null,
               userId: null,
+              userRole: null,
               userType: null,
               accessToken: null,
               refreshToken: null,
@@ -109,6 +114,7 @@ export const useUserStore = create(
             isVerified: false,
             user: null,
             userId: null,
+            userRole: null,
             userType: null,
             accessToken: null,
             refreshToken: null,
@@ -121,6 +127,7 @@ export const useUserStore = create(
       partialize: (state) => ({
         user: state.user,
         userId: state.userId,
+        userRole: state.userRole,
         isVerified: state.isVerified,
         userType: state.userType,
         accessToken: state.accessToken,
@@ -200,6 +207,7 @@ export function resetUserSession(): void {
   useUserStore.setState({
     user: null,
     userId: null,
+    userRole: null,
     isVerified: false,
     userType: null,
     accessToken: null,
