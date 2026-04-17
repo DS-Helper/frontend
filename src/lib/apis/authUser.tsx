@@ -205,11 +205,15 @@ export const googleLogin = async (body: { code: string }) => {
 export const getCheckAuth = async () => {
   try {
     const { refreshToken } = useUserStore.getState();
-    const hasRefreshToken =
-      typeof refreshToken === "string" && !!refreshToken.trim();
-    if (!hasRefreshToken) return null;
+    const normalizedRefreshToken =
+      typeof refreshToken === "string" && refreshToken.trim()
+        ? refreshToken.trim()
+        : undefined;
+    if (!normalizedRefreshToken) return null;
 
-    const res = await instance.get("/auth/check-logged-in");
+    const res = await instance.get("/auth/check-logged-in", {
+      headers: { refreshToken: normalizedRefreshToken },
+    });
     return res;
   } catch {
     return null;
