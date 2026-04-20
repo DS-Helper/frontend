@@ -33,4 +33,4 @@ jobs:
             npm run build
 
             echo "🚀 Reload server"
-            pm2 reload app || pm2 start app.js
+            pm2 reload dshelper || pm2 start dshelper
