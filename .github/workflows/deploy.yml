@@ -24,7 +24,7 @@ jobs:
             cd ~/frontend
 
             echo "📥 Pull latest code"
-            git pull origin main
+            git pull origin prd
 
             echo "📦 Install dependencies"
             npm install
