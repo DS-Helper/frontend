@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest   # GitHub가 제공하는 서버
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -20,7 +20,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
-          script: 
+          script: |
             cd ~/frontend
 
             echo "📥 Pull latest code"
