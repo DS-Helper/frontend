@@ -15,8 +15,16 @@ export default function Footer() {
         </ul>
         <p className={cn("footerTitle")}>연락처</p>
         <ul className={cn("footerInfo", "footerInfoContact")}>
-          <li>전화번호 : 010-5250-9548</li>
-          <li>이메일 : dshelper77@gmail.com</li>
+          <div className={cn("footerInfoContactItem")}>
+            <li className={cn("footerInfoContactItemTitle")}>전화번호 : 010-5250-9548</li>
+            <li>이메일 : dshelper77@gmail.com</li>
+          </div>
+          <div className={cn("footerInfoContactItem")}>
+            <li>인스타그램 : <a href="https://www.instagram.com/ds_helper_?igsh=bGRtN3pkNG95MnB1&utm_source=qr" target="_blank" rel="noopener noreferrer">https://www.instagram.com/ds_helper_?igsh=bGRtN3pkNG95MnB1&utm_source=qr</a></li>
+          </div>
+          <div>
+            <li>네이버 블로그 : <a href="https://blog.naver.com/dshelper" target="_blank" rel="noopener noreferrer">https://blog.naver.com/dshelper</a></li>
+          </div>
         </ul>
         <div className={cn("footerLinkContainer")}>
           <Link href="/terms" className={cn("footerLink")}>이용약관</Link>

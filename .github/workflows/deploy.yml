@@ -1,33 +1,40 @@
 name: Deploy to EC2
 
-on:
+on: 
   push:
     branches:
       - prd
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest   # GitHub가 제공하는 서버
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           script: |
+            export NVM_DIR="$HOME/.nvm"
+            source $NVM_DIR/nvm.sh
+            nvm use 20
+            
             cd ~/frontend
 
-            echo "📥 Pull latest code"
-            git pull origin main
+            echo "pull latest code"
+            git pull origin prd
 
-            echo "📦 Install dependencies"
+            echo "install dependencies"
             npm install
 
-            echo "🚀 Restart server"
-            pm2 restart app || pm2 start app.js
+            echo "Build"
+            npm run build
+
+            echo "Reload server"
+            pm2 reload dshelper || pm2 start dshelper

@@ -24,6 +24,11 @@
   }
 }
 
+.footerInfoContactItem {
+  display: flex;
+  gap: 1rem;
+}
+
 .footerLinkContainer {
   display: flex;
   flex-direction: column;
@@ -43,6 +48,8 @@
 
 .footerInfo {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 1rem;
   margin-bottom: 5rem;
 
@@ -52,7 +59,7 @@
     font-size: 1.5rem;
   }
 
-  li:first-child {
+  .footerInfoContactItemTitle:first-child {
     &:after {
       content: "|";
       margin-left: 1rem;
@@ -65,7 +72,7 @@
     flex-direction: column;
     gap: 1.2rem;
 
-    li:first-child {
+    .footerInfoContactItemTitle:first-child {
       &:after {
         content: "";
       }

@@ -278,6 +278,10 @@
 
 .writeFieldGroup {
 	width: 100%;
+
+	@media (max-width: 611px) {
+		order: 2;
+	}
 }
 
 .writeCategoryDropdown {
@@ -379,6 +383,10 @@
 	overflow: hidden;
 	background: #fff;
 	padding-top: 1.6rem;
+
+	@media (max-width: 611px) {
+		order: 3;
+	}
 }
 
 .writeTitleInput {
@@ -577,6 +585,11 @@
 	align-items: center;
 	gap: 1.2rem;
 	margin-top: 0.4rem;
+
+	@media (max-width: 611px) {
+		order: 1;
+		margin-top: 0;
+	}
 }
 
 .writeConfirmButton {

@@ -183,6 +183,8 @@ export default function BoardPage() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const keyword = searchQuery.trim();
+    const currentKeyword = activeSearchKeyword.trim();
+    if (keyword === currentKeyword) return;
     if (!keyword) {
       setActiveSearchKeyword("");
       setBoardPosts([]);
