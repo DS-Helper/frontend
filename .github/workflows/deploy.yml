@@ -29,5 +29,8 @@ jobs:
             echo "📦 Install dependencies"
             npm install
 
-            echo "🚀 Restart server"
-            pm2 restart app || pm2 start app.js
+            echo "🏗 Build"
+            npm run build
+
+            echo "🚀 Reload server"
+            pm2 reload app || pm2 start app.js
