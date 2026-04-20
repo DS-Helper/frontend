@@ -1,6 +1,6 @@
 name: Deploy to EC2
 
-on:
+on: 
   push:
     branches:
       - prd
@@ -23,14 +23,14 @@ jobs:
           script: |
             cd ~/frontend
 
-            echo "📥 Pull latest code"
+            echo "pull latest code"
             git pull origin prd
 
-            echo "📦 Install dependencies"
+            echo "install dependencies"
             npm install
 
-            echo "🏗 Build"
+            echo "Build"
             npm run build
 
-            echo "🚀 Reload server"
+            echo "Reload server"
             pm2 reload dshelper || pm2 start dshelper
