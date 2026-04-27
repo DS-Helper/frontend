@@ -1,5 +1,6 @@
 import { instance } from "./axios";
 import { useUserStore } from "../store/userStore";
+import { getClientHostname, isTestHost, pickValueByHost } from "../config/domainEnv";
 
 export const KAKAO_OAUTH_AUTHORIZE_ENDPOINT =
   "https://kauth.kakao.com/oauth/authorize";
@@ -12,25 +13,29 @@ export const NAVER_OAUTH_REDIRECT_PATH = "/naver/callback";
 
 function getAppOrigin(): string {
   if (typeof window === "undefined") return "";
-  return (
-    (process.env.NEXT_PUBLIC_APP_ORIGIN ?? "").replace(/\/$/, "") ||
-    window.location.origin
+  const hostname = getClientHostname();
+  const appOrigin = pickValueByHost(
+    hostname,
+    process.env.NEXT_PUBLIC_APP_ORIGIN,
+    process.env.NEXT_PUBLIC_TEST_APP_ORIGIN
   );
+  return appOrigin.replace(/\/$/, "") || window.location.origin;
 }
 
 function resolveOAuthRedirectUri(
-  envFullUrl: string | undefined,
+  productionUrl: string | undefined,
+  testUrl: string | undefined,
   pathname: string
 ): string {
+  const currentHost = getClientHostname();
   if (typeof window !== "undefined") {
     const currentOrigin = window.location.origin.replace(/\/$/, "");
-    const currentHost = window.location.hostname.toLowerCase();
-    // test 배포에서는 현재 호스트 기준 callback을 강제해 잘못된 env 고정값을 방지한다.
-    if (currentHost === "test.dshelper.kr") {
+    // test 도메인에서는 현재 호스트 callback을 강제해 잘못된 env 고정값을 방지한다.
+    if (isTestHost(currentHost)) {
       return `${currentOrigin}${pathname}`;
     }
   }
-  const fromEnv = envFullUrl?.trim();
+  const fromEnv = pickValueByHost(currentHost, productionUrl, testUrl);
   if (fromEnv) return fromEnv;
   if (typeof window === "undefined") return "";
   return `${getAppOrigin()}${pathname}`;
@@ -39,6 +44,7 @@ function resolveOAuthRedirectUri(
 export function getKakaoOAuthRedirectUri(): string {
   return resolveOAuthRedirectUri(
     process.env.NEXT_PUBLIC_KAKAO_OAUTH_REDIRECT_URI,
+    process.env.NEXT_PUBLIC_KAKAO_OAUTH_REDIRECT_URI_TEST,
     KAKAO_OAUTH_REDIRECT_PATH
   );
 }
@@ -46,6 +52,7 @@ export function getKakaoOAuthRedirectUri(): string {
 export function getGoogleOAuthRedirectUri(): string {
   return resolveOAuthRedirectUri(
     process.env.NEXT_PUBLIC_GOOGLE_OAUTH_REDIRECT_URI,
+    process.env.NEXT_PUBLIC_GOOGLE_OAUTH_REDIRECT_URI_TEST,
     GOOGLE_OAUTH_REDIRECT_PATH
   );
 }
@@ -53,12 +60,17 @@ export function getGoogleOAuthRedirectUri(): string {
 export function getNaverOAuthRedirectUri(): string {
   return resolveOAuthRedirectUri(
     process.env.NEXT_PUBLIC_NAVER_OAUTH_REDIRECT_URI,
+    process.env.NEXT_PUBLIC_NAVER_OAUTH_REDIRECT_URI_TEST,
     NAVER_OAUTH_REDIRECT_PATH
   );
 }
 
 export function getKakaoOAuthCallbackPathname(): string {
-  const fromEnv = process.env.NEXT_PUBLIC_KAKAO_OAUTH_REDIRECT_URI?.trim();
+  const fromEnv = pickValueByHost(
+    getClientHostname(),
+    process.env.NEXT_PUBLIC_KAKAO_OAUTH_REDIRECT_URI,
+    process.env.NEXT_PUBLIC_KAKAO_OAUTH_REDIRECT_URI_TEST
+  );
   if (fromEnv) {
     try {
       return new URL(fromEnv).pathname || KAKAO_OAUTH_REDIRECT_PATH;
@@ -70,7 +82,11 @@ export function getKakaoOAuthCallbackPathname(): string {
 }
 
 export function buildKakaoAuthorizeUrl(): string {
-  const clientId = process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY?.trim();
+  const clientId = pickValueByHost(
+    getClientHostname(),
+    process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY,
+    process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY_TEST
+  );
   if (!clientId) {
     throw new Error(
       ".env에 NEXT_PUBLIC_KAKAO_REST_API_KEY(카카오 REST API 키)를 설정하세요."
@@ -137,11 +153,13 @@ function normalizeOAuthAuthorizeUrl(url: string): string {
   const u = url.trim();
   if (u.startsWith("http://") || u.startsWith("https://")) return u;
   if (u.startsWith("/")) {
-    const base = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(
-      /\/$/,
-      ""
+    const base = pickValueByHost(
+      getClientHostname(),
+      process.env.NEXT_PUBLIC_API_URL,
+      process.env.NEXT_PUBLIC_TEST_API_URL
     );
-    return base ? `${base}${u}` : u;
+    const normalized = base.replace(/\/$/, "");
+    return normalized ? `${normalized}${u}` : u;
   }
   return u;
 }
