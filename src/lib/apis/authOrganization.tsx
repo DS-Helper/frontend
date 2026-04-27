@@ -20,3 +20,13 @@ export const getCheckAuth = async () => {
     return null;
   }
 };
+
+export const postSignup = async (data: any) => {
+  try {
+    const res = await instance.post("/auth/join/organization", data);
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};

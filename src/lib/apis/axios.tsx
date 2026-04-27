@@ -3,8 +3,13 @@ import {
   useUserStore,
   resetUserSession,
 } from "../store/userStore";
+import { getClientHostname, pickValueByHost } from "../config/domainEnv";
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_TEST_API_URL;
+const apiBaseUrl = pickValueByHost(
+  getClientHostname(),
+  process.env.NEXT_PUBLIC_API_URL,
+  process.env.NEXT_PUBLIC_TEST_API_URL
+);
 
 function formatBearer(raw: string | null): string | undefined {
   if (!raw?.trim()) return undefined;

@@ -1,4 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { pickValueByHost } from "@/lib/config/domainEnv";
+import { getHostnameFromNextApiRequest } from "@/lib/maps/kakaoMapEnv";
 
 type KakaoAddressResponse = {
   documents: unknown[];
@@ -57,13 +59,16 @@ export default async function handler(
     return res.status(400).json({ error: "검색어(q)가 필요합니다." });
   }
 
-  const apiKey =
-    process.env.KAKAO_REST_API_KEY?.trim() ||
-    process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY_TEST?.trim();
+  const hostname = getHostnameFromNextApiRequest(req);
+  const apiKey = pickValueByHost(
+    hostname,
+    process.env.KAKAO_REST_API_KEY || process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY,
+    process.env.KAKAO_REST_API_KEY_TEST || process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY_TEST
+  );
   if (!apiKey) {
     return res.status(500).json({
       error:
-        "KAKAO_REST_API_KEY(또는 NEXT_PUBLIC_KAKAO_REST_API_KEY_TEST)가 설정되지 않았습니다.",
+        "KAKAO_REST_API_KEY(.TEST) 또는 NEXT_PUBLIC_KAKAO_REST_API_KEY(.TEST)가 설정되지 않았습니다.",
     });
   }
 
