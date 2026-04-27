@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 
 /**
- * 카카오 지도 JavaScript 키 — 배포 변수 `NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY`를 사용합니다.
+ * 카카오 지도 JavaScript 키 — 배포 변수 `NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY_TEST`를 사용합니다.
  */
 
 const PRODUCTION_HOSTS = new Set(["dshelper.kr", "www.dshelper.kr"]);
@@ -12,7 +12,7 @@ export function isKakaoMapProductionHost(hostname: string): boolean {
 }
 
 export function getKakaoMapJavaScriptKeyForHost(hostname: string): string {
-  const prodKey = process.env.NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY?.trim() ?? "";
+  const prodKey = process.env.NEXT_PUBLIC_KAKAO_MAP_JAVASCRIPT_KEY_TEST?.trim() ?? "";
   void hostname;
   return prodKey;
 }
