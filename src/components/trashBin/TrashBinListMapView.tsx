@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/router";
 import classNames from "classnames/bind";
 import styles from "@/styles/TrashBinList.module.scss";
 import { getKakaoMapJavaScriptKeyForHost } from "@/lib/maps/kakaoMapEnv";
 import { getKakaoMapLoadErrorMessage, loadKakaoMapSdk } from "@/lib/maps/loadKakaoMapSdk";
-import type { TrashBinPlace } from "@/types/trashBin";
+import type { TrashBinApiItem, TrashBinPlace } from "@/types/trashBin";
+import { getTrashBins } from "@/lib/apis/trashBin";
 import Image from "next/image";
 
 const cn = classNames.bind(styles);
@@ -14,11 +16,32 @@ const PIN_ANCHOR = { x: 17, y: 53 };
 const MY_LOC_SIZE = { width: 24, height: 24 };
 const MY_LOC_ANCHOR = { x: 12, y: 12 };
 
-/**
- * 달성군청(논공읍 청사) — 지도 **최초 중심**만 여기로 고정.
- * 사용자 위치는 허용 시 `myLocationDot.svg` 마커로만 별도 표시합니다.
- */
+const FALLBACK_BIN_IMAGE_URL = "/mapIconGray.svg";
+
+/** 달성군청(논공읍 청사) — 지도 최초 중심 및 위치 권한은 있으나 신호 불가 등 시 거리 참조 폴백 */
 const DALSEONG_COUNTY_OFFICE = { lat: 35.77448, lng: 128.43018 };
+
+function trashBinApiToPlace(item: TrashBinApiItem): TrashBinPlace {
+  const imageUrl =
+    typeof item.photoUrl === "string" && item.photoUrl.trim() !== ""
+      ? item.photoUrl
+      : FALLBACK_BIN_IMAGE_URL;
+  const nameParts = [item.provinceName, item.cityCountyName, item.address]
+    .map((s) => s.trim())
+    .filter(Boolean);
+  /** 바텀시트 본문은 API `locationDescription`만 노출 */
+  const description = item.locationDescription.trim();
+
+  return {
+    id: item.id,
+    lat: item.latitude,
+    lng: item.longitude,
+    name: nameParts.join(" ").trim() || item.address.trim() || "분리수거함",
+    categoryLabel: item.binType.trim() || "분리수거함",
+    description,
+    imageUrl,
+  };
+}
 
 function openKakaoDirections(place: TrashBinPlace) {
   const url = `https://map.kakao.com/link/to/${encodeURIComponent(place.name)},${place.lat},${place.lng}`;
@@ -54,51 +77,9 @@ function formatDistance(meters: number): string {
   return `${(meters / 1000).toFixed(1)}km`;
 }
 
-/** 백엔드 연동 전 목 데이터 */
-const MOCK_TRASH_BINS: TrashBinPlace[] = [
-  {
-    id: "mock-1",
-    lat: 35.7751,
-    lng: 128.4302,
-    name: "새마을공원 인근 휴지통",
-    categoryLabel: "일반쓰레기통",
-    description: "새마을공원 우측에 위치해 있어요!",
-    imageUrl:
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=240&h=240&fit=crop&q=80",
-  },
-  {
-    id: "mock-2",
-    lat: 35.7736,
-    lng: 128.4275,
-    name: "달성군청 주변 수거함",
-    categoryLabel: "일반쓰레기통",
-    description: "군청 민원 동선 쪽에 설치되어 있어요.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=240&h=240&fit=crop&q=80",
-  },
-  {
-    id: "mock-3",
-    lat: 35.7758,
-    lng: 128.4268,
-    name: "공원 산책로 분리수거함",
-    categoryLabel: "재활용",
-    description: "플라스틱·캔 분리 배출이 가능해요.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1605600659908-0ef14b481dfd?w=240&h=240&fit=crop&q=80",
-  },
-  {
-    id: "mock-4",
-    lat: 35.7729,
-    lng: 128.4315,
-    name: "마을 입구 대형 수거함",
-    categoryLabel: "일반쓰레기통",
-    description: "주차장 근처에 쉽게 찾을 수 있어요.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=240&h=240&fit=crop&q=80",
-  },
-];
-
 export default function TrashBinListMapView() {
+  const router = useRouter();
+
   const mapElRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<KakaoMaps.Map | null>(null);
   const markersRef = useRef<KakaoMaps.Marker[]>([]);
@@ -106,12 +87,25 @@ export default function TrashBinListMapView() {
   const mapTapMarkerRef = useRef<KakaoMaps.Marker | null>(null);
   const isMapDraggingRef = useRef(false);
   const ignoreMapClickUntilRef = useRef(0);
+  /** 마커 클릭 직후 지도 click으로 바텀시트가 바로 닫히지 않게 함 */
+  const blockMapDeselectRef = useRef(false);
+
+  const [mapReady, setMapReady] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
+  const [binsError, setBinsError] = useState<string | null>(null);
+  const [places, setPlaces] = useState<TrashBinPlace[]>([]);
+
   const [selectedPlace, setSelectedPlace] = useState<TrashBinPlace | null>(null);
   const [selectedMapTap, setSelectedMapTap] = useState<MapTapInfo | null>(null);
-  const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
+  /** 실제 GPS 또는 거부·오류 시 달성군청 좌표 (거리·내 위치 마커 기준) */
+  const [referenceLocation, setReferenceLocation] = useState<{ lat: number; lng: number } | null>(
+    null
+  );
   const [isMapTapResolving, setIsMapTapResolving] = useState(false);
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
+
+  /** 위치 권한 허용(또는 거부 외 오류 폴백) 전에는 지도·마커를 올리지 않음 — 재방문 시 effect가 다시 돌며 getCurrentPosition으로 다시 요청 */
+  const [geoGateOk, setGeoGateOk] = useState(false);
 
   useEffect(() => {
     if (!selectedPlace) setIsImagePreviewOpen(false);
@@ -126,7 +120,72 @@ export default function TrashBinListMapView() {
     return () => window.removeEventListener("keydown", onKey);
   }, [isImagePreviewOpen]);
 
+  /** 매 페이지 진입마다 브라우저 위치 권한 재요청. 사용자가 명시 거부하면 홈으로 이동 */
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    let cancelled = false;
+
+    const goHome = () => {
+      void router.replace("/");
+    };
+
+    const finishOk = (lat: number, lng: number) => {
+      if (cancelled) return;
+      setReferenceLocation({ lat, lng });
+      setGeoGateOk(true);
+    };
+
+    const finishFallback = () => {
+      if (cancelled) return;
+      setReferenceLocation({ ...DALSEONG_COUNTY_OFFICE });
+      setGeoGateOk(true);
+    };
+
+    if (!navigator.geolocation) {
+      alert(
+        "이 기기에서는 위치 정보를 사용할 수 없어요. 근처 수거함 기능은 위치 허용이 필요합니다."
+      );
+      goHome();
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => finishOk(pos.coords.latitude, pos.coords.longitude),
+      (err) => {
+        if (cancelled) return;
+        if (err.code === err.PERMISSION_DENIED) {
+          alert("근처 수거함 안내를 위해 위치 권한이 필요해요. 홈 화면으로 이동합니다.");
+          goHome();
+          return;
+        }
+        finishFallback();
+      },
+      { enableHighAccuracy: true, timeout: 12_000, maximumAge: 0 }
+    );
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
+
+  /** 위치 허용 여부와 관계없이 공개 수거함 목록 조회 후 지도 마커에 반영 */
+  useEffect(() => {
+    void (async () => {
+      const items = await getTrashBins();
+      if (items == null) {
+        setBinsError("수거함 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.");
+        return;
+      }
+      setPlaces(items.map(trashBinApiToPlace));
+    })();
+  }, []);
+
+  /** 카카오 지도 초기화 — 위치 허용(또는 비거부 폴백) 확정 후에만 실행해, 거부 직후 짧게 지도가 깜박이지 않도록 함 */
+  useEffect(() => {
+    if (!geoGateOk) return;
+
     const el = mapElRef.current;
     if (!el) return;
 
@@ -139,8 +198,6 @@ export default function TrashBinListMapView() {
     }
 
     let cancelled = false;
-    const pinIconSrc = `${window.location.origin}/pinIcon.svg`;
-    const myLocIconSrc = `${window.location.origin}/myLocationDot.svg`;
 
     void (async () => {
       try {
@@ -161,55 +218,24 @@ export default function TrashBinListMapView() {
 
       const { maps } = window.kakao;
       const geocoder = new maps.services.Geocoder();
-      const center = new maps.LatLng(
-        DALSEONG_COUNTY_OFFICE.lat,
-        DALSEONG_COUNTY_OFFICE.lng
-      );
+      const center = new maps.LatLng(DALSEONG_COUNTY_OFFICE.lat, DALSEONG_COUNTY_OFFICE.lng);
       const map = new maps.Map(mapElRef.current, { center, level: 5 });
       mapInstanceRef.current = map;
+
       maps.event.addListener(map, "dragstart", () => {
         isMapDraggingRef.current = true;
-        // 터치/마우스 드래그 시작 시 click 처리 유예
         ignoreMapClickUntilRef.current = Date.now() + 120;
       });
       maps.event.addListener(map, "dragend", () => {
         isMapDraggingRef.current = false;
-        // 드래그 종료 직후 발생할 수 있는 click을 무시
         ignoreMapClickUntilRef.current = Date.now() + 220;
-      });
-
-      const markerSize = new maps.Size(PIN_SIZE.width, PIN_SIZE.height);
-      const markerOffset = new maps.Point(PIN_ANCHOR.x, PIN_ANCHOR.y);
-      const pinImage = new maps.MarkerImage(pinIconSrc, markerSize, {
-        offset: markerOffset,
-      });
-
-      markersRef.current.forEach((m) => m.setMap(null));
-      let blockMapDeselect = false;
-      markersRef.current = MOCK_TRASH_BINS.map((place) => {
-        const marker = new maps.Marker({
-          map,
-          position: new maps.LatLng(place.lat, place.lng),
-          image: pinImage,
-        });
-        maps.event.addListener(marker, "click", () => {
-          blockMapDeselect = true;
-          setSelectedPlace(place);
-          setSelectedMapTap(null);
-          mapTapMarkerRef.current?.setMap(null);
-          mapTapMarkerRef.current = null;
-          window.setTimeout(() => {
-            blockMapDeselect = false;
-          }, 0);
-        });
-        return marker;
       });
 
       maps.event.addListener(map, "click", (mouseEvent: { latLng: KakaoMaps.LatLng }) => {
         if (isMapDraggingRef.current || Date.now() < ignoreMapClickUntilRef.current) {
           return;
         }
-        if (blockMapDeselect) return;
+        if (blockMapDeselectRef.current) return;
         setSelectedPlace(null);
         setIsImagePreviewOpen(false);
 
@@ -233,42 +259,9 @@ export default function TrashBinListMapView() {
         });
       });
 
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            if (
-              cancelled ||
-              !mapInstanceRef.current ||
-              !window.kakao?.maps ||
-              map !== mapInstanceRef.current
-            ) {
-              return;
-            }
-            userLocationMarkerRef.current?.setMap(null);
-            const { maps: m } = window.kakao;
-            const dotImage = new m.MarkerImage(
-              myLocIconSrc,
-              new m.Size(MY_LOC_SIZE.width, MY_LOC_SIZE.height),
-              { offset: new m.Point(MY_LOC_ANCHOR.x, MY_LOC_ANCHOR.y) }
-            );
-            const userMarker = new m.Marker({
-              map,
-              position: new m.LatLng(pos.coords.latitude, pos.coords.longitude),
-              image: dotImage,
-            });
-            userLocationMarkerRef.current = userMarker;
-            setCurrentLocation({
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
-            });
-          },
-          () => {
-            setCurrentLocation(null);
-          },
-          { enableHighAccuracy: true, timeout: 12_000, maximumAge: 30_000 }
-        );
+      if (!cancelled) {
+        setMapReady(true);
       }
-
       requestAnimationFrame(() => map.relayout());
     })();
 
@@ -281,20 +274,89 @@ export default function TrashBinListMapView() {
       mapTapMarkerRef.current?.setMap(null);
       mapTapMarkerRef.current = null;
       mapInstanceRef.current = null;
+      setMapReady(false);
     };
-  }, []);
+  }, [geoGateOk]);
+
+  /** 수거함 마커 동기화 */
+  useEffect(() => {
+    if (!mapReady || !mapInstanceRef.current || !window.kakao?.maps) return;
+    const map = mapInstanceRef.current;
+    const { maps } = window.kakao;
+    const pinIconSrc = `${window.location.origin}/pinIcon.svg`;
+    const markerSize = new maps.Size(PIN_SIZE.width, PIN_SIZE.height);
+    const markerOffset = new maps.Point(PIN_ANCHOR.x, PIN_ANCHOR.y);
+    const pinImage = new maps.MarkerImage(pinIconSrc, markerSize, {
+      offset: markerOffset,
+    });
+
+    markersRef.current.forEach((m) => m.setMap(null));
+    markersRef.current = places.map((place) => {
+      const marker = new maps.Marker({
+        map,
+        position: new maps.LatLng(place.lat, place.lng),
+        image: pinImage,
+      });
+      maps.event.addListener(marker, "click", () => {
+        blockMapDeselectRef.current = true;
+        setSelectedPlace(place);
+        setSelectedMapTap(null);
+        mapTapMarkerRef.current?.setMap(null);
+        mapTapMarkerRef.current = null;
+        window.setTimeout(() => {
+          blockMapDeselectRef.current = false;
+        }, 0);
+      });
+      return marker;
+    });
+
+    return () => {
+      markersRef.current.forEach((m) => m.setMap(null));
+      markersRef.current = [];
+    };
+  }, [mapReady, places]);
+
+  /** 기준 위치(실제 GPS 또는 달성군청) 마커 */
+  useEffect(() => {
+    if (!mapReady || !referenceLocation || !mapInstanceRef.current || !window.kakao?.maps) {
+      return;
+    }
+    const map = mapInstanceRef.current;
+    const { maps } = window.kakao;
+    const myLocIconSrc = `${window.location.origin}/myLocationDot.svg`;
+
+    userLocationMarkerRef.current?.setMap(null);
+    const dotImage = new maps.MarkerImage(
+      myLocIconSrc,
+      new maps.Size(MY_LOC_SIZE.width, MY_LOC_SIZE.height),
+      { offset: new maps.Point(MY_LOC_ANCHOR.x, MY_LOC_ANCHOR.y) }
+    );
+    userLocationMarkerRef.current = new maps.Marker({
+      map,
+      position: new maps.LatLng(referenceLocation.lat, referenceLocation.lng),
+      image: dotImage,
+    });
+  }, [mapReady, referenceLocation]);
 
   return (
     <div className={cn("mapShell")}>
-      {mapError && (
+      {(mapError || binsError) && (
         <p className={cn("mapErrorBanner")} role="alert">
-          {mapError}
+          {mapError ?? binsError}
         </p>
       )}
 
-      <div ref={mapElRef} className={cn("mapContainer")} aria-label="휴지통 지도" />
+      {!geoGateOk && (
+        <div className={cn("geoCheckingPanel")} aria-live="polite">
+          <p className={cn("geoCheckingMessage")}>위치 권한 확인 중입니다…</p>
+        </div>
+      )}
 
-      {(selectedPlace || isMapTapResolving || selectedMapTap) && (
+      {geoGateOk && (
+      <div ref={mapElRef} className={cn("mapContainer")} aria-label="휴지통 지도" />
+      )}
+
+      {geoGateOk && (selectedPlace || isMapTapResolving || selectedMapTap) && (
         <>
           <button
             type="button"
@@ -367,14 +429,14 @@ export default function TrashBinListMapView() {
                 <>
                   <p className={cn("mapTapSheetAddress")}>{selectedMapTap.addressLabel}</p>
                   <p className={cn("mapTapSheetDistance")}>
-                    {currentLocation
+                    {referenceLocation
                       ? `현재 위치에서 ${formatDistance(
-                          distanceInMeters(currentLocation, {
+                          distanceInMeters(referenceLocation, {
                             lat: selectedMapTap.lat,
                             lng: selectedMapTap.lng,
                           })
                         )}`
-                      : "현재 위치를 확인할 수 없어 거리를 계산하지 못했어요."}
+                      : "현재 위치를 확인하는 중이에요."}
                   </p>
                   <button
                     type="button"
@@ -387,7 +449,7 @@ export default function TrashBinListMapView() {
                         name: selectedMapTap.addressLabel,
                         categoryLabel: "선택 위치",
                         description: selectedMapTap.addressLabel,
-                        imageUrl: "",
+                        imageUrl: FALLBACK_BIN_IMAGE_URL,
                       })
                     }
                   >
@@ -400,7 +462,7 @@ export default function TrashBinListMapView() {
         </>
       )}
 
-      {isImagePreviewOpen && selectedPlace && (
+      {geoGateOk && isImagePreviewOpen && selectedPlace && (
         <div className={cn("imagePreviewRoot")} role="presentation">
           <button
             type="button"
