@@ -20,9 +20,6 @@ const MY_LOC_ANCHOR = { x: 12, y: 12 };
 
 const FALLBACK_BIN_IMAGE_URL = "/mapIconGray.svg";
 
-/** 달성군청(논공읍 청사) — 지도 최초 중심 및 위치 권한은 있으나 신호 불가 등 시 거리 참조 폴백 */
-const DALSEONG_COUNTY_OFFICE = { lat: 35.77448, lng: 128.43018 };
-
 function trashBinApiToPlace(item: TrashBinApiItem): TrashBinPlace {
   const imageUrl =
     typeof item.photoUrl === "string" && item.photoUrl.trim() !== ""
@@ -97,14 +94,14 @@ export default function TrashBinListMapView() {
 
   const [selectedPlace, setSelectedPlace] = useState<TrashBinPlace | null>(null);
   const [selectedMapTap, setSelectedMapTap] = useState<MapTapInfo | null>(null);
-  /** 실제 GPS 또는 거부·오류 시 달성군청 좌표 (거리·내 위치 마커 기준) */
+  /** 실제 GPS 좌표 (위치 거부/오류 시 홈으로 이동) */
   const [referenceLocation, setReferenceLocation] = useState<{ lat: number; lng: number } | null>(
     null
   );
   const [isMapTapResolving, setIsMapTapResolving] = useState(false);
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
 
-  /** 위치 권한 허용(또는 거부 외 오류 폴백) 전에는 지도·마커를 올리지 않음 — 재방문 시 effect가 다시 돌며 getCurrentPosition으로 다시 요청 */
+  /** 위치 권한 허용 전에는 지도·마커를 올리지 않음 — 재방문 시 effect가 다시 돌며 getCurrentPosition으로 다시 요청 */
   const [geoGateOk, setGeoGateOk] = useState(false);
   const trashBins = useTrashBinStore((state) => state.trashBins);
   const setTrashBins = useTrashBinStore((state) => state.setTrashBins);
@@ -156,13 +153,6 @@ export default function TrashBinListMapView() {
       setGeoGateOk(true);
     };
 
-    const finishFallback = () => {
-      if (cancelled) return;
-      console.warn("[GEO FALLBACK] using DALSEONG_COUNTY_OFFICE");
-      setReferenceLocation({ ...DALSEONG_COUNTY_OFFICE });
-      setGeoGateOk(true);
-    };
-
     if (!navigator.geolocation) {
       alert(
         "이 기기에서는 위치 정보를 사용할 수 없어요. 근처 수거함 기능은 위치 허용이 필요합니다."
@@ -178,12 +168,8 @@ export default function TrashBinListMapView() {
       (err) => {
         if (cancelled) return;
         console.error("[GEO ERROR]", { code: err.code, message: err.message });
-        if (err.code === err.PERMISSION_DENIED) {
-          alert("근처 수거함 안내를 위해 위치 권한이 필요해요. 홈 화면으로 이동합니다.");
-          goHome();
-          return;
-        }
-        finishFallback();
+        alert("근처 수거함 안내를 위해 위치 권한이 필요해요. 홈 화면으로 이동합니다.");
+        goHome();
       },
       { enableHighAccuracy: true, timeout: 12_000, maximumAge: 0 }
     );
@@ -198,7 +184,7 @@ export default function TrashBinListMapView() {
     setTrashBins(trashBinsQuery.data);
   }, [setTrashBins, trashBinsQuery.data]);
 
-  /** 카카오 지도 초기화 — 위치 허용(또는 비거부 폴백) 확정 후에만 실행해, 거부 직후 짧게 지도가 깜박이지 않도록 함 */
+  /** 카카오 지도 초기화 — 위치 허용 확정 후에만 실행해, 거부 직후 짧게 지도가 깜박이지 않도록 함 */
   useEffect(() => {
     if (!geoGateOk) return;
 
@@ -334,7 +320,7 @@ export default function TrashBinListMapView() {
     };
   }, [mapReady, places]);
 
-  /** 기준 위치(실제 GPS 또는 달성군청) 마커 */
+  /** 기준 위치(실제 GPS) 마커 */
   useEffect(() => {
     if (!mapReady || !referenceLocation || !mapInstanceRef.current || !window.kakao?.maps) {
       return;
@@ -417,6 +403,7 @@ export default function TrashBinListMapView() {
                     height={90}
                     loading="lazy"
                     decoding="async"
+                    unoptimized
                   />
                 </button>
                 <div className={cn("bottomSheetTextCol")}>
@@ -504,6 +491,7 @@ export default function TrashBinListMapView() {
                 className={cn("imagePreviewImage")}
                 sizes="(max-width: 900px) calc(100vw - 3.2rem), 52rem"
                 priority
+                unoptimized
               />
             </div>
           </div>
