@@ -109,13 +109,13 @@ function parseTrashBinsPage(body: unknown): {
   return { items, totalPages };
 }
 
-/** 쿼리 `page`는 **0부터** (`totalPages`가 4면 `page=0,1,2,3` 네 번). */
-async function fetchTrashBinsPage(pageZeroBased: number): Promise<{
+/** 수거함 목록은 고정 페이지 조건으로 1회 조회 (`page=0`, `size=100`). */
+async function fetchTrashBinsPage(): Promise<{
   items: TrashBinApiItem[];
   totalPages: number;
 } | null> {
   const res = await instance.get<unknown>("/trash-bins", {
-    params: { page: pageZeroBased },
+    params: { page: 0, size: 100 },
   });
   return parseTrashBinsPage(res.data);
 }
@@ -130,10 +130,6 @@ let binsRecentValue: TrashBinApiItem[] | null | undefined;
 let binsRecentUntil = 0;
 const RECENT_TRASH_BINS_MS = 2000;
 
-/**
- * `totalPages`가 N이면 `page = 0,1,…,N−1`로 **정확히 N번** 요청합니다.
- * 0페이지에서 `totalPages`를 받은 뒤, `1 … N−1`은 병렬로 받아 하나의 배열로 합칩니다.
- */
 export const getTrashBins = async (): Promise<TrashBinApiItem[] | null> => {
   const now = Date.now();
   if (now < binsRecentUntil && binsRecentValue !== undefined) {
@@ -143,30 +139,11 @@ export const getTrashBins = async (): Promise<TrashBinApiItem[] | null> => {
 
   binsInflight = (async (): Promise<TrashBinApiItem[] | null> => {
     try {
-      const first = await fetchTrashBinsPage(0);
-      if (!first) return null;
-
-      const totalPages = first.totalPages;
-      const merged: TrashBinApiItem[] = [...first.items];
-
-      if (totalPages <= 1) {
-        binsRecentValue = merged;
-        binsRecentUntil = Date.now() + RECENT_TRASH_BINS_MS;
-        return merged;
-      }
-
-      const restPageNums = Array.from({ length: totalPages - 1 }, (_, i) => i + 1);
-
-      const rest = await Promise.all(restPageNums.map((p) => fetchTrashBinsPage(p)));
-      if (rest.some((chunk) => chunk == null)) return null;
-
-      for (const chunk of rest as NonNullable<(typeof rest)[number]>[]) {
-        merged.push(...chunk.items);
-      }
-
-      binsRecentValue = merged;
+      const page0 = await fetchTrashBinsPage();
+      if (!page0) return null;
+      binsRecentValue = page0.items;
       binsRecentUntil = Date.now() + RECENT_TRASH_BINS_MS;
-      return merged;
+      return page0.items;
     } catch (e) {
       console.error(e);
       return null;

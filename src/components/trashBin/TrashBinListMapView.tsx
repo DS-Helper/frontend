@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import classNames from "classnames/bind";
 import styles from "@/styles/TrashBinList.module.scss";
@@ -6,6 +6,8 @@ import { getKakaoMapJavaScriptKeyForHost } from "@/lib/maps/kakaoMapEnv";
 import { getKakaoMapLoadErrorMessage, loadKakaoMapSdk } from "@/lib/maps/loadKakaoMapSdk";
 import type { TrashBinApiItem, TrashBinPlace } from "@/types/trashBin";
 import { getTrashBins } from "@/lib/apis/trashBin";
+import { useTrashBinStore } from "@/lib/store/trashBinStore";
+import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 
 const cn = classNames.bind(styles);
@@ -92,8 +94,6 @@ export default function TrashBinListMapView() {
 
   const [mapReady, setMapReady] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
-  const [binsError, setBinsError] = useState<string | null>(null);
-  const [places, setPlaces] = useState<TrashBinPlace[]>([]);
 
   const [selectedPlace, setSelectedPlace] = useState<TrashBinPlace | null>(null);
   const [selectedMapTap, setSelectedMapTap] = useState<MapTapInfo | null>(null);
@@ -106,6 +106,26 @@ export default function TrashBinListMapView() {
 
   /** 위치 권한 허용(또는 거부 외 오류 폴백) 전에는 지도·마커를 올리지 않음 — 재방문 시 effect가 다시 돌며 getCurrentPosition으로 다시 요청 */
   const [geoGateOk, setGeoGateOk] = useState(false);
+  const trashBins = useTrashBinStore((state) => state.trashBins);
+  const setTrashBins = useTrashBinStore((state) => state.setTrashBins);
+
+  const trashBinsQuery = useQuery({
+    queryKey: ["trashBins", 0, 100],
+    queryFn: async () => {
+      const items = await getTrashBins();
+      if (items == null) {
+        throw new Error("TRASH_BINS_FETCH_FAILED");
+      }
+      return items;
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+  const binsError = trashBinsQuery.isError
+    ? "수거함 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요."
+    : null;
+  const places = useMemo(() => trashBins.map(trashBinApiToPlace), [trashBins]);
 
   useEffect(() => {
     if (!selectedPlace) setIsImagePreviewOpen(false);
@@ -131,12 +151,14 @@ export default function TrashBinListMapView() {
 
     const finishOk = (lat: number, lng: number) => {
       if (cancelled) return;
+      console.log("[GEO SUCCESS] current position:", { lat, lng });
       setReferenceLocation({ lat, lng });
       setGeoGateOk(true);
     };
 
     const finishFallback = () => {
       if (cancelled) return;
+      console.warn("[GEO FALLBACK] using DALSEONG_COUNTY_OFFICE");
       setReferenceLocation({ ...DALSEONG_COUNTY_OFFICE });
       setGeoGateOk(true);
     };
@@ -155,6 +177,7 @@ export default function TrashBinListMapView() {
       (pos) => finishOk(pos.coords.latitude, pos.coords.longitude),
       (err) => {
         if (cancelled) return;
+        console.error("[GEO ERROR]", { code: err.code, message: err.message });
         if (err.code === err.PERMISSION_DENIED) {
           alert("근처 수거함 안내를 위해 위치 권한이 필요해요. 홈 화면으로 이동합니다.");
           goHome();
@@ -170,17 +193,10 @@ export default function TrashBinListMapView() {
     };
   }, [router]);
 
-  /** 위치 허용 여부와 관계없이 공개 수거함 목록 조회 후 지도 마커에 반영 */
   useEffect(() => {
-    void (async () => {
-      const items = await getTrashBins();
-      if (items == null) {
-        setBinsError("수거함 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.");
-        return;
-      }
-      setPlaces(items.map(trashBinApiToPlace));
-    })();
-  }, []);
+    if (!trashBinsQuery.data) return;
+    setTrashBins(trashBinsQuery.data);
+  }, [setTrashBins, trashBinsQuery.data]);
 
   /** 카카오 지도 초기화 — 위치 허용(또는 비거부 폴백) 확정 후에만 실행해, 거부 직후 짧게 지도가 깜박이지 않도록 함 */
   useEffect(() => {
@@ -218,7 +234,9 @@ export default function TrashBinListMapView() {
 
       const { maps } = window.kakao;
       const geocoder = new maps.services.Geocoder();
-      const center = new maps.LatLng(DALSEONG_COUNTY_OFFICE.lat, DALSEONG_COUNTY_OFFICE.lng);
+      if (!referenceLocation) return;
+      console.log("[MAP INIT] center from referenceLocation:", referenceLocation);
+      const center = new maps.LatLng(referenceLocation.lat, referenceLocation.lng);
       const map = new maps.Map(mapElRef.current, { center, level: 5 });
       mapInstanceRef.current = map;
 
@@ -276,7 +294,7 @@ export default function TrashBinListMapView() {
       mapInstanceRef.current = null;
       setMapReady(false);
     };
-  }, [geoGateOk]);
+  }, [geoGateOk, referenceLocation]);
 
   /** 수거함 마커 동기화 */
   useEffect(() => {
