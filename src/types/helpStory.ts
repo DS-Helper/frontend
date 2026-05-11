@@ -34,6 +34,7 @@ export interface PostsListResponse {
 
 /** GET /posts 쿼리 (page는 보통 0부터) */
 export interface GetPostsParams {
+  keyword?: string;
   page?: number;
   size?: number;
   sort?: string;
