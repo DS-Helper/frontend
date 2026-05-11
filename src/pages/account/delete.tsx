@@ -2,18 +2,26 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import classNames from "classnames/bind";
 import styles from "@/styles/AccountDelete.module.scss";
-import { useUserStore } from "@/lib/store/userStore";
-import { getMyInfo, parseAccountMyInfoResponse } from "@/lib/apis/account";
+import { useUserStore, resetUserSession } from "@/lib/store/userStore";
+import {
+  deleteGoogle,
+  deleteKakao,
+  deleteNaver,
+  getMyInfo,
+  parseAccountMyInfoResponse,
+} from "@/lib/apis/account";
 
 const cn = classNames.bind(styles);
 
 export default function AccountDeletePage() {
   const router = useRouter();
-  const { isVerified, checkAuthStatus, user, selectedSocialLoginProvider } = useUserStore();
+  const { isVerified, checkAuthStatus, user, selectedSocialLoginProvider, accessToken } =
+    useUserStore();
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -68,9 +76,39 @@ export default function AccountDeletePage() {
     setDeleteConfirmOpen(false);
   };
 
-  const handleConfirmDelete = () => {
-    setDeleteConfirmOpen(false);
-    alert("계정 삭제 기능은 준비 중입니다.");
+  const handleConfirmDelete = async () => {
+    const token = accessToken?.trim() ?? "";
+    if (!token) {
+      alert("로그인 토큰을 확인할 수 없어요. 다시 로그인한 뒤 시도해 주세요.");
+      return;
+    }
+
+    const provider = selectedSocialLoginProvider;
+    if (provider !== "google" && provider !== "kakao" && provider !== "naver") {
+      alert("SNS 로그인으로 연동된 계정만 이 화면에서 삭제할 수 있어요.");
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const res =
+        provider === "google"
+          ? await deleteGoogle(token)
+          : provider === "kakao"
+            ? await deleteKakao(token)
+            : await deleteNaver(token);
+
+      if (res == null) {
+        alert("계정 삭제에 실패했어요. 잠시 후 다시 시도해 주세요.");
+        return;
+      }
+
+      setDeleteConfirmOpen(false);
+      resetUserSession();
+      await router.replace("/");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   if (isAuthChecking) {
@@ -162,13 +200,15 @@ export default function AccountDeletePage() {
               <button
                 type="button"
                 className={cn("confirmDeleteButton")}
-                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                onClick={() => void handleConfirmDelete()}
               >
-                삭제
+                {isDeleting ? "처리 중…" : "삭제"}
               </button>
               <button
                 type="button"
                 className={cn("confirmCancelButton")}
+                disabled={isDeleting}
                 onClick={handleCloseDeleteConfirm}
               >
                 취소
