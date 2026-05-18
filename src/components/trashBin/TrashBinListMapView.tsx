@@ -276,15 +276,17 @@ export default function TrashBinListMapView() {
       window.addEventListener("deviceorientation", onOrientation, true);
     };
 
-    const request =
+    type DeviceOrientationPermission = "granted" | "denied" | "default";
+
+    const request: Promise<DeviceOrientationPermission> =
       typeof DeviceOrientationEvent !== "undefined" &&
       "requestPermission" in DeviceOrientationEvent &&
       typeof DeviceOrientationEvent.requestPermission === "function"
-        ? DeviceOrientationEvent.requestPermission()
-        : Promise.resolve("granted" as PermissionState);
+        ? (DeviceOrientationEvent.requestPermission() as Promise<DeviceOrientationPermission>)
+        : Promise.resolve("granted");
 
     let cancelled = false;
-    void request.then((state) => {
+    void request.then((state: DeviceOrientationPermission) => {
       if (cancelled || state !== "granted") return;
       attach();
     });
