@@ -15,10 +15,9 @@ const cn = classNames.bind(styles);
 const PIN_SIZE = { width: 35, height: 53 };
 const PIN_ANCHOR = { x: 17, y: 53 };
 
-const MY_LOC_SIZE = { width: 24, height: 24 };
-const MY_LOC_ANCHOR = { x: 12, y: 12 };
-
 const FALLBACK_BIN_IMAGE_URL = "/mapIconGray.svg";
+
+const USER_LOC_OVERLAY_SIZE = 48;
 
 function trashBinApiToPlace(item: TrashBinApiItem): TrashBinPlace {
   const imageUrl =
@@ -47,33 +46,80 @@ function openKakaoDirections(place: TrashBinPlace) {
   window.open(url, "_blank", "noopener,noreferrer");
 }
 
-type MapTapInfo = {
-  lat: number;
-  lng: number;
-  addressLabel: string;
-};
-
-function distanceInMeters(
-  from: { lat: number; lng: number },
-  to: { lat: number; lng: number }
-): number {
-  const toRad = (deg: number) => (deg * Math.PI) / 180;
-  const earthRadiusM = 6371000;
-  const dLat = toRad(to.lat - from.lat);
-  const dLng = toRad(to.lng - from.lng);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(from.lat)) *
-      Math.cos(toRad(to.lat)) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return earthRadiusM * c;
+function headingFromGeolocation(coords: GeolocationCoordinates): number | null {
+  const { heading } = coords;
+  if (heading == null || Number.isNaN(heading) || heading < 0) return null;
+  return heading;
 }
 
-function formatDistance(meters: number): string {
-  if (meters < 1000) return `${Math.round(meters)}m`;
-  return `${(meters / 1000).toFixed(1)}km`;
+function headingFromDeviceOrientation(event: DeviceOrientationEvent): number | null {
+  const webkitHeading = (event as DeviceOrientationEvent & { webkitCompassHeading?: number })
+    .webkitCompassHeading;
+  if (typeof webkitHeading === "number" && !Number.isNaN(webkitHeading)) {
+    return webkitHeading;
+  }
+  if (event.alpha == null || Number.isNaN(event.alpha)) return null;
+  return (360 - event.alpha) % 360;
+}
+
+function createUserLocationOverlayElement(): {
+  root: HTMLDivElement;
+  setHeading: (heading: number | null) => void;
+} {
+  const root = document.createElement("div");
+  root.style.cssText = [
+    "position:relative",
+    `width:${USER_LOC_OVERLAY_SIZE}px`,
+    `height:${USER_LOC_OVERLAY_SIZE}px`,
+    "pointer-events:none",
+  ].join(";");
+
+  const headingLayer = document.createElement("div");
+  headingLayer.style.cssText = [
+    "position:absolute",
+    "inset:0",
+    "display:none",
+    "align-items:center",
+    "justify-content:center",
+    "transform-origin:50% 50%",
+  ].join(";");
+
+  const arrow = document.createElement("div");
+  arrow.style.cssText = [
+    "position:absolute",
+    "top:2px",
+    "left:50%",
+    "transform:translateX(-50%)",
+    "width:0",
+    "height:0",
+    "border-left:7px solid transparent",
+    "border-right:7px solid transparent",
+    "border-bottom:14px solid rgba(25,139,230,0.55)",
+  ].join(";");
+
+  const dot = document.createElement("img");
+  dot.src = `${window.location.origin}/myLocationDot.svg`;
+  dot.width = 24;
+  dot.height = 24;
+  dot.alt = "";
+  dot.style.cssText =
+    "position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:block;";
+
+  headingLayer.appendChild(arrow);
+  root.appendChild(headingLayer);
+  root.appendChild(dot);
+
+  return {
+    root,
+    setHeading: (heading) => {
+      if (heading == null) {
+        headingLayer.style.display = "none";
+        return;
+      }
+      headingLayer.style.display = "flex";
+      headingLayer.style.transform = `rotate(${heading}deg)`;
+    },
+  };
 }
 
 export default function TrashBinListMapView() {
@@ -82,23 +128,26 @@ export default function TrashBinListMapView() {
   const mapElRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<KakaoMaps.Map | null>(null);
   const markersRef = useRef<KakaoMaps.Marker[]>([]);
-  const userLocationMarkerRef = useRef<KakaoMaps.Marker | null>(null);
-  const mapTapMarkerRef = useRef<KakaoMaps.Marker | null>(null);
+  const userLocationOverlayRef = useRef<KakaoMaps.CustomOverlay | null>(null);
+  const userLocationOverlayElRef = useRef<ReturnType<typeof createUserLocationOverlayElement> | null>(
+    null
+  );
   const isMapDraggingRef = useRef(false);
   const ignoreMapClickUntilRef = useRef(0);
   /** 마커 클릭 직후 지도 click으로 바텀시트가 바로 닫히지 않게 함 */
   const blockMapDeselectRef = useRef(false);
+  const hasGpsHeadingRef = useRef(false);
+  const didInitMapRef = useRef(false);
 
   const [mapReady, setMapReady] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
   const [selectedPlace, setSelectedPlace] = useState<TrashBinPlace | null>(null);
-  const [selectedMapTap, setSelectedMapTap] = useState<MapTapInfo | null>(null);
   /** 실제 GPS 좌표 (위치 거부/오류 시 홈으로 이동) */
   const [referenceLocation, setReferenceLocation] = useState<{ lat: number; lng: number } | null>(
     null
   );
-  const [isMapTapResolving, setIsMapTapResolving] = useState(false);
+  const [userHeading, setUserHeading] = useState<number | null>(null);
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
 
   /** 위치 권한 허용 전에는 지도·마커를 올리지 않음 — 재방문 시 effect가 다시 돌며 getCurrentPosition으로 다시 요청 */
@@ -146,10 +195,10 @@ export default function TrashBinListMapView() {
       void router.replace("/");
     };
 
-    const finishOk = (lat: number, lng: number) => {
+    const finishOk = (lat: number, lng: number, heading: number | null) => {
       if (cancelled) return;
-      console.log("[GEO SUCCESS] current position:", { lat, lng });
       setReferenceLocation({ lat, lng });
+      if (heading != null) setUserHeading(heading);
       setGeoGateOk(true);
     };
 
@@ -164,10 +213,14 @@ export default function TrashBinListMapView() {
     }
 
     navigator.geolocation.getCurrentPosition(
-      (pos) => finishOk(pos.coords.latitude, pos.coords.longitude),
+      (pos) =>
+        finishOk(
+          pos.coords.latitude,
+          pos.coords.longitude,
+          headingFromGeolocation(pos.coords)
+        ),
       (err) => {
         if (cancelled) return;
-        console.error("[GEO ERROR]", { code: err.code, message: err.message });
         alert("근처 수거함 안내를 위해 위치 권한이 필요해요. 홈 화면으로 이동합니다.");
         goHome();
       },
@@ -179,14 +232,77 @@ export default function TrashBinListMapView() {
     };
   }, [router]);
 
+  /** 이동 시 위치·방향 갱신 및 지도 중심 동기화 */
+  useEffect(() => {
+    if (!geoGateOk || typeof window === "undefined" || !navigator.geolocation) return;
+
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lng } = pos.coords;
+        setReferenceLocation({ lat, lng });
+        const heading = headingFromGeolocation(pos.coords);
+        if (heading != null) {
+          hasGpsHeadingRef.current = true;
+          setUserHeading(heading);
+        }
+
+        const map = mapInstanceRef.current;
+        if (map && window.kakao?.maps) {
+          map.setCenter(new window.kakao.maps.LatLng(lat, lng));
+        }
+      },
+      () => {
+        /* 위치 추적 일시 오류는 무시 — 마지막 좌표 유지 */
+      },
+      { enableHighAccuracy: true, maximumAge: 1000, timeout: 15_000 }
+    );
+
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+    };
+  }, [geoGateOk]);
+
+  /** GPS heading이 없을 때 기기 나침반(방향) 보조 */
+  useEffect(() => {
+    if (!geoGateOk || typeof window === "undefined") return;
+
+    const onOrientation = (event: DeviceOrientationEvent) => {
+      if (hasGpsHeadingRef.current) return;
+      const heading = headingFromDeviceOrientation(event);
+      if (heading != null) setUserHeading(heading);
+    };
+
+    const attach = () => {
+      window.addEventListener("deviceorientation", onOrientation, true);
+    };
+
+    const request =
+      typeof DeviceOrientationEvent !== "undefined" &&
+      "requestPermission" in DeviceOrientationEvent &&
+      typeof DeviceOrientationEvent.requestPermission === "function"
+        ? DeviceOrientationEvent.requestPermission()
+        : Promise.resolve("granted" as PermissionState);
+
+    let cancelled = false;
+    void request.then((state) => {
+      if (cancelled || state !== "granted") return;
+      attach();
+    });
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener("deviceorientation", onOrientation, true);
+    };
+  }, [geoGateOk]);
+
   useEffect(() => {
     if (!trashBinsQuery.data) return;
     setTrashBins(trashBinsQuery.data);
   }, [setTrashBins, trashBinsQuery.data]);
 
-  /** 카카오 지도 초기화 — 위치 허용 확정 후에만 실행해, 거부 직후 짧게 지도가 깜박이지 않도록 함 */
+  /** 카카오 지도 초기화 — 위치 허용 확정 후 1회만 (이동 중에는 watchPosition이 center 갱신) */
   useEffect(() => {
-    if (!geoGateOk) return;
+    if (!geoGateOk || !referenceLocation || didInitMapRef.current) return;
 
     const el = mapElRef.current;
     if (!el) return;
@@ -219,9 +335,7 @@ export default function TrashBinListMapView() {
       }
 
       const { maps } = window.kakao;
-      const geocoder = new maps.services.Geocoder();
       if (!referenceLocation) return;
-      console.log("[MAP INIT] center from referenceLocation:", referenceLocation);
       const center = new maps.LatLng(referenceLocation.lat, referenceLocation.lng);
       const map = new maps.Map(mapElRef.current, { center, level: 5 });
       mapInstanceRef.current = map;
@@ -235,35 +349,17 @@ export default function TrashBinListMapView() {
         ignoreMapClickUntilRef.current = Date.now() + 220;
       });
 
-      maps.event.addListener(map, "click", (mouseEvent: { latLng: KakaoMaps.LatLng }) => {
+      maps.event.addListener(map, "click", () => {
         if (isMapDraggingRef.current || Date.now() < ignoreMapClickUntilRef.current) {
           return;
         }
         if (blockMapDeselectRef.current) return;
         setSelectedPlace(null);
         setIsImagePreviewOpen(false);
-
-        const lat = mouseEvent.latLng.getLat();
-        const lng = mouseEvent.latLng.getLng();
-        mapTapMarkerRef.current?.setMap(null);
-        mapTapMarkerRef.current = new maps.Marker({
-          map,
-          position: new maps.LatLng(lat, lng),
-        });
-        setIsMapTapResolving(true);
-        geocoder.coord2Address(lng, lat, (result, status) => {
-          if (cancelled || !mapInstanceRef.current || map !== mapInstanceRef.current) return;
-          const isOk = status === maps.services.Status.OK;
-          const item = isOk ? result?.[0] : undefined;
-          const road = item?.road_address?.address_name?.trim() ?? "";
-          const jibun = item?.address?.address_name?.trim() ?? "";
-          const label = road || jibun || "선택한 위치";
-          setSelectedMapTap({ lat, lng, addressLabel: label });
-          setIsMapTapResolving(false);
-        });
       });
 
       if (!cancelled) {
+        didInitMapRef.current = true;
         setMapReady(true);
       }
       requestAnimationFrame(() => map.relayout());
@@ -271,12 +367,12 @@ export default function TrashBinListMapView() {
 
     return () => {
       cancelled = true;
+      didInitMapRef.current = false;
       markersRef.current.forEach((m) => m.setMap(null));
       markersRef.current = [];
-      userLocationMarkerRef.current?.setMap(null);
-      userLocationMarkerRef.current = null;
-      mapTapMarkerRef.current?.setMap(null);
-      mapTapMarkerRef.current = null;
+      userLocationOverlayRef.current?.setMap(null);
+      userLocationOverlayRef.current = null;
+      userLocationOverlayElRef.current = null;
       mapInstanceRef.current = null;
       setMapReady(false);
     };
@@ -304,9 +400,6 @@ export default function TrashBinListMapView() {
       maps.event.addListener(marker, "click", () => {
         blockMapDeselectRef.current = true;
         setSelectedPlace(place);
-        setSelectedMapTap(null);
-        mapTapMarkerRef.current?.setMap(null);
-        mapTapMarkerRef.current = null;
         window.setTimeout(() => {
           blockMapDeselectRef.current = false;
         }, 0);
@@ -320,27 +413,34 @@ export default function TrashBinListMapView() {
     };
   }, [mapReady, places]);
 
-  /** 기준 위치(실제 GPS) 마커 */
+  /** 기준 위치(실제 GPS) — 방향 화살표 + 점 */
   useEffect(() => {
     if (!mapReady || !referenceLocation || !mapInstanceRef.current || !window.kakao?.maps) {
       return;
     }
     const map = mapInstanceRef.current;
     const { maps } = window.kakao;
-    const myLocIconSrc = `${window.location.origin}/myLocationDot.svg`;
+    const position = new maps.LatLng(referenceLocation.lat, referenceLocation.lng);
 
-    userLocationMarkerRef.current?.setMap(null);
-    const dotImage = new maps.MarkerImage(
-      myLocIconSrc,
-      new maps.Size(MY_LOC_SIZE.width, MY_LOC_SIZE.height),
-      { offset: new maps.Point(MY_LOC_ANCHOR.x, MY_LOC_ANCHOR.y) }
-    );
-    userLocationMarkerRef.current = new maps.Marker({
-      map,
-      position: new maps.LatLng(referenceLocation.lat, referenceLocation.lng),
-      image: dotImage,
-    });
-  }, [mapReady, referenceLocation]);
+    if (!userLocationOverlayElRef.current) {
+      userLocationOverlayElRef.current = createUserLocationOverlayElement();
+    }
+    userLocationOverlayElRef.current.setHeading(userHeading);
+
+    if (!userLocationOverlayRef.current) {
+      userLocationOverlayRef.current = new maps.CustomOverlay({
+        map,
+        position,
+        content: userLocationOverlayElRef.current.root,
+        xAnchor: 0.5,
+        yAnchor: 0.5,
+        zIndex: 4,
+      });
+    } else {
+      userLocationOverlayRef.current.setPosition(position);
+      userLocationOverlayRef.current.setMap(map);
+    }
+  }, [mapReady, referenceLocation, userHeading]);
 
   return (
     <div className={cn("mapShell")}>
@@ -360,7 +460,7 @@ export default function TrashBinListMapView() {
       <div ref={mapElRef} className={cn("mapContainer")} aria-label="휴지통 지도" />
       )}
 
-      {geoGateOk && (selectedPlace || isMapTapResolving || selectedMapTap) && (
+      {geoGateOk && selectedPlace && (
         <>
           <button
             type="button"
@@ -368,10 +468,6 @@ export default function TrashBinListMapView() {
             aria-label="상세 닫기"
             onClick={() => {
               setSelectedPlace(null);
-              setSelectedMapTap(null);
-              setIsMapTapResolving(false);
-              mapTapMarkerRef.current?.setMap(null);
-              mapTapMarkerRef.current = null;
             }}
           />
           {selectedPlace && (
@@ -421,49 +517,6 @@ export default function TrashBinListMapView() {
             </div>
           )}
 
-          {!selectedPlace && (
-            <div
-              className={cn("mapTapSheet")}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="mapTapSheetTitle"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {isMapTapResolving && <p className={cn("mapTapSheetAddress")}>주소를 불러오는 중...</p>}
-              {!isMapTapResolving && selectedMapTap && (
-                <>
-                  <p className={cn("mapTapSheetAddress")}>{selectedMapTap.addressLabel}</p>
-                  <p className={cn("mapTapSheetDistance")}>
-                    {referenceLocation
-                      ? `현재 위치에서 ${formatDistance(
-                          distanceInMeters(referenceLocation, {
-                            lat: selectedMapTap.lat,
-                            lng: selectedMapTap.lng,
-                          })
-                        )}`
-                      : "현재 위치를 확인하는 중이에요."}
-                  </p>
-                  <button
-                    type="button"
-                    className={cn("bottomSheetDirections")}
-                    onClick={() =>
-                      openKakaoDirections({
-                        id: "selected-map-tap",
-                        lat: selectedMapTap.lat,
-                        lng: selectedMapTap.lng,
-                        name: selectedMapTap.addressLabel,
-                        categoryLabel: "선택 위치",
-                        description: selectedMapTap.addressLabel,
-                        imageUrl: FALLBACK_BIN_IMAGE_URL,
-                      })
-                    }
-                  >
-                    이 위치로 길찾기
-                  </button>
-                </>
-              )}
-            </div>
-          )}
         </>
       )}
 
