@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import classNames from "classnames/bind";
 import styles from "@/styles/TrashBinList.module.scss";
@@ -97,10 +97,45 @@ function headingFromDeviceOrientation(event: DeviceOrientationEvent): number | n
   return (360 - event.alpha) % 360;
 }
 
+
+function bearingFromMovement(
+  from: { lat: number; lng: number },
+  to: { lat: number; lng: number }
+): number | null {
+  const movedM = distanceMeters(from.lat, from.lng, to.lat, to.lng);
+  if (movedM < 1.5) return null;
+
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const toDeg = (rad: number) => (rad * 180) / Math.PI;
+  const lat1 = toRad(from.lat);
+  const lat2 = toRad(to.lat);
+  const dLng = toRad(to.lng - from.lng);
+  const y = Math.sin(dLng) * Math.cos(lat2);
+  const x =
+    Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+  return (toDeg(Math.atan2(y, x)) + 360) % 360;
+}
+
+function resolveUserHeading(
+  gpsHeading: number | null,
+  previous: { lat: number; lng: number } | null,
+  current: { lat: number; lng: number },
+  lastKnownHeading: number | null
+): number | null {
+  if (gpsHeading != null) return gpsHeading;
+  if (previous) {
+    const movementHeading = bearingFromMovement(previous, current);
+    if (movementHeading != null) return movementHeading;
+  }
+  return lastKnownHeading;
+}
+
 function createUserLocationOverlayElement(): {
   root: HTMLDivElement;
   setHeading: (heading: number | null) => void;
 } {
+  let cachedHeading: number | null = null;
+
   const root = document.createElement("div");
   root.style.cssText = [
     "position:relative",
@@ -113,7 +148,7 @@ function createUserLocationOverlayElement(): {
   headingLayer.style.cssText = [
     "position:absolute",
     "inset:0",
-    "display:none",
+    "display:flex",
     "align-items:center",
     "justify-content:center",
     "transform-origin:50% 50%",
@@ -147,15 +182,17 @@ function createUserLocationOverlayElement(): {
   return {
     root,
     setHeading: (heading) => {
-      if (heading == null) {
-        headingLayer.style.display = "none";
-        return;
+      if (heading != null) {
+        cachedHeading = heading;
       }
+      const degrees = cachedHeading ?? 0;
       headingLayer.style.display = "flex";
-      headingLayer.style.transform = `rotate(${heading}deg)`;
+      headingLayer.style.transform = `rotate(${degrees}deg)`;
+      headingLayer.style.opacity = cachedHeading != null ? "1" : "0.5";
     },
   };
 }
+
 
 export default function TrashBinListMapView() {
   const router = useRouter();
@@ -171,8 +208,10 @@ export default function TrashBinListMapView() {
   const ignoreMapClickUntilRef = useRef(0);
   /** 마커 클릭 직후 지도 click으로 바텀시트가 바로 닫히지 않게 함 */
   const blockMapDeselectRef = useRef(false);
-  const hasGpsHeadingRef = useRef(false);
   const didInitMapRef = useRef(false);
+  const lastGeoPointRef = useRef<{ lat: number; lng: number } | null>(null);
+  const lastHeadingRef = useRef<number | null>(null);
+  const orientationListenerAttachedRef = useRef(false);
   /** 지도 최초 중심 — GPS 갱신마다 지도를 재생성하지 않도록 1회만 고정 */
   const mapInitCenterRef = useRef<{ lat: number; lng: number } | null>(null);
 
@@ -210,6 +249,39 @@ export default function TrashBinListMapView() {
     ? "수거함 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요."
     : null;
   const places = useMemo(() => trashBins.map(trashBinApiToPlace), [trashBins]);
+
+  const syncUserLocationOverlay = useCallback((lat: number, lng: number, heading: number | null) => {
+    const map = mapInstanceRef.current;
+    if (!map || !window.kakao?.maps) return;
+
+    const { maps } = window.kakao;
+    if (!userLocationOverlayElRef.current) {
+      userLocationOverlayElRef.current = createUserLocationOverlayElement();
+    }
+
+    const resolvedHeading = heading ?? lastHeadingRef.current;
+    if (resolvedHeading != null) {
+      lastHeadingRef.current = resolvedHeading;
+    }
+    userLocationOverlayElRef.current.setHeading(resolvedHeading);
+
+    const position = new maps.LatLng(lat, lng);
+    if (!userLocationOverlayRef.current) {
+      userLocationOverlayRef.current = new maps.CustomOverlay({
+        map,
+        position,
+        content: userLocationOverlayElRef.current.root,
+        xAnchor: 0.5,
+        yAnchor: 0.5,
+        zIndex: 4,
+      });
+      return;
+    }
+
+    userLocationOverlayRef.current.setPosition(position);
+    userLocationOverlayRef.current.setMap(map);
+  }, []);
+
 
   useEffect(() => {
     if (!selectedPlace) {
@@ -249,8 +321,13 @@ export default function TrashBinListMapView() {
 
     const finishOk = (lat: number, lng: number, heading: number | null) => {
       if (cancelled) return;
-      setReferenceLocation({ lat, lng });
-      if (heading != null) setUserHeading(heading);
+      const point = { lat, lng };
+      lastGeoPointRef.current = point;
+      if (heading != null) {
+        lastHeadingRef.current = heading;
+        setUserHeading(heading);
+      }
+      setReferenceLocation(point);
       setGeoGateOk(true);
     };
 
@@ -290,14 +367,24 @@ export default function TrashBinListMapView() {
 
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
-        const { latitude: lat, longitude: lng } = pos.coords;
-        setReferenceLocation({ lat, lng });
-        const heading = headingFromGeolocation(pos.coords);
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const current = { lat, lng };
+        const heading = resolveUserHeading(
+          headingFromGeolocation(pos.coords),
+          lastGeoPointRef.current,
+          current,
+          lastHeadingRef.current
+        );
+
+        lastGeoPointRef.current = current;
         if (heading != null) {
-          hasGpsHeadingRef.current = true;
+          lastHeadingRef.current = heading;
           setUserHeading(heading);
         }
 
+        setReferenceLocation(current);
+        syncUserLocationOverlay(lat, lng, heading);
       },
       () => {
         /* 위치 추적 일시 오류는 무시 — 마지막 좌표 유지 */
@@ -308,42 +395,61 @@ export default function TrashBinListMapView() {
     return () => {
       navigator.geolocation.clearWatch(watchId);
     };
-  }, [geoGateOk]);
+  }, [geoGateOk, syncUserLocationOverlay]);
 
   /** GPS heading이 없을 때 기기 나침반(방향) 보조 */
   useEffect(() => {
     if (!geoGateOk || typeof window === "undefined") return;
 
     const onOrientation = (event: DeviceOrientationEvent) => {
-      if (hasGpsHeadingRef.current) return;
       const heading = headingFromDeviceOrientation(event);
-      if (heading != null) setUserHeading(heading);
+      if (heading == null) return;
+
+      lastHeadingRef.current = heading;
+      setUserHeading(heading);
+
+      const point = lastGeoPointRef.current;
+      if (point) {
+        syncUserLocationOverlay(point.lat, point.lng, heading);
+      }
     };
 
-    const attach = () => {
+    const attachOrientationListener = () => {
+      if (orientationListenerAttachedRef.current) return;
+      orientationListenerAttachedRef.current = true;
       window.addEventListener("deviceorientation", onOrientation, true);
     };
 
     type DeviceOrientationPermission = "granted" | "denied" | "default";
 
-    const request: Promise<DeviceOrientationPermission> =
-      typeof DeviceOrientationEvent !== "undefined" &&
-      "requestPermission" in DeviceOrientationEvent &&
-      typeof DeviceOrientationEvent.requestPermission === "function"
-        ? (DeviceOrientationEvent.requestPermission() as Promise<DeviceOrientationPermission>)
-        : Promise.resolve("granted");
+    const requestOrientationPermission = () => {
+      const request: Promise<DeviceOrientationPermission> =
+        typeof DeviceOrientationEvent !== "undefined" &&
+        "requestPermission" in DeviceOrientationEvent &&
+        typeof DeviceOrientationEvent.requestPermission === "function"
+          ? (DeviceOrientationEvent.requestPermission() as Promise<DeviceOrientationPermission>)
+          : Promise.resolve("granted");
 
-    let cancelled = false;
-    void request.then((state: DeviceOrientationPermission) => {
-      if (cancelled || state !== "granted") return;
-      attach();
-    });
+      void request.then((state: DeviceOrientationPermission) => {
+        if (state === "granted") attachOrientationListener();
+      });
+    };
+
+    requestOrientationPermission();
+
+    const mapEl = mapElRef.current;
+    const onMapPointerDown = () => {
+      requestOrientationPermission();
+    };
+    mapEl?.addEventListener("pointerdown", onMapPointerDown, { passive: true });
 
     return () => {
-      cancelled = true;
+      mapEl?.removeEventListener("pointerdown", onMapPointerDown);
       window.removeEventListener("deviceorientation", onOrientation, true);
+      orientationListenerAttachedRef.current = false;
     };
-  }, [geoGateOk]);
+  }, [geoGateOk, syncUserLocationOverlay]);
+
 
   useEffect(() => {
     if (!trashBinsQuery.data) return;
@@ -477,32 +583,14 @@ export default function TrashBinListMapView() {
 
   /** 기준 위치(실제 GPS) — 방향 화살표 + 점 */
   useEffect(() => {
-    if (!mapReady || !referenceLocation || !mapInstanceRef.current || !window.kakao?.maps) {
-      return;
-    }
-    const map = mapInstanceRef.current;
-    const { maps } = window.kakao;
-    const position = new maps.LatLng(referenceLocation.lat, referenceLocation.lng);
+    if (!mapReady || !referenceLocation) return;
+    syncUserLocationOverlay(
+      referenceLocation.lat,
+      referenceLocation.lng,
+      userHeading ?? lastHeadingRef.current
+    );
+  }, [mapReady, referenceLocation, userHeading, syncUserLocationOverlay]);
 
-    if (!userLocationOverlayElRef.current) {
-      userLocationOverlayElRef.current = createUserLocationOverlayElement();
-    }
-    userLocationOverlayElRef.current.setHeading(userHeading);
-
-    if (!userLocationOverlayRef.current) {
-      userLocationOverlayRef.current = new maps.CustomOverlay({
-        map,
-        position,
-        content: userLocationOverlayElRef.current.root,
-        xAnchor: 0.5,
-        yAnchor: 0.5,
-        zIndex: 4,
-      });
-    } else {
-      userLocationOverlayRef.current.setPosition(position);
-      userLocationOverlayRef.current.setMap(map);
-    }
-  }, [mapReady, referenceLocation, userHeading]);
 
   return (
     <div className={cn("mapShell")}>
