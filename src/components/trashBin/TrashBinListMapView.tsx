@@ -526,7 +526,9 @@ export default function TrashBinListMapView() {
         <>
           <button
             type="button"
-            className={cn("bottomSheetBackdrop")}
+            className={cn("bottomSheetBackdrop", {
+              bottomSheetBackdropDirections: isDirectionsSheetOpen,
+            })}
             aria-label="상세 닫기"
             onClick={() => {
               setSelectedPlace(null);
