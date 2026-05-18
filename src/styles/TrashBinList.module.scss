@@ -173,6 +173,26 @@ $pageMinHeight: calc(100vh - 6rem);
   padding: 1.1rem 0;
 }
 
+@keyframes mapTapSheetSlideUp {
+  from {
+    transform: translate3d(0, 100%, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes bottomSheetBackdropFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 .mapTapSheet {
   position: absolute;
   left: 0;
@@ -184,6 +204,20 @@ $pageMinHeight: calc(100vh - 6rem);
   border-radius: 2.4rem 2.4rem 0 0;
   background: var(--color-semantic-bg-page);
   box-shadow: 0 -0.4rem 2.4rem rgba(47, 59, 53, 0.12);
+  transform: translate3d(0, 0, 0);
+  animation: mapTapSheetSlideUp 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.bottomSheetBackdropDirections {
+  animation: bottomSheetBackdropFadeIn 0.28s ease-out both;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
 }
 
 .mapTapSheetGrabber {
