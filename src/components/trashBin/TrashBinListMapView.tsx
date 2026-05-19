@@ -24,6 +24,10 @@ const USER_LOC_OVERLAY_SIZE = 48;
 const USER_LOC_SNAP_DISTANCE_M = 80;
 /** 내 위치 마커 이동 보간 시간 (ms) */
 const USER_LOC_ANIM_MS = 380;
+/** 바텀시트 열림/닫힘 애니메이션 (ms) — SCSS duration과 맞춤 */
+const SHEET_ANIM_MS = 340;
+const SHEET_BACKDROP_ANIM_MS = 280;
+const SHEET_CLOSE_MS = Math.max(SHEET_ANIM_MS, SHEET_BACKDROP_ANIM_MS);
 
 type GeoPoint = { lat: number; lng: number };
 
@@ -241,6 +245,8 @@ export default function TrashBinListMapView() {
 
   const [selectedPlace, setSelectedPlace] = useState<TrashBinPlace | null>(null);
   const [isDirectionsSheetOpen, setIsDirectionsSheetOpen] = useState(false);
+  const [isSheetClosing, setIsSheetClosing] = useState(false);
+  const sheetCloseTimerRef = useRef<number | null>(null);
   /** 실제 GPS 좌표 (위치 거부/오류 시 홈으로 이동) */
   const [referenceLocation, setReferenceLocation] = useState<{ lat: number; lng: number } | null>(
     null
@@ -385,12 +391,46 @@ export default function TrashBinListMapView() {
     animateUserLocationOverlay(point, userHeading ?? lastHeadingRef.current);
   }, [animateUserLocationOverlay, panMapToUser, referenceLocation, userHeading]);
 
+  const clearSheetCloseTimer = useCallback(() => {
+    if (sheetCloseTimerRef.current != null) {
+      window.clearTimeout(sheetCloseTimerRef.current);
+      sheetCloseTimerRef.current = null;
+    }
+  }, []);
+
+  const closeBottomSheet = useCallback(() => {
+    if (!selectedPlace || isSheetClosing) return;
+
+    const reducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const closeMs = reducedMotion ? 0 : SHEET_CLOSE_MS;
+
+    setIsSheetClosing(true);
+    clearSheetCloseTimer();
+    sheetCloseTimerRef.current = window.setTimeout(() => {
+      setSelectedPlace(null);
+      setIsDirectionsSheetOpen(false);
+      setIsSheetClosing(false);
+      sheetCloseTimerRef.current = null;
+    }, closeMs);
+  }, [clearSheetCloseTimer, isSheetClosing, selectedPlace]);
+
+  const closeBottomSheetRef = useRef(closeBottomSheet);
+  closeBottomSheetRef.current = closeBottomSheet;
+
+  useEffect(() => {
+    return () => clearSheetCloseTimer();
+  }, [clearSheetCloseTimer]);
+
   useEffect(() => {
     if (!selectedPlace) {
       setIsImagePreviewOpen(false);
-      setIsDirectionsSheetOpen(false);
+      if (!isSheetClosing) {
+        setIsDirectionsSheetOpen(false);
+      }
     }
-  }, [selectedPlace]);
+  }, [isSheetClosing, selectedPlace]);
 
   const selectedPlaceDistanceLabel = useMemo(() => {
     if (!selectedPlace || !referenceLocation) return null;
@@ -625,9 +665,8 @@ export default function TrashBinListMapView() {
           return;
         }
         if (blockMapDeselectRef.current) return;
-        setSelectedPlace(null);
         setIsImagePreviewOpen(false);
-        setIsDirectionsSheetOpen(false);
+        closeBottomSheetRef.current();
       });
 
       if (!cancelled) {
@@ -673,6 +712,8 @@ export default function TrashBinListMapView() {
       });
       maps.event.addListener(marker, "click", () => {
         blockMapDeselectRef.current = true;
+        clearSheetCloseTimer();
+        setIsSheetClosing(false);
         setIsDirectionsSheetOpen(false);
         setSelectedPlace(place);
         window.setTimeout(() => {
@@ -686,7 +727,7 @@ export default function TrashBinListMapView() {
       markersRef.current.forEach((m) => m.setMap(null));
       markersRef.current = [];
     };
-  }, [mapReady, places]);
+  }, [clearSheetCloseTimer, mapReady, places]);
 
   /** 기준 위치(실제 GPS) — 방향 화살표 + 점 */
   useEffect(() => {
@@ -733,17 +774,16 @@ export default function TrashBinListMapView() {
         <>
           <button
             type="button"
-            className={cn("bottomSheetBackdrop")}
+            className={cn("bottomSheetBackdrop", {
+              bottomSheetBackdropClosing: isSheetClosing,
+            })}
             aria-label="상세 닫기"
-            onClick={() => {
-              setSelectedPlace(null);
-              setIsDirectionsSheetOpen(false);
-            }}
+            onClick={closeBottomSheet}
           />
           {isDirectionsSheetOpen ? (
             <div
               key={`directions-${selectedPlace.id}`}
-              className={cn("mapTapSheet")}
+              className={cn("mapTapSheet", { mapTapSheetClosing: isSheetClosing })}
               role="dialog"
               aria-modal="true"
               aria-labelledby="trashBinDirectionsTitle"
@@ -796,7 +836,7 @@ export default function TrashBinListMapView() {
           ) : (
             <div
               key={`detail-${selectedPlace.id}`}
-              className={cn("bottomSheet")}
+              className={cn("bottomSheet", { bottomSheetClosing: isSheetClosing })}
               role="dialog"
               aria-modal="true"
               aria-labelledby="trashBinSheetTitle"
