@@ -1,49 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# DS-Helper Frontend
 
-### 카카오 개발자 콘솔 설정
+대구 **달성군** 생활밀착형 플랫폼 **디에스헬퍼** 사용자 웹 앱입니다.
 
-1. [카카오 개발자 콘솔](https://developers.kakao.com/) 접속
-2. 애플리케이션 생성 후 Client ID 확인
-3. 플랫폼 설정에서 Web 플랫폼 추가
-4. Redirect URI 설정:
-   - 개발: `http://localhost:8080/oauth/kakao/login`
-   - 프로덕션: `https://www.dshelper.kro.kr/oauth/kakao/login`
+| 환경 | URL |
+|------|-----|
+| 프로덕션 | https://dshelper.kr |
+| 테스트 | https://test.dshelper.kr |
 
-## Getting Started
+- 프론트엔드: https://github.com/DS-Helper/frontend  
+- 백엔드: https://github.com/DS-Helper/backend  
 
-First, run the development server:
+## 빠른 시작
 
 ```bash
+npm install
+# .env.local 은 docs/ENV.md 참고
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+http://localhost:3000
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## 문서
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+전체 가이드는 [`docs/`](./docs/) 디렉터리를 보세요.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+| 문서 | 설명 |
+|------|------|
+| [docs/ONBOARDING.md](./docs/ONBOARDING.md) | 로컬 셋업·OAuth·브랜치 |
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | 구조·인증·상태 |
+| [docs/API_FRONTEND.md](./docs/API_FRONTEND.md) | 백엔드 호출 목록 |
+| [docs/ENV.md](./docs/ENV.md) | 환경 변수 |
+| [docs/DEPLOY.md](./docs/DEPLOY.md) | EC2·Netlify 배포 |
+| [docs/WORKLOG.md](./docs/WORKLOG.md) | 브랜치별 작업 로그 |
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 스택
 
-## Learn More
+Next.js (Pages Router) · React 19 · TypeScript · SCSS Modules · TanStack Query · Zustand · Axios · Kakao Map SDK
 
-To learn more about Next.js, take a look at the following resources:
+## 스크립트
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+```bash
+npm run dev      # 개발 서버
+npm run build    # 프로덕션 빌드
+npm run start    # 빌드 결과 실행
+npm run lint     # ESLint
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 카카오 OAuth (요약)
 
-## Deploy on Vercel
+Redirect URI는 접속 도메인과 일치해야 합니다.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| 환경 | 예시 |
+|------|------|
+| 로컬 | `http://localhost:3000/kakao/callback` |
+| 테스트 | `https://test.dshelper.kr/kakao/callback` |
+| 프로덕션 | `https://dshelper.kr/kakao/callback` |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+자세한 키·변수: [docs/ENV.md](./docs/ENV.md), [docs/ONBOARDING.md](./docs/ONBOARDING.md).
+
+## 배포
+
+- **dshelper.kr**: `prd` 브랜치 push → GitHub Actions → EC2 (`pm2 reload dshelper`)
+- **test.dshelper.kr**: Netlify
+
+[docs/DEPLOY.md](./docs/DEPLOY.md)

@@ -29,13 +29,14 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
     return times;
   };
 
-  // 로컬 날짜를 yyyy-mm-dd 형식으로 변환하는 함수
   const formatLocalDate = (date: Date): string => {
     const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
+
+  const isBlockedDate = (date: Date) => formatLocalDate(date) === "2026-05-24";
 
   const handleDateChange = async (date: Date) => {
     setSelectedDate(date);
@@ -235,7 +236,11 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
           calendarType="gregory"
           onChange={(value) => handleDateChange(value as Date)}
           value={selectedDate}
-          tileDisabled={({ date }) => isPastDate(date) || !isAvailableDay(date)}
+          tileDisabled={({ date }) =>
+            isPastDate(date) ||
+            !isAvailableDay(date) ||
+            isBlockedDate(date)
+          }
           className={cn("customCalendar")}
           prev2Label={null}
           next2Label={null}
@@ -268,6 +273,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
               const isPast = isPastDate(date);
               const isAvailable = isAvailableDay(date);
               const isSundayDay = isSunday(date);
+              const isBlocked = isBlockedDate(date);
               
               return cn({
                 'calendarTile': true,
@@ -275,7 +281,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
                 'pastTile': isPast,
                 'sundayTile': isSundayDay,
                 'availableTile': isAvailable,
-                'disabledTile': isPast || !isAvailable
+                'disabledTile': isPast || !isAvailable || isBlocked
               });
             }
             return '';
