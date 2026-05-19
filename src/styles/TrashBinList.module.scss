@@ -98,6 +98,11 @@ $pageMinHeight: calc(100vh - 6rem);
   border: none;
   background: rgba(47, 59, 53, 0.35);
   cursor: pointer;
+  animation: bottomSheetBackdropFadeIn 0.28s ease-out both;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
 }
 
 .bottomSheet {
@@ -111,6 +116,12 @@ $pageMinHeight: calc(100vh - 6rem);
   border-radius: 2.4rem 2.4rem 0 0;
   background: var(--color-semantic-bg-page);
   box-shadow: 0 -0.4rem 2.4rem rgba(47, 59, 53, 0.12);
+  transform: translate3d(0, 0, 0);
+  animation: mapTapSheetSlideUp 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
 }
 
 .bottomSheetSrTitle {
@@ -228,14 +239,6 @@ $pageMinHeight: calc(100vh - 6rem);
   box-shadow: 0 -0.4rem 2.4rem rgba(47, 59, 53, 0.12);
   transform: translate3d(0, 0, 0);
   animation: mapTapSheetSlideUp 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-.bottomSheetBackdropDirections {
-  animation: bottomSheetBackdropFadeIn 0.28s ease-out both;
 
   @media (prefers-reduced-motion: reduce) {
     animation: none;
