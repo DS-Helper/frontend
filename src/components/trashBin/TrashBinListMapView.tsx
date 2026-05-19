@@ -1,121 +1,195 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/router";
 import classNames from "classnames/bind";
 import styles from "@/styles/TrashBinList.module.scss";
 import { getKakaoMapJavaScriptKeyForHost } from "@/lib/maps/kakaoMapEnv";
 import { getKakaoMapLoadErrorMessage, loadKakaoMapSdk } from "@/lib/maps/loadKakaoMapSdk";
-import type { TrashBinPlace } from "@/types/trashBin";
+import type { TrashBinApiItem, TrashBinPlace } from "@/types/trashBin";
+import { getTrashBins } from "@/lib/apis/trashBin";
+import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
+import shareIcon from "@/public/shareIcon.svg";
 
 const cn = classNames.bind(styles);
 
 const PIN_SIZE = { width: 35, height: 53 };
 const PIN_ANCHOR = { x: 17, y: 53 };
 
-const MY_LOC_SIZE = { width: 24, height: 24 };
-const MY_LOC_ANCHOR = { x: 12, y: 12 };
+const FALLBACK_BIN_IMAGE_URL = "/mapIconGray.svg";
 
-/**
- * 달성군청(논공읍 청사) — 지도 **최초 중심**만 여기로 고정.
- * 사용자 위치는 허용 시 `myLocationDot.svg` 마커로만 별도 표시합니다.
- */
-const DALSEONG_COUNTY_OFFICE = { lat: 35.77448, lng: 128.43018 };
+/** 바텀시트 열림/닫힘 애니메이션 (ms) — SCSS duration과 맞춤 */
+const SHEET_ANIM_MS = 340;
+const SHEET_BACKDROP_ANIM_MS = 280;
+const SHEET_CLOSE_MS = Math.max(SHEET_ANIM_MS, SHEET_BACKDROP_ANIM_MS);
 
-function openKakaoDirections(place: TrashBinPlace) {
-  const url = `https://map.kakao.com/link/to/${encodeURIComponent(place.name)},${place.lat},${place.lng}`;
+/** 위치 안내 confirm — 최초 1회만 */
+const GEO_CONSENT_STORAGE_KEY = "factory.trashBin.geoConsentAsked";
+
+function trashBinApiToPlace(item: TrashBinApiItem): TrashBinPlace {
+  const imageUrl =
+    typeof item.photoUrl === "string" && item.photoUrl.trim() !== ""
+      ? item.photoUrl
+      : FALLBACK_BIN_IMAGE_URL;
+  const nameParts = [item.provinceName, item.cityCountyName, item.address]
+    .map((s) => s.trim())
+    .filter(Boolean);
+  /** 바텀시트 본문은 API `locationDescription`만 노출 */
+  const description = item.locationDescription.trim();
+
+  return {
+    id: item.id,
+    lat: item.latitude,
+    lng: item.longitude,
+    name: nameParts.join(" ").trim() || item.address.trim() || "분리수거함",
+    categoryLabel: item.binType.trim() || "분리수거함",
+    description,
+    imageUrl,
+  };
+}
+
+function openKakaoMapLink(path: "to" | "from", place: TrashBinPlace) {
+  const url = `https://map.kakao.com/link/${path}/${encodeURIComponent(place.name)},${place.lat},${place.lng}`;
   window.open(url, "_blank", "noopener,noreferrer");
 }
 
-type MapTapInfo = {
-  lat: number;
-  lng: number;
-  addressLabel: string;
-};
-
-function distanceInMeters(
-  from: { lat: number; lng: number },
-  to: { lat: number; lng: number }
-): number {
+function distanceMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const earthRadiusM = 6_371_000;
   const toRad = (deg: number) => (deg * Math.PI) / 180;
-  const earthRadiusM = 6371000;
-  const dLat = toRad(to.lat - from.lat);
-  const dLng = toRad(to.lng - from.lng);
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
   const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(from.lat)) *
-      Math.cos(toRad(to.lat)) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return earthRadiusM * c;
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return earthRadiusM * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-function formatDistance(meters: number): string {
+function formatDistanceLabel(meters: number): string {
   if (meters < 1000) return `${Math.round(meters)}m`;
   return `${(meters / 1000).toFixed(1)}km`;
 }
 
-/** 백엔드 연동 전 목 데이터 */
-const MOCK_TRASH_BINS: TrashBinPlace[] = [
-  {
-    id: "mock-1",
-    lat: 35.7751,
-    lng: 128.4302,
-    name: "새마을공원 인근 휴지통",
-    categoryLabel: "일반쓰레기통",
-    description: "새마을공원 우측에 위치해 있어요!",
-    imageUrl:
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=240&h=240&fit=crop&q=80",
-  },
-  {
-    id: "mock-2",
-    lat: 35.7736,
-    lng: 128.4275,
-    name: "달성군청 주변 수거함",
-    categoryLabel: "일반쓰레기통",
-    description: "군청 민원 동선 쪽에 설치되어 있어요.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=240&h=240&fit=crop&q=80",
-  },
-  {
-    id: "mock-3",
-    lat: 35.7758,
-    lng: 128.4268,
-    name: "공원 산책로 분리수거함",
-    categoryLabel: "재활용",
-    description: "플라스틱·캔 분리 배출이 가능해요.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1605600659908-0ef14b481dfd?w=240&h=240&fit=crop&q=80",
-  },
-  {
-    id: "mock-4",
-    lat: 35.7729,
-    lng: 128.4315,
-    name: "마을 입구 대형 수거함",
-    categoryLabel: "일반쓰레기통",
-    description: "주차장 근처에 쉽게 찾을 수 있어요.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=240&h=240&fit=crop&q=80",
-  },
-];
+async function shareTrashBinPlace(place: TrashBinPlace) {
+  const url = `https://map.kakao.com/link/map/${place.lat},${place.lng}`;
+  const shareData = { title: place.name, text: place.name, url };
+  try {
+    if (typeof navigator.share === "function") {
+      await navigator.share(shareData);
+      return;
+    }
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(url);
+      alert("위치 링크가 복사되었어요.");
+    }
+  } catch {
+    /* 사용자가 공유를 취소한 경우 */
+  }
+}
 
 export default function TrashBinListMapView() {
+  const router = useRouter();
+
   const mapElRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<KakaoMaps.Map | null>(null);
   const markersRef = useRef<KakaoMaps.Marker[]>([]);
-  const userLocationMarkerRef = useRef<KakaoMaps.Marker | null>(null);
-  const mapTapMarkerRef = useRef<KakaoMaps.Marker | null>(null);
   const isMapDraggingRef = useRef(false);
   const ignoreMapClickUntilRef = useRef(0);
+  /** 마커 클릭 직후 지도 click으로 바텀시트가 바로 닫히지 않게 함 */
+  const blockMapDeselectRef = useRef(false);
+  const didInitMapRef = useRef(false);
+  /** 지도 최초 중심 — 최초 GPS 1회만 고정 */
+  const mapInitCenterRef = useRef<{ lat: number; lng: number } | null>(null);
+
+  const [mapReady, setMapReady] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
+
   const [selectedPlace, setSelectedPlace] = useState<TrashBinPlace | null>(null);
-  const [selectedMapTap, setSelectedMapTap] = useState<MapTapInfo | null>(null);
-  const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [isMapTapResolving, setIsMapTapResolving] = useState(false);
+  const [isDirectionsSheetOpen, setIsDirectionsSheetOpen] = useState(false);
+  const [isSheetClosing, setIsSheetClosing] = useState(false);
+  const sheetCloseTimerRef = useRef<number | null>(null);
+  /** 페이지 진입 시 1회만 확보한 기준 좌표 (거리 표시·지도 중심) */
+  const [referenceLocation, setReferenceLocation] = useState<{ lat: number; lng: number } | null>(
+    null
+  );
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
 
+  /** 위치 권한 허용 후에만 지도·API 조회 */
+  const [geoGateOk, setGeoGateOk] = useState(false);
+
+  const trashBinsQuery = useQuery({
+    queryKey: ["trashBins", 0, 100],
+    queryFn: async () => {
+      const items = await getTrashBins();
+      if (items == null) {
+        throw new Error("TRASH_BINS_FETCH_FAILED");
+      }
+      return items;
+    },
+    enabled: geoGateOk,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+  });
+  const binsError = trashBinsQuery.isError
+    ? "수거함 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요."
+    : null;
+  const places = useMemo(
+    () => (trashBinsQuery.data ?? []).map(trashBinApiToPlace),
+    [trashBinsQuery.data]
+  );
+
+  const clearSheetCloseTimer = useCallback(() => {
+    if (sheetCloseTimerRef.current != null) {
+      window.clearTimeout(sheetCloseTimerRef.current);
+      sheetCloseTimerRef.current = null;
+    }
+  }, []);
+
+  const closeBottomSheet = useCallback(() => {
+    if (!selectedPlace || isSheetClosing) return;
+
+    const reducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const closeMs = reducedMotion ? 0 : SHEET_CLOSE_MS;
+
+    setIsSheetClosing(true);
+    clearSheetCloseTimer();
+    sheetCloseTimerRef.current = window.setTimeout(() => {
+      setSelectedPlace(null);
+      setIsDirectionsSheetOpen(false);
+      setIsSheetClosing(false);
+      sheetCloseTimerRef.current = null;
+    }, closeMs);
+  }, [clearSheetCloseTimer, isSheetClosing, selectedPlace]);
+
+  const closeBottomSheetRef = useRef(closeBottomSheet);
+  closeBottomSheetRef.current = closeBottomSheet;
+
   useEffect(() => {
-    if (!selectedPlace) setIsImagePreviewOpen(false);
-  }, [selectedPlace]);
+    return () => clearSheetCloseTimer();
+  }, [clearSheetCloseTimer]);
+
+  useEffect(() => {
+    if (!selectedPlace) {
+      setIsImagePreviewOpen(false);
+      if (!isSheetClosing) {
+        setIsDirectionsSheetOpen(false);
+      }
+    }
+  }, [isSheetClosing, selectedPlace]);
+
+  const selectedPlaceDistanceLabel = useMemo(() => {
+    if (!selectedPlace || !referenceLocation) return null;
+    const meters = distanceMeters(
+      referenceLocation.lat,
+      referenceLocation.lng,
+      selectedPlace.lat,
+      selectedPlace.lng
+    );
+    return formatDistanceLabel(meters);
+  }, [referenceLocation, selectedPlace]);
 
   useEffect(() => {
     if (!isImagePreviewOpen) return;
@@ -126,9 +200,94 @@ export default function TrashBinListMapView() {
     return () => window.removeEventListener("keydown", onKey);
   }, [isImagePreviewOpen]);
 
+  /**
+   * 진입 시 위치 권한 1회 요청 → 허용 시 현재 위치 1회만 확보 → 지도·API 로드.
+   * watchPosition·내 위치 마커·연속 API 재요청 없음.
+   */
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    let cancelled = false;
+
+    const goHome = () => {
+      void router.replace("/");
+    };
+
+    const finishOk = (lat: number, lng: number) => {
+      if (cancelled) return;
+      const point = { lat, lng };
+      mapInitCenterRef.current = point;
+      setReferenceLocation(point);
+      setGeoGateOk(true);
+    };
+
+    const requestPosition = () => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => finishOk(pos.coords.latitude, pos.coords.longitude),
+        () => {
+          if (cancelled) return;
+          alert("근처 수거함 안내를 위해 위치 권한이 필요해요. 홈 화면으로 이동합니다.");
+          goHome();
+        },
+        { enableHighAccuracy: true, timeout: 12_000, maximumAge: 60_000 }
+      );
+    };
+
+    void (async () => {
+      if (!navigator.geolocation) {
+        alert(
+          "이 기기에서는 위치 정보를 사용할 수 없어요. 근처 수거함 기능은 위치 허용이 필요합니다."
+        );
+        goHome();
+        return;
+      }
+
+      try {
+        const permission = await navigator.permissions.query({ name: "geolocation" });
+        if (cancelled) return;
+
+        if (permission.state === "denied") {
+          alert("위치 권한이 꺼져 있어요. 설정에서 허용한 뒤 다시 시도해 주세요.");
+          goHome();
+          return;
+        }
+
+        if (permission.state === "granted") {
+          requestPosition();
+          return;
+        }
+      } catch {
+        /* Permissions API 미지원 브라우저 — 아래 confirm 후 getCurrentPosition */
+      }
+
+      const hasAskedBefore = window.localStorage.getItem(GEO_CONSENT_STORAGE_KEY) === "1";
+      if (!hasAskedBefore) {
+        const accepted = window.confirm(
+          "근처 수거함을 지도에 표시하려면 현재 위치 접근이 필요해요. 위치를 허용할까요?"
+        );
+        window.localStorage.setItem(GEO_CONSENT_STORAGE_KEY, "1");
+        if (!accepted) {
+          goHome();
+          return;
+        }
+      }
+
+      requestPosition();
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
+
+  /** 카카오 지도 초기화 — 위치 허용·좌표 확정 후 1회만 */
+  useEffect(() => {
+    if (!geoGateOk || didInitMapRef.current) return;
+
     const el = mapElRef.current;
     if (!el) return;
+
+    const initialCenter = mapInitCenterRef.current;
+    if (!initialCenter) return;
 
     const appKey = getKakaoMapJavaScriptKeyForHost(window.location.hostname);
     if (!appKey) {
@@ -139,8 +298,6 @@ export default function TrashBinListMapView() {
     }
 
     let cancelled = false;
-    const pinIconSrc = `${window.location.origin}/pinIcon.svg`;
-    const myLocIconSrc = `${window.location.origin}/myLocationDot.svg`;
 
     void (async () => {
       try {
@@ -160,157 +317,170 @@ export default function TrashBinListMapView() {
       }
 
       const { maps } = window.kakao;
-      const geocoder = new maps.services.Geocoder();
-      const center = new maps.LatLng(
-        DALSEONG_COUNTY_OFFICE.lat,
-        DALSEONG_COUNTY_OFFICE.lng
-      );
+      const center = new maps.LatLng(initialCenter.lat, initialCenter.lng);
       const map = new maps.Map(mapElRef.current, { center, level: 5 });
       mapInstanceRef.current = map;
+
       maps.event.addListener(map, "dragstart", () => {
         isMapDraggingRef.current = true;
-        // 터치/마우스 드래그 시작 시 click 처리 유예
         ignoreMapClickUntilRef.current = Date.now() + 120;
       });
       maps.event.addListener(map, "dragend", () => {
         isMapDraggingRef.current = false;
-        // 드래그 종료 직후 발생할 수 있는 click을 무시
         ignoreMapClickUntilRef.current = Date.now() + 220;
       });
 
-      const markerSize = new maps.Size(PIN_SIZE.width, PIN_SIZE.height);
-      const markerOffset = new maps.Point(PIN_ANCHOR.x, PIN_ANCHOR.y);
-      const pinImage = new maps.MarkerImage(pinIconSrc, markerSize, {
-        offset: markerOffset,
-      });
-
-      markersRef.current.forEach((m) => m.setMap(null));
-      let blockMapDeselect = false;
-      markersRef.current = MOCK_TRASH_BINS.map((place) => {
-        const marker = new maps.Marker({
-          map,
-          position: new maps.LatLng(place.lat, place.lng),
-          image: pinImage,
-        });
-        maps.event.addListener(marker, "click", () => {
-          blockMapDeselect = true;
-          setSelectedPlace(place);
-          setSelectedMapTap(null);
-          mapTapMarkerRef.current?.setMap(null);
-          mapTapMarkerRef.current = null;
-          window.setTimeout(() => {
-            blockMapDeselect = false;
-          }, 0);
-        });
-        return marker;
-      });
-
-      maps.event.addListener(map, "click", (mouseEvent: { latLng: KakaoMaps.LatLng }) => {
+      maps.event.addListener(map, "click", () => {
         if (isMapDraggingRef.current || Date.now() < ignoreMapClickUntilRef.current) {
           return;
         }
-        if (blockMapDeselect) return;
-        setSelectedPlace(null);
+        if (blockMapDeselectRef.current) return;
         setIsImagePreviewOpen(false);
-
-        const lat = mouseEvent.latLng.getLat();
-        const lng = mouseEvent.latLng.getLng();
-        mapTapMarkerRef.current?.setMap(null);
-        mapTapMarkerRef.current = new maps.Marker({
-          map,
-          position: new maps.LatLng(lat, lng),
-        });
-        setIsMapTapResolving(true);
-        geocoder.coord2Address(lng, lat, (result, status) => {
-          if (cancelled || !mapInstanceRef.current || map !== mapInstanceRef.current) return;
-          const isOk = status === maps.services.Status.OK;
-          const item = isOk ? result?.[0] : undefined;
-          const road = item?.road_address?.address_name?.trim() ?? "";
-          const jibun = item?.address?.address_name?.trim() ?? "";
-          const label = road || jibun || "선택한 위치";
-          setSelectedMapTap({ lat, lng, addressLabel: label });
-          setIsMapTapResolving(false);
-        });
+        closeBottomSheetRef.current();
       });
 
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            if (
-              cancelled ||
-              !mapInstanceRef.current ||
-              !window.kakao?.maps ||
-              map !== mapInstanceRef.current
-            ) {
-              return;
-            }
-            userLocationMarkerRef.current?.setMap(null);
-            const { maps: m } = window.kakao;
-            const dotImage = new m.MarkerImage(
-              myLocIconSrc,
-              new m.Size(MY_LOC_SIZE.width, MY_LOC_SIZE.height),
-              { offset: new m.Point(MY_LOC_ANCHOR.x, MY_LOC_ANCHOR.y) }
-            );
-            const userMarker = new m.Marker({
-              map,
-              position: new m.LatLng(pos.coords.latitude, pos.coords.longitude),
-              image: dotImage,
-            });
-            userLocationMarkerRef.current = userMarker;
-            setCurrentLocation({
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
-            });
-          },
-          () => {
-            setCurrentLocation(null);
-          },
-          { enableHighAccuracy: true, timeout: 12_000, maximumAge: 30_000 }
-        );
+      if (!cancelled) {
+        didInitMapRef.current = true;
+        setMapReady(true);
       }
-
       requestAnimationFrame(() => map.relayout());
     })();
 
     return () => {
       cancelled = true;
+      didInitMapRef.current = false;
       markersRef.current.forEach((m) => m.setMap(null));
       markersRef.current = [];
-      userLocationMarkerRef.current?.setMap(null);
-      userLocationMarkerRef.current = null;
-      mapTapMarkerRef.current?.setMap(null);
-      mapTapMarkerRef.current = null;
       mapInstanceRef.current = null;
+      setMapReady(false);
     };
-  }, []);
+  }, [geoGateOk]);
+
+  /** 수거함 마커 동기화 */
+  useEffect(() => {
+    if (!mapReady || !mapInstanceRef.current || !window.kakao?.maps) return;
+    const map = mapInstanceRef.current;
+    const { maps } = window.kakao;
+    const pinIconSrc = `${window.location.origin}/pinIcon.svg`;
+    const markerSize = new maps.Size(PIN_SIZE.width, PIN_SIZE.height);
+    const markerOffset = new maps.Point(PIN_ANCHOR.x, PIN_ANCHOR.y);
+    const pinImage = new maps.MarkerImage(pinIconSrc, markerSize, {
+      offset: markerOffset,
+    });
+
+    markersRef.current.forEach((m) => m.setMap(null));
+    markersRef.current = places.map((place) => {
+      const marker = new maps.Marker({
+        map,
+        position: new maps.LatLng(place.lat, place.lng),
+        image: pinImage,
+      });
+      maps.event.addListener(marker, "click", () => {
+        blockMapDeselectRef.current = true;
+        clearSheetCloseTimer();
+        setIsSheetClosing(false);
+        setIsDirectionsSheetOpen(false);
+        setSelectedPlace(place);
+        window.setTimeout(() => {
+          blockMapDeselectRef.current = false;
+        }, 0);
+      });
+      return marker;
+    });
+
+    return () => {
+      markersRef.current.forEach((m) => m.setMap(null));
+      markersRef.current = [];
+    };
+  }, [clearSheetCloseTimer, mapReady, places]);
+
+  const isLoadingBins =
+    geoGateOk && (trashBinsQuery.isLoading || trashBinsQuery.isFetching) && places.length === 0;
 
   return (
     <div className={cn("mapShell")}>
-      {mapError && (
+      {(mapError || binsError) && (
         <p className={cn("mapErrorBanner")} role="alert">
-          {mapError}
+          {mapError ?? binsError}
         </p>
       )}
 
-      <div ref={mapElRef} className={cn("mapContainer")} aria-label="휴지통 지도" />
+      {!geoGateOk && (
+        <div className={cn("geoCheckingPanel")} aria-live="polite">
+          <p className={cn("geoCheckingMessage")}>위치 권한 확인 중입니다…</p>
+        </div>
+      )}
 
-      {(selectedPlace || isMapTapResolving || selectedMapTap) && (
+      {geoGateOk && (
+        <div ref={mapElRef} className={cn("mapContainer")} aria-label="휴지통 지도" />
+      )}
+
+      {isLoadingBins && (
+        <div className={cn("geoCheckingPanel")} aria-live="polite">
+          <p className={cn("geoCheckingMessage")}>수거함 정보를 불러오는 중입니다…</p>
+        </div>
+      )}
+
+      {geoGateOk && selectedPlace && (
         <>
           <button
             type="button"
-            className={cn("bottomSheetBackdrop")}
+            className={cn("bottomSheetBackdrop", {
+              bottomSheetBackdropClosing: isSheetClosing,
+            })}
             aria-label="상세 닫기"
-            onClick={() => {
-              setSelectedPlace(null);
-              setSelectedMapTap(null);
-              setIsMapTapResolving(false);
-              mapTapMarkerRef.current?.setMap(null);
-              mapTapMarkerRef.current = null;
-            }}
+            onClick={closeBottomSheet}
           />
-          {selectedPlace && (
+          {isDirectionsSheetOpen ? (
             <div
-              className={cn("bottomSheet")}
+              key={`directions-${selectedPlace.id}`}
+              className={cn("mapTapSheet", { mapTapSheetClosing: isSheetClosing })}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="trashBinDirectionsTitle"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className={cn("mapTapSheetGrabber")} aria-hidden="true" />
+              <h2 id="trashBinDirectionsTitle" className={cn("mapTapSheetAddress")}>
+                {selectedPlace.name}
+              </h2>
+              {selectedPlaceDistanceLabel && (
+                <p className={cn("mapTapSheetDistance")}>{selectedPlaceDistanceLabel}</p>
+              )}
+              <div className={cn("mapTapSheetDivider")} aria-hidden="true" />
+              <div className={cn("mapTapSheetActions")}>
+                <div className={cn("mapTapSheetIconGroup")}>
+                  <button
+                    type="button"
+                    className={cn("mapTapSheetIconButton")}
+                    aria-label="위치 공유"
+                    onClick={() => void shareTrashBinPlace(selectedPlace)}
+                  >
+                    <Image src={shareIcon} alt="" width={24} height={24} />
+                  </button>
+                </div>
+                <div className={cn("mapTapSheetNavGroup")}>
+                  <button
+                    type="button"
+                    className={cn("mapTapSheetNavButton", "mapTapSheetNavButtonDepart")}
+                    onClick={() => openKakaoMapLink("from", selectedPlace)}
+                  >
+                    출발
+                  </button>
+                  <button
+                    type="button"
+                    className={cn("mapTapSheetNavButton", "mapTapSheetNavButtonArrive")}
+                    onClick={() => openKakaoMapLink("to", selectedPlace)}
+                  >
+                    도착
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div
+              key={`detail-${selectedPlace.id}`}
+              className={cn("bottomSheet", { bottomSheetClosing: isSheetClosing })}
               role="dialog"
               aria-modal="true"
               aria-labelledby="trashBinSheetTitle"
@@ -337,6 +507,7 @@ export default function TrashBinListMapView() {
                     height={90}
                     loading="lazy"
                     decoding="async"
+                    unoptimized
                   />
                 </button>
                 <div className={cn("bottomSheetTextCol")}>
@@ -347,60 +518,16 @@ export default function TrashBinListMapView() {
               <button
                 type="button"
                 className={cn("bottomSheetDirections")}
-                onClick={() => openKakaoDirections(selectedPlace)}
+                onClick={() => setIsDirectionsSheetOpen(true)}
               >
                 길찾기
               </button>
             </div>
           )}
-
-          {!selectedPlace && (
-            <div
-              className={cn("mapTapSheet")}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="mapTapSheetTitle"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {isMapTapResolving && <p className={cn("mapTapSheetAddress")}>주소를 불러오는 중...</p>}
-              {!isMapTapResolving && selectedMapTap && (
-                <>
-                  <p className={cn("mapTapSheetAddress")}>{selectedMapTap.addressLabel}</p>
-                  <p className={cn("mapTapSheetDistance")}>
-                    {currentLocation
-                      ? `현재 위치에서 ${formatDistance(
-                          distanceInMeters(currentLocation, {
-                            lat: selectedMapTap.lat,
-                            lng: selectedMapTap.lng,
-                          })
-                        )}`
-                      : "현재 위치를 확인할 수 없어 거리를 계산하지 못했어요."}
-                  </p>
-                  <button
-                    type="button"
-                    className={cn("bottomSheetDirections")}
-                    onClick={() =>
-                      openKakaoDirections({
-                        id: "selected-map-tap",
-                        lat: selectedMapTap.lat,
-                        lng: selectedMapTap.lng,
-                        name: selectedMapTap.addressLabel,
-                        categoryLabel: "선택 위치",
-                        description: selectedMapTap.addressLabel,
-                        imageUrl: "",
-                      })
-                    }
-                  >
-                    이 위치로 길찾기
-                  </button>
-                </>
-              )}
-            </div>
-          )}
         </>
       )}
 
-      {isImagePreviewOpen && selectedPlace && (
+      {geoGateOk && isImagePreviewOpen && selectedPlace && (
         <div className={cn("imagePreviewRoot")} role="presentation">
           <button
             type="button"
@@ -424,6 +551,7 @@ export default function TrashBinListMapView() {
                 className={cn("imagePreviewImage")}
                 sizes="(max-width: 900px) calc(100vw - 3.2rem), 52rem"
                 priority
+                unoptimized
               />
             </div>
           </div>

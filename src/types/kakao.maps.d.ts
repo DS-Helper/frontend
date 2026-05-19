@@ -34,6 +34,7 @@ declare global {
         options: { center: LatLng; level: number }
       );
       setCenter(latlng: LatLng): void;
+      panTo(latlng: LatLng): void;
       relayout(): void;
     }
 
@@ -44,6 +45,19 @@ declare global {
         image?: MarkerImage;
       });
       setMap(map: Map | null): void;
+    }
+
+    class CustomOverlay {
+      constructor(options: {
+        position: LatLng;
+        content: HTMLElement | string;
+        map?: Map;
+        xAnchor?: number;
+        yAnchor?: number;
+        zIndex?: number;
+      });
+      setMap(map: Map | null): void;
+      setPosition(position: LatLng): void;
     }
 
     namespace services {
@@ -74,6 +88,7 @@ declare global {
         Map: typeof KakaoMaps.Map;
         LatLng: typeof KakaoMaps.LatLng;
         Marker: typeof KakaoMaps.Marker;
+        CustomOverlay: typeof KakaoMaps.CustomOverlay;
         MarkerImage: typeof KakaoMaps.MarkerImage;
         Size: typeof KakaoMaps.Size;
         Point: typeof KakaoMaps.Point;

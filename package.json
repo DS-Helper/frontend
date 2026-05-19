@@ -10,16 +10,13 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.83.0",
-    "@types/js-cookie": "^3.0.6",
     "axios": "^1.11.0",
     "classnames": "^2.5.1",
-    "js-cookie": "^3.0.5",
     "next": "16.2.3",
     "react": "^19.2.5",
     "react-calendar": "^6.0.0",
     "react-dom": "^19.2.5",
     "react-icons": "^5.5.0",
-    "react-router-dom": "^7.7.1",
     "sass": "^1.89.2",
     "zustand": "^5.0.6"
   },

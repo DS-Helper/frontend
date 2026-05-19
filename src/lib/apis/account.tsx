@@ -111,3 +111,39 @@ export const getScraps = async () => {
     return null;
   }
 };
+
+export const deleteGoogle = async (accessToken: string) => {
+  try {
+    const res = await instance.delete("/user/oauth/google", {
+      data: { accessToken },
+    });
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+export const deleteKakao = async (accessToken: string) => {
+  try {
+    const res = await instance.delete("/user/oauth/kakao", {
+      data: { accessToken },
+    });
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+export const deleteNaver = async (accessToken: string) => {
+  try {
+    const res = await instance.delete("/user/oauth/naver", {
+      data: { accessToken },
+    });
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};

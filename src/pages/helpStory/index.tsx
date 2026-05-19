@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import { getPosts, parsePostsListResponse } from "@/lib/apis/helpStory";
 import type { PostListItem } from "@/types/helpStory";
@@ -30,8 +30,13 @@ export default function HelpStoryPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
+  /** 입력창 값 (검색 실행 전까지 API에 반영되지 않음) */
   const [searchQuery, setSearchQuery] = useState("");
+  /** 마지막으로 API에 적용된 검색어 (trimmed, 빈 문자열이면 키워드 없음) */
+  const [appliedKeyword, setAppliedKeyword] = useState("");
   const [sortType, setSortType] = useState<SortType>("latest");
+  /** 연속 클릭·이벤트로 동일 검색이 중복 실행되지 않도록 */
+  const searchSubmitLockRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -45,6 +50,9 @@ export default function HelpStoryPage() {
           size: POST_PAGE_SIZE,
           sort,
           sortBy,
+          ...(appliedKeyword.trim() !== ""
+            ? { keyword: appliedKeyword.trim() }
+            : {}),
         });
 
         if (cancelled) return;
@@ -74,7 +82,10 @@ export default function HelpStoryPage() {
           setTotalElements(0);
         }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+          searchSubmitLockRef.current = false;
+        }
       }
     };
 
@@ -82,7 +93,7 @@ export default function HelpStoryPage() {
     return () => {
       cancelled = true;
     };
-  }, [currentPage, sortType]);
+  }, [currentPage, sortType, appliedKeyword]);
 
   const applySortType = (next: SortType) => {
     if (next !== sortType) {
@@ -124,12 +135,19 @@ export default function HelpStoryPage() {
     router.push(`/helpStory/${postId}`);
   };
 
-  /** 정렬은 API(page 요청의 sort/sortBy) 기준 — 여기서는 현재 페이지 내 검색만 */
-  const displayedPosts = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return posts;
-    return posts.filter((p) => p.title.toLowerCase().includes(q));
-  }, [posts, searchQuery]);
+  const runSearch = () => {
+    const term = searchQuery.trim();
+    if (term === appliedKeyword && currentPage === 1) return;
+    if (searchSubmitLockRef.current) return;
+
+    searchSubmitLockRef.current = true;
+    if (term !== appliedKeyword) {
+      setAppliedKeyword(term);
+    }
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
+  };
 
   if (loading) {
     return (
@@ -149,7 +167,10 @@ export default function HelpStoryPage() {
         <div className={cn("listToolbar")}>
           <form
             className={cn("searchForm")}
-            onSubmit={(e) => e.preventDefault()}
+            onSubmit={(e) => {
+              e.preventDefault();
+              runSearch();
+            }}
             aria-label="게시물 제목 검색"
           >
             <input
@@ -160,27 +181,33 @@ export default function HelpStoryPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               enterKeyHint="search"
             />
-            <span className={cn("searchIconWrap")} aria-hidden>
-              <svg
-                className={cn("searchIcon")}
-                viewBox="0 0 30 30"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                focusable="false"
-              >
-                <circle
-                  cx="14"
-                  cy="14"
-                  r="7"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M22.2929 23.7071C22.6834 24.0976 23.3166 24.0976 23.7071 23.7071C24.0976 23.3166 24.0976 22.6834 23.7071 22.2929L23 23L22.2929 23.7071ZM19 19L18.2929 19.7071L22.2929 23.7071L23 23L23.7071 22.2929L19.7071 18.2929L19 19Z"
-                  fill="currentColor"
-                />
-              </svg>
-            </span>
+            <button
+              type="submit"
+              className={cn("searchSubmitButton")}
+              aria-label="검색"
+            >
+              <span className={cn("searchIconWrap")} aria-hidden>
+                <svg
+                  className={cn("searchIcon")}
+                  viewBox="0 0 30 30"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  focusable="false"
+                >
+                  <circle
+                    cx="14"
+                    cy="14"
+                    r="7"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                  <path
+                    d="M22.2929 23.7071C22.6834 24.0976 23.3166 24.0976 23.7071 23.7071C24.0976 23.3166 24.0976 22.6834 23.7071 22.2929L23 23L22.2929 23.7071ZM19 19L18.2929 19.7071L22.2929 23.7071L23 23L23.7071 22.2929L19.7071 18.2929L19 19Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </span>
+            </button>
           </form>
           <div className={cn("sortRow")} role="group" aria-label="정렬">
             <button
@@ -201,8 +228,8 @@ export default function HelpStoryPage() {
         </div>
 
         <ul className={cn("storyList")}>
-          {displayedPosts.length > 0 ? (
-            displayedPosts.map((post) => (
+          {posts.length > 0 ? (
+            posts.map((post) => (
               <li
                 key={post.postId} 
                 className={cn("storyItem")}
@@ -230,7 +257,7 @@ export default function HelpStoryPage() {
                 </div>
               </li>
             ))
-          ) : posts.length > 0 ? (
+          ) : appliedKeyword.trim() !== "" ? (
             <div className={cn("emptyState")}>
               <p>검색 결과가 없습니다.</p>
             </div>
