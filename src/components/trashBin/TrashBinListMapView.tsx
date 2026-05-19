@@ -6,11 +6,9 @@ import { getKakaoMapJavaScriptKeyForHost } from "@/lib/maps/kakaoMapEnv";
 import { getKakaoMapLoadErrorMessage, loadKakaoMapSdk } from "@/lib/maps/loadKakaoMapSdk";
 import type { TrashBinApiItem, TrashBinPlace } from "@/types/trashBin";
 import { getTrashBins } from "@/lib/apis/trashBin";
-import { useTrashBinStore } from "@/lib/store/trashBinStore";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import shareIcon from "@/public/shareIcon.svg";
-import bookmarkIcon from "@/public/boardBookmarkIcon.svg";
 
 const cn = classNames.bind(styles);
 
@@ -116,8 +114,6 @@ export default function TrashBinListMapView() {
 
   /** 위치 권한 허용 후에만 지도·API 조회 */
   const [geoGateOk, setGeoGateOk] = useState(false);
-  const trashBins = useTrashBinStore((state) => state.trashBins);
-  const setTrashBins = useTrashBinStore((state) => state.setTrashBins);
 
   const trashBinsQuery = useQuery({
     queryKey: ["trashBins", 0, 100],
@@ -138,7 +134,10 @@ export default function TrashBinListMapView() {
   const binsError = trashBinsQuery.isError
     ? "수거함 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요."
     : null;
-  const places = useMemo(() => trashBins.map(trashBinApiToPlace), [trashBins]);
+  const places = useMemo(
+    () => (trashBinsQuery.data ?? []).map(trashBinApiToPlace),
+    [trashBinsQuery.data]
+  );
 
   const clearSheetCloseTimer = useCallback(() => {
     if (sheetCloseTimerRef.current != null) {
@@ -280,11 +279,6 @@ export default function TrashBinListMapView() {
     };
   }, [router]);
 
-  useEffect(() => {
-    if (!trashBinsQuery.data) return;
-    setTrashBins(trashBinsQuery.data);
-  }, [setTrashBins, trashBinsQuery.data]);
-
   /** 카카오 지도 초기화 — 위치 허용·좌표 확정 후 1회만 */
   useEffect(() => {
     if (!geoGateOk || didInitMapRef.current) return;
@@ -400,7 +394,8 @@ export default function TrashBinListMapView() {
     };
   }, [clearSheetCloseTimer, mapReady, places]);
 
-  const isLoadingBins = geoGateOk && trashBinsQuery.isLoading && places.length === 0;
+  const isLoadingBins =
+    geoGateOk && (trashBinsQuery.isLoading || trashBinsQuery.isFetching) && places.length === 0;
 
   return (
     <div className={cn("mapShell")}>
@@ -455,13 +450,6 @@ export default function TrashBinListMapView() {
               <div className={cn("mapTapSheetDivider")} aria-hidden="true" />
               <div className={cn("mapTapSheetActions")}>
                 <div className={cn("mapTapSheetIconGroup")}>
-                  <button
-                    type="button"
-                    className={cn("mapTapSheetIconButton")}
-                    aria-label="즐겨찾기"
-                  >
-                    <Image src={bookmarkIcon} alt="" width={24} height={24} />
-                  </button>
                   <button
                     type="button"
                     className={cn("mapTapSheetIconButton")}

@@ -64,28 +64,6 @@ $pageMinHeight: calc(100vh - 6rem);
   min-width: 0;
 }
 
-.mapFollowButton {
-  position: absolute;
-  right: 1.6rem;
-  bottom: 1.6rem;
-  z-index: 12;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 4.4rem;
-  height: 4.4rem;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: var(--color-semantic-bg-page);
-  box-shadow: 0 0.2rem 1.2rem rgba(47, 59, 53, 0.18);
-  cursor: pointer;
-}
-
-.mapFollowButtonSheetOpen {
-  bottom: 14rem;
-}
-
 .bottomSheetBackdrop {
   position: absolute;
   left: 0;
@@ -303,13 +281,6 @@ $pageMinHeight: calc(100vh - 6rem);
   background: var(--color-primitive-gray-300);
 }
 
-.mapTapSheetTitle {
-  margin: 0 0 0.8rem;
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: var(--color-primitive-gray-600);
-}
-
 .mapTapSheetAddress {
   margin: 0 0 0.6rem;
   font-size: 2rem;
@@ -323,13 +294,6 @@ $pageMinHeight: calc(100vh - 6rem);
   margin: 0 0 1.2rem;
   font-size: 1.5rem;
   font-weight: 500;
-  color: var(--color-primitive-gray-700);
-}
-
-.mapTapSheetMeta {
-  margin: 0 0 1.6rem;
-  font-size: 1.4rem;
-  font-weight: 400;
   color: var(--color-primitive-gray-700);
 }
 

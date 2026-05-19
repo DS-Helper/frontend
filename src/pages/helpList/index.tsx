@@ -291,9 +291,6 @@ export default function HelpListPage() {
       return;
     }
     
-    console.log('취소할 예약 ID:', cancelId);
-    console.log('reservationDetail:', reservationDetail);
-    
     if(confirm("예약을 취소하시겠습니까?")) {
       try {
         const response = currentUserType === 'organization' 

@@ -12,10 +12,8 @@ export default function KakaoLoginLegacyRedirectPage() {
 
   useEffect(() => {
     if (!router.isReady) return;
-    console.log("[kakao legacy login-url] asPath", router.asPath);
     const qIndex = router.asPath.indexOf("?");
     const query = qIndex >= 0 ? router.asPath.slice(qIndex) : "";
-    console.log("[kakao legacy login-url] redirectQuery", query);
 
     void router.replace(`/kakao/callback${query}`);
   }, [router.isReady, router.asPath, router]);

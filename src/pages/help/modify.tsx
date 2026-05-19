@@ -314,10 +314,6 @@ export default function ModifyPage() {
             };
   
         // 사용자 타입에 따라 적절한 API 호출
-        console.log('현재 사용자:', user);
-        console.log('선택된 타입:', type);
-        console.log('전송할 payload:', payload);
-        
         let res;
         try {
           res = type === 'personal' 
@@ -333,7 +329,6 @@ export default function ModifyPage() {
           throw apiError;
         }
         
-        console.log(res);
         if (res) {
           router.push("/help/complete");
         } else {
