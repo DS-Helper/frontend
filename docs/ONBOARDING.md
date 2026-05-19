@@ -2,12 +2,15 @@
 
 DS-Helper 사용자 프론트엔드 저장소입니다. 신규 협업자는 이 문서부터 읽고 [ENV.md](./ENV.md) → [ARCHITECTURE.md](./ARCHITECTURE.md) 순으로 이어가면 됩니다.
 
+> **Public 레포:** 이메일·전화·테스트 계정·API 키 실값은 `docs/`·Issue·PR에 올리지 않습니다. [SECURITY.md](./SECURITY.md)
+
 ## 저장소
 
 | 구분 | URL |
 |------|-----|
 | 프론트엔드 (이 저장소) | https://github.com/DS-Helper/frontend |
 | 백엔드 | https://github.com/DS-Helper/backend |
+| 어드민 (FE+BE) | https://github.com/DS-Helper/admin |
 
 ## 서비스·배포 환경
 
@@ -23,7 +26,7 @@ DS-Helper 사용자 프론트엔드 저장소입니다. 신규 협업자는 이 
 
 - Node.js 20 (배포 스크립트·EC2와 동일)
 - npm
-- 백엔드 API가 기동 중이거나, 테스트/스테이징 API URL을 `.env.local`에 설정
+- 백엔드 API가 기동 중이거나, **`.env`**에 테스트 API 설정 (`https://be-test.dshelper.kr` — [Swagger](https://be-test.dshelper.kr/swagger-ui/index.html))
 
 ## 로컬 실행
 
@@ -31,7 +34,7 @@ DS-Helper 사용자 프론트엔드 저장소입니다. 신규 협업자는 이 
 git clone https://github.com/DS-Helper/frontend.git
 cd frontend
 npm install
-cp .env.example .env.local   # 없으면 ENV.md 참고해 직접 작성
+cp .env.example .env   # 이미 .env가 있으면 ENV.md 참고해 키만 맞춤
 npm run dev
 ```
 
@@ -39,7 +42,7 @@ npm run dev
 
 ## 환경 변수
 
-`.env.local`은 git에 포함되지 않습니다. 필수·선택 항목은 [ENV.md](./ENV.md)를 따르세요.
+**`.env`**는 git에 포함되지 않습니다. 필수·선택 항목은 [ENV.md](./ENV.md)를 따르세요.
 
 ## OAuth (개인 회원)
 
@@ -55,7 +58,7 @@ npm run dev
 테스트: `https://test.dshelper.kr/kakao/callback`  
 프로덕션: `https://dshelper.kr/kakao/callback`
 
-각 개발자 콘솔에 위 URI를 등록하고, `.env.local`의 `NEXT_PUBLIC_*_OAUTH_REDIRECT_URI(_TEST)`와 맞춥니다.
+각 개발자 콘솔에 위 URI를 등록하고, **`.env`**의 `NEXT_PUBLIC_*_OAUTH_REDIRECT_URI(_TEST)`와 맞춥니다.
 
 ## 기관(조직) 로그인
 
@@ -67,11 +70,14 @@ npm run dev
 
 | 브랜치 | 용도 |
 |--------|------|
-| `main` | 기본 브랜치 (GitHub 기준) |
-| `prd` | EC2 프로덕션 자동 배포 트리거 |
-| `dev`, `ja` 등 | 기능 개발 (팀 규칙에 따름) |
+| `ja` 등 | 기능 작업 → **로컬** 테스트 |
+| `dev` | **1차 PR** → Netlify (`test.dshelper.kr`) |
+| `prd` | **3차 PR** → EC2 (`dshelper.kr`, GitHub Actions) |
 
-`prd`에 push하면 [DEPLOY.md](./DEPLOY.md) 워크플로가 EC2에서 pull → build → pm2 reload를 수행합니다. **테스트 사이트(Netlify)는 별도 연결**이므로 PR/브랜치 정책은 팀과 확인하세요.
+상세 다이어그램: [DEPLOY.md](./DEPLOY.md).
+
+- `be-test` API는 **IP 제한** — 허용 IP 요청 후 연동
+- EC2 프로덕션 `NEXT_PUBLIC_API_URL` = `https://server.dshelper.kr`
 
 ## 작업 로그 (브랜치 단위)
 
@@ -79,7 +85,10 @@ npm run dev
 
 ## 다음에 읽을 문서
 
-1. [ARCHITECTURE.md](./ARCHITECTURE.md) — 폴더·인증·상태 관리
-2. [API_FRONTEND.md](./API_FRONTEND.md) — 백엔드 호출 목록
-3. [CONVENTIONS.md](./CONVENTIONS.md) — PR·코딩 규칙
-4. [AGENTS.md](./AGENTS.md) — AI 도구 사용 시 규칙
+1. [../CONTRIBUTING.md](../CONTRIBUTING.md) — PR·브랜치·Public 레포 주의
+2. [ARCHITECTURE.md](./ARCHITECTURE.md) — 폴더·인증·상태 관리
+3. [AUTH.md](./AUTH.md) · [INTEGRATIONS.md](./INTEGRATIONS.md) — 로그인·외부 연동
+4. [API_FRONTEND.md](./API_FRONTEND.md) · [BACKEND.md](./BACKEND.md)
+5. [DEPLOY.md](./DEPLOY.md) · [OBSERVABILITY.md](./OBSERVABILITY.md)
+6. [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) · [QA.md](./QA.md)
+7. [CONVENTIONS.md](./CONVENTIONS.md) · [AGENTS.md](./AGENTS.md)
