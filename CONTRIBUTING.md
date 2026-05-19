@@ -30,7 +30,14 @@ DS-Helper **사용자 웹** 프론트엔드([DS-Helper/frontend](https://github.
 
 상세·예시: [docs/CONVENTIONS.md](./docs/CONVENTIONS.md#커밋-메시지)
 
-**에이전트에게:** "커밋해줘" / "기능별로 커밋해줘"라고 하면 diff를 보고 접두사를 붙여 커밋할 수 있습니다. push는 별도로 요청하세요.
+**에이전트(Cursor) 커밋 절차**
+
+1. "커밋해줘" → 에이전트가 diff 분석 후 **커밋 계획안** 제시  
+2. 팀원이 계획안 **승인**  
+3. 에이전트가 **로컬 `git commit`만** 실행  
+4. **`git push`는 에이전트가 하지 않음** — push는 각자 로컬에서 직접
+
+자세한 표·예외: [docs/CONVENTIONS.md](./docs/CONVENTIONS.md#cursor에이전트-커밋-워크플로), [docs/AGENTS.md](./docs/AGENTS.md#커밋-요청-워크플로)
 
 ## Pull Request
 
