@@ -24,6 +24,10 @@ Cursor 등 AI가 이 저장소를 수정할 때 따를 규칙입니다.
 - **상태**: 서버 데이터는 React Query 우선; Zustand는 `userStore`(세션) 위주
 - **API**: 새 호출은 `src/lib/apis/`에 모듈 추가, `instance` 사용
 
+## Public 레포
+
+- `docs/`, Issue, PR, WORKLOG에 **이메일·전화·실명·테스트 계정·키 실값** 금지 — [SECURITY.md](./SECURITY.md)
+
 ## 건드리지 말 것 (확인 없이)
 
 - `prd` 브랜치 직접 push (자동 EC2 배포)
@@ -40,10 +44,12 @@ Cursor 등 AI가 이 저장소를 수정할 때 따를 규칙입니다.
 
 | 변경 유형 | 갱신 문서 |
 |-----------|-----------|
-| 새 API 사용 | API_FRONTEND.md |
-| env 키 추가 | ENV.md |
+| 새 API 사용 | API_FRONTEND.md, BACKEND.md |
+| env 키 추가 | ENV.md, INTEGRATIONS.md |
+| OAuth·로그인 변경 | AUTH.md, TROUBLESHOOTING.md |
 | 배포 절차 변경 | DEPLOY.md |
 | 구조·인증 변경 | ARCHITECTURE.md, DECISIONS.md |
+| 미구현·TODO | KNOWN_ISSUES.md, ROADMAP.md |
 | 브랜치 작업 마무리 | docs/worklog/\<branch\>.md, WORKLOG.md 인덱스 |
 
 ## 테스트
