@@ -733,9 +733,7 @@ export default function TrashBinListMapView() {
         <>
           <button
             type="button"
-            className={cn("bottomSheetBackdrop", {
-              bottomSheetBackdropDirections: isDirectionsSheetOpen,
-            })}
+            className={cn("bottomSheetBackdrop")}
             aria-label="상세 닫기"
             onClick={() => {
               setSelectedPlace(null);
@@ -744,6 +742,7 @@ export default function TrashBinListMapView() {
           />
           {isDirectionsSheetOpen ? (
             <div
+              key={`directions-${selectedPlace.id}`}
               className={cn("mapTapSheet")}
               role="dialog"
               aria-modal="true"
@@ -796,6 +795,7 @@ export default function TrashBinListMapView() {
             </div>
           ) : (
             <div
+              key={`detail-${selectedPlace.id}`}
               className={cn("bottomSheet")}
               role="dialog"
               aria-modal="true"
