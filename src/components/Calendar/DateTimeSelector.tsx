@@ -39,6 +39,9 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
   const isBlockedDate = (date: Date) => formatLocalDate(date) === "2026-05-24";
 
   const handleDateChange = async (date: Date) => {
+    if (isClosedBookingWeek(date)) {
+      return;
+    }
     setSelectedDate(date);
     setSelectedTimeBlocks([]);
     
@@ -208,6 +211,40 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
     const dateToCheck = new Date(date);
     dateToCheck.setHours(0, 0, 0, 0);
     return dateToCheck <= today;
+  };
+
+  /** 이번 주 월요일 00:00 (로컬). 일요일은 직전 주의 일요일이 아니라 해당 주의 일요일로 묶음 */
+  const startOfWeekMonday = (d: Date): Date => {
+    const copy = new Date(d);
+    copy.setHours(0, 0, 0, 0);
+    const day = copy.getDay();
+    const diffToMonday = day === 0 ? -6 : 1 - day;
+    copy.setDate(copy.getDate() + diffToMonday);
+    return copy;
+  };
+
+  const addDays = (d: Date, n: number): Date => {
+    const next = new Date(d);
+    next.setDate(next.getDate() + n);
+    return next;
+  };
+
+  /** 다음 주·다다음 주(월~일 두 구간)는 신청 불가 */
+  const isClosedBookingWeek = (date: Date): boolean => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const thisMonday = startOfWeekMonday(today);
+    const nextWeekStart = addDays(thisMonday, 7);
+    const weekAfterNextStart = addDays(thisMonday, 14);
+    const nextWeekEnd = addDays(nextWeekStart, 7);
+    const weekAfterNextEnd = addDays(weekAfterNextStart, 7);
+
+    const check = new Date(date);
+    check.setHours(0, 0, 0, 0);
+
+    const inNextWeek = check >= nextWeekStart && check < nextWeekEnd;
+    const inWeekAfterNext = check >= weekAfterNextStart && check < weekAfterNextEnd;
+    return inNextWeek || inWeekAfterNext;
   };
 
   const isSunday = (date: Date) => {
