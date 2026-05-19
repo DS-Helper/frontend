@@ -20,6 +20,20 @@ const PIN_ANCHOR = { x: 17, y: 53 };
 const FALLBACK_BIN_IMAGE_URL = "/mapIconGray.svg";
 
 const USER_LOC_OVERLAY_SIZE = 48;
+/** GPS 점프 시 즉시 이동 (m) — 이보다 작으면 보간 */
+const USER_LOC_SNAP_DISTANCE_M = 80;
+/** 내 위치 마커 이동 보간 시간 (ms) */
+const USER_LOC_ANIM_MS = 380;
+
+type GeoPoint = { lat: number; lng: number };
+
+function lerpCoord(from: number, to: number, t: number): number {
+  return from + (to - from) * t;
+}
+
+function easeOutCubic(t: number): number {
+  return 1 - (1 - t) ** 3;
+}
 
 function trashBinApiToPlace(item: TrashBinApiItem): TrashBinPlace {
   const imageUrl =
@@ -209,9 +223,16 @@ export default function TrashBinListMapView() {
   /** 마커 클릭 직후 지도 click으로 바텀시트가 바로 닫히지 않게 함 */
   const blockMapDeselectRef = useRef(false);
   const didInitMapRef = useRef(false);
-  const lastGeoPointRef = useRef<{ lat: number; lng: number } | null>(null);
+  const lastGeoPointRef = useRef<GeoPoint | null>(null);
   const lastHeadingRef = useRef<number | null>(null);
+  const displayedGeoRef = useRef<GeoPoint | null>(null);
+  const userLocAnimFrameRef = useRef<number | null>(null);
+  const userLocAnimFromRef = useRef<GeoPoint | null>(null);
+  const userLocAnimToRef = useRef<GeoPoint | null>(null);
+  const userLocAnimStartRef = useRef(0);
   const orientationListenerAttachedRef = useRef(false);
+  /** 지도를 드래그하면 내 위치 따라가기 해제 */
+  const followUserLocationRef = useRef(true);
   /** 지도 최초 중심 — GPS 갱신마다 지도를 재생성하지 않도록 1회만 고정 */
   const mapInitCenterRef = useRef<{ lat: number; lng: number } | null>(null);
 
@@ -226,6 +247,7 @@ export default function TrashBinListMapView() {
   );
   const [userHeading, setUserHeading] = useState<number | null>(null);
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
+  const [isFollowingUser, setIsFollowingUser] = useState(true);
 
   /** 위치 권한 허용 전에는 지도·마커를 올리지 않음 — 재방문 시 effect가 다시 돌며 getCurrentPosition으로 다시 요청 */
   const [geoGateOk, setGeoGateOk] = useState(false);
@@ -250,7 +272,22 @@ export default function TrashBinListMapView() {
     : null;
   const places = useMemo(() => trashBins.map(trashBinApiToPlace), [trashBins]);
 
-  const syncUserLocationOverlay = useCallback((lat: number, lng: number, heading: number | null) => {
+  const panMapToUser = useCallback((lat: number, lng: number, immediate = false) => {
+    if (!followUserLocationRef.current) return;
+
+    const map = mapInstanceRef.current;
+    if (!map || !window.kakao?.maps) return;
+
+    const { maps } = window.kakao;
+    const latlng = new maps.LatLng(lat, lng);
+    if (immediate) {
+      map.setCenter(latlng);
+      return;
+    }
+    map.panTo(latlng);
+  }, []);
+
+  const applyUserLocationOverlay = useCallback((lat: number, lng: number, heading: number | null) => {
     const map = mapInstanceRef.current;
     if (!map || !window.kakao?.maps) return;
 
@@ -265,6 +302,7 @@ export default function TrashBinListMapView() {
     }
     userLocationOverlayElRef.current.setHeading(resolvedHeading);
 
+    displayedGeoRef.current = { lat, lng };
     const position = new maps.LatLng(lat, lng);
     if (!userLocationOverlayRef.current) {
       userLocationOverlayRef.current = new maps.CustomOverlay({
@@ -282,6 +320,70 @@ export default function TrashBinListMapView() {
     userLocationOverlayRef.current.setMap(map);
   }, []);
 
+  const cancelUserLocationAnimation = useCallback(() => {
+    if (userLocAnimFrameRef.current != null) {
+      cancelAnimationFrame(userLocAnimFrameRef.current);
+      userLocAnimFrameRef.current = null;
+    }
+  }, []);
+
+  const animateUserLocationOverlay = useCallback(
+    (target: GeoPoint, heading: number | null) => {
+      const map = mapInstanceRef.current;
+      if (!map || !window.kakao?.maps) return;
+
+      const from = displayedGeoRef.current ?? target;
+      const jumpM = distanceMeters(from.lat, from.lng, target.lat, target.lng);
+
+      if (jumpM >= USER_LOC_SNAP_DISTANCE_M || jumpM < 0.5) {
+        cancelUserLocationAnimation();
+        panMapToUser(target.lat, target.lng, jumpM >= USER_LOC_SNAP_DISTANCE_M);
+        applyUserLocationOverlay(target.lat, target.lng, heading);
+        return;
+      }
+
+      panMapToUser(target.lat, target.lng, false);
+      cancelUserLocationAnimation();
+      userLocAnimFromRef.current = from;
+      userLocAnimToRef.current = target;
+      userLocAnimStartRef.current = performance.now();
+
+      const step = (now: number) => {
+        const rawT = Math.min(1, (now - userLocAnimStartRef.current) / USER_LOC_ANIM_MS);
+        const t = easeOutCubic(rawT);
+        const fromPt = userLocAnimFromRef.current;
+        const toPt = userLocAnimToRef.current;
+        if (!fromPt || !toPt) {
+          userLocAnimFrameRef.current = null;
+          return;
+        }
+
+        const lat = lerpCoord(fromPt.lat, toPt.lat, t);
+        const lng = lerpCoord(fromPt.lng, toPt.lng, t);
+        applyUserLocationOverlay(lat, lng, heading);
+
+        if (rawT < 1) {
+          userLocAnimFrameRef.current = requestAnimationFrame(step);
+        } else {
+          applyUserLocationOverlay(toPt.lat, toPt.lng, heading);
+          userLocAnimFrameRef.current = null;
+        }
+      };
+
+      userLocAnimFrameRef.current = requestAnimationFrame(step);
+    },
+    [applyUserLocationOverlay, cancelUserLocationAnimation, panMapToUser]
+  );
+
+  const recenterOnUser = useCallback(() => {
+    const point = referenceLocation ?? displayedGeoRef.current ?? lastGeoPointRef.current;
+    if (!point) return;
+
+    followUserLocationRef.current = true;
+    setIsFollowingUser(true);
+    panMapToUser(point.lat, point.lng, false);
+    animateUserLocationOverlay(point, userHeading ?? lastHeadingRef.current);
+  }, [animateUserLocationOverlay, panMapToUser, referenceLocation, userHeading]);
 
   useEffect(() => {
     if (!selectedPlace) {
@@ -384,18 +486,17 @@ export default function TrashBinListMapView() {
         }
 
         setReferenceLocation(current);
-        syncUserLocationOverlay(lat, lng, heading);
       },
       () => {
         /* 위치 추적 일시 오류는 무시 — 마지막 좌표 유지 */
       },
-      { enableHighAccuracy: true, maximumAge: 1000, timeout: 15_000 }
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 15_000 }
     );
 
     return () => {
       navigator.geolocation.clearWatch(watchId);
     };
-  }, [geoGateOk, syncUserLocationOverlay]);
+  }, [geoGateOk]);
 
   /** GPS heading이 없을 때 기기 나침반(방향) 보조 */
   useEffect(() => {
@@ -408,9 +509,9 @@ export default function TrashBinListMapView() {
       lastHeadingRef.current = heading;
       setUserHeading(heading);
 
-      const point = lastGeoPointRef.current;
+      const point = displayedGeoRef.current ?? lastGeoPointRef.current;
       if (point) {
-        syncUserLocationOverlay(point.lat, point.lng, heading);
+        applyUserLocationOverlay(point.lat, point.lng, heading);
       }
     };
 
@@ -448,7 +549,7 @@ export default function TrashBinListMapView() {
       window.removeEventListener("deviceorientation", onOrientation, true);
       orientationListenerAttachedRef.current = false;
     };
-  }, [geoGateOk, syncUserLocationOverlay]);
+  }, [geoGateOk, applyUserLocationOverlay]);
 
 
   useEffect(() => {
@@ -509,6 +610,10 @@ export default function TrashBinListMapView() {
       maps.event.addListener(map, "dragstart", () => {
         isMapDraggingRef.current = true;
         ignoreMapClickUntilRef.current = Date.now() + 120;
+        if (followUserLocationRef.current) {
+          followUserLocationRef.current = false;
+          setIsFollowingUser(false);
+        }
       });
       maps.event.addListener(map, "dragend", () => {
         isMapDraggingRef.current = false;
@@ -534,16 +639,18 @@ export default function TrashBinListMapView() {
 
     return () => {
       cancelled = true;
+      cancelUserLocationAnimation();
       didInitMapRef.current = false;
       markersRef.current.forEach((m) => m.setMap(null));
       markersRef.current = [];
       userLocationOverlayRef.current?.setMap(null);
       userLocationOverlayRef.current = null;
       userLocationOverlayElRef.current = null;
+      displayedGeoRef.current = null;
       mapInstanceRef.current = null;
       setMapReady(false);
     };
-  }, [geoGateOk]);
+  }, [geoGateOk, cancelUserLocationAnimation]);
 
   /** 수거함 마커 동기화 */
   useEffect(() => {
@@ -584,12 +691,11 @@ export default function TrashBinListMapView() {
   /** 기준 위치(실제 GPS) — 방향 화살표 + 점 */
   useEffect(() => {
     if (!mapReady || !referenceLocation) return;
-    syncUserLocationOverlay(
-      referenceLocation.lat,
-      referenceLocation.lng,
+    animateUserLocationOverlay(
+      referenceLocation,
       userHeading ?? lastHeadingRef.current
     );
-  }, [mapReady, referenceLocation, userHeading, syncUserLocationOverlay]);
+  }, [mapReady, referenceLocation, userHeading, animateUserLocationOverlay]);
 
 
   return (
@@ -607,7 +713,20 @@ export default function TrashBinListMapView() {
       )}
 
       {geoGateOk && (
-      <div ref={mapElRef} className={cn("mapContainer")} aria-label="휴지통 지도" />
+        <div ref={mapElRef} className={cn("mapContainer")} aria-label="휴지통 지도" />
+      )}
+
+      {geoGateOk && mapReady && !isFollowingUser && (
+        <button
+          type="button"
+          className={cn("mapFollowButton", {
+            mapFollowButtonSheetOpen: Boolean(selectedPlace),
+          })}
+          aria-label="내 위치 따라가기"
+          onClick={recenterOnUser}
+        >
+          <Image src="/myLocationDot.svg" alt="" width={24} height={24} />
+        </button>
       )}
 
       {geoGateOk && selectedPlace && (

@@ -34,6 +34,7 @@ declare global {
         options: { center: LatLng; level: number }
       );
       setCenter(latlng: LatLng): void;
+      panTo(latlng: LatLng): void;
       relayout(): void;
     }
 
