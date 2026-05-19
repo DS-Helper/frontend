@@ -36,7 +36,7 @@ export default function DateTimeSelector({ onChange }: DateTimeSelectorProps) {
     return `${year}-${month}-${day}`;
   };
 
-  const isBlockedDate = (date: Date) => formatLocalDate(date) === "2026-05-24";
+  const isBlockedDate = (date: Date) => formatLocalDate(date) === "2026-05-24" || formatLocalDate(date) === "2026-05-31";
 
   const handleDateChange = async (date: Date) => {
     setSelectedDate(date);
