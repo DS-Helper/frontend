@@ -105,12 +105,9 @@ export default function Customer(){
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
     
     const openModal = (answer: string | null) => {
-        console.log('openModal called with answer:', answer);
         if (!answer || answer.trim() === '') {
-            console.log('Answer is empty, not opening modal');
             return; // 답변 없는 경우 클릭 x
         }
-        console.log('Setting modal state');
         setSelectedAnswer(answer);
         setModalOpen(true);
     };
@@ -147,7 +144,6 @@ export default function Customer(){
             });
             
             const response = await postInquiry(formData);
-            console.log('문의 등록 응답:', response);
             
             // 응답이 있고 상태 코드가 200번대면 성공으로 간주
             if (response && (response.status === 200 || response.status === 201)) {
@@ -305,10 +301,6 @@ export default function Customer(){
                         {waiting: item.status==="답변 대기", 
                         done: item.status==="답변 보기"})}
                     onClick={() => {
-                        console.log('Status clicked, item:', item);
-                        console.log('item.reply:', item.reply);
-                        console.log('item.answer:', item.answer);
-                        console.log('item.status:', item.status);
                         const answerContent = item.reply?.content || item.answer;
                         if (item.status === "답변 보기" && answerContent) {
                             onOpenModal(answerContent);
@@ -555,7 +547,6 @@ export default function Customer(){
             {/* 답변 내용 모달 */}
             {isModalOpen && selectedAnswer && (
                 <>
-                    {console.log('Rendering AnswerModal, isModalOpen:', isModalOpen, 'selectedAnswer:', selectedAnswer)}
                     <AnswerModal 
                         answer={selectedAnswer} 
                         onClose={closeModal}

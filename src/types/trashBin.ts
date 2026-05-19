@@ -16,22 +16,6 @@ export type TrashBinApiItem = {
   existsYn: string | null;
 };
 
-/**
- * 응답 body의 `data` 객체
- * - `trashBins`와 `page`는 같은 depth(형제)
- * - `data.page` 안에 `totalPages`, 현재 페이지 인덱스 `page`(0부터)
- */
-export type TrashBinsPageMeta = {
-  totalPages?: number;
-  /** 현재 페이지 번호(0부터) */
-  page?: number;
-};
-
-export type TrashBinsPayload = {
-  trashBins: TrashBinApiItem[];
-  page?: TrashBinsPageMeta;
-};
-
 /** 카카오 지도 마커 / 바텀시트 표시용 (API → UI 매핑) */
 export type TrashBinPlace = {
   id: string;

@@ -8,7 +8,7 @@ import { getCheckAuth as getOrgCheckAuth } from "../apis/authOrganization";
 const DEV_MOCK_LOGGED_IN_INDIVIDUAL = false;
 
 /** 모의 로그인 시 API `Authorization`에 실릴 access/refresh 값 */
-const DEV_MOCK_PLACEHOLDER_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEyY2IzYjNlLTFjMDYtNDU2Yy04NTExLWJhMzYxNDk2NTNmOCIsInJvbGUiOiJVU0VSIiwidHlwZSI6IlBFUlNPTkFMIiwidG9rZW5UeXBlIjoiYWNjZXNzVG9rZW4iLCJpYXQiOjE3NzY2ODgwMzgsImV4cCI6MTc3NjY5MTYzOH0.jHy-SfdcKPXih11btq_AxpwHKJI8XUWxmF00e0diGvY";
+const DEV_MOCK_PLACEHOLDER_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjU1YTE1NTI0LTU0MjQtNDQyNS1iMzY0LWU3MGZlYzM5MTBjOSIsInJvbGUiOiJVU0VSIiwidHlwZSI6IlBFUlNPTkFMIiwidG9rZW5UeXBlIjoiYWNjZXNzVG9rZW4iLCJpYXQiOjE3NzkxNzI0ODMsImV4cCI6MTc3OTE3NjA4M30.qU9hPNuyjYbz3eUzX-v5EvecxyPzghpin1q3xtKM-Ho";
 
 interface UserState {
   user: User | null;

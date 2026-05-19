@@ -106,7 +106,6 @@ export const getLogin = async (code: string) => {
     const res = await instance.post("/oauth/kakao/login", {
       code,
     });
-    console.log("[oauth/kakao/login] response.data", res.data);
     return res;
   } catch (e) {
     console.error(e);
