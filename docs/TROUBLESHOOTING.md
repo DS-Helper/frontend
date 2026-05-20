@@ -2,10 +2,15 @@
 
 증상별로 확인할 파일·환경 변수를 정리했습니다. 온보딩은 [ONBOARDING.md](./ONBOARDING.md), 인증 상세는 [AUTH.md](./AUTH.md), 외부 연동은 [INTEGRATIONS.md](./INTEGRATIONS.md)를 참고하세요.
 
+## GTM·분석
+
+- 컨테이너 `GTM-W9SFJS2J` — `_document.tsx`
+- 로컬에서 태그가 안 보이면 정상일 수 있음 → [OBSERVABILITY.md](./OBSERVABILITY.md)
+
 ## 공통 진단 순서
 
 1. **접속 URL** — `localhost` / `test.dshelper.kr` / `dshelper.kr` 중 어디인지
-2. **`.env.local` 재시작** — env 변경 후 `npm run dev` 재기동
+2. **`.env` 변경 후 재기동** — env 수정 후 `npm run dev` 다시 실행
 3. **브라우저 Network** — API base URL·status·CORS
 4. **호스트 분기** — `src/lib/config/domainEnv.ts` (`*_TEST` vs 프로덕션)
 
@@ -51,6 +56,11 @@
 ---
 
 ## API / 네트워크
+
+### 증상: be-test API 타임아웃·연결 거부
+
+- **IP 제한** — `be-test.dshelper.kr`는 허용 IP만 접근 가능. 사무실·집 IP 변경 시 백엔드에 등록 요청
+- Netlify 빌드/프리뷰 IP도 필요할 수 있음
 
 ### 증상: API가 엉뚱한 서버로 감
 

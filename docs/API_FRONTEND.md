@@ -1,6 +1,14 @@
 # API (프론트엔드 기준)
 
-백엔드 **전체 스펙·Swagger**는 [DS-Helper/backend](https://github.com/DS-Helper/backend) 저장소를 기준으로 합니다.  
+백엔드 **전체 스펙**은 Swagger UI를 기준으로 합니다.
+
+| 환경 | Swagger |
+|------|---------|
+| 프로덕션 | https://server.dshelper.kr/swagger-ui/index.html |
+| 테스트 | https://be-test.dshelper.kr/swagger-ui/index.html |
+
+소스 레포: [DS-Helper/backend](https://github.com/DS-Helper/backend).  
+**경로는 API 루트 기준** (공통 prefix 없음). 전체 스펙·스키마는 Swagger에서 확인합니다.  
 이 문서는 **이 프론트엔드가 실제로 호출하는 경로**만 정리합니다.
 
 - Base URL: `NEXT_PUBLIC_API_URL` / `NEXT_PUBLIC_TEST_API_URL` ([ENV.md](./ENV.md))
@@ -111,10 +119,48 @@
 - **알림 목록**: `NotificationListModal` — API TODO, 현재 빈 배열/샘플 주석
 - **휴지통 즐겨찾기**: UI 제거됨 (백엔드 API 없음)
 
-## 에러 처리 공통
+## HTTP·에러 처리 (프론트 공통)
 
-- `401`: 세션 초기화 (`resetUserSession`)
-- `403`: 예약 API가 아니면 권한 alert 가능
-- 호출 실패 시 각 API 함수가 `null` 또는 `catch` 후 UI alert — 페이지별 처리
+구현: `src/lib/apis/axios.tsx` 인터셉터 + 페이지별 `catch`.
+
+### Axios 인터셉터
+
+| status | 동작 | 예외 |
+|--------|------|------|
+| **401** | `resetUserSession()` — 로그인 상태 초기화 | `GET /auth/check-logged-in` 요청 자체는 reject만 하고 세션 리셋 안 함 |
+| **403** | `console.error` | URL에 `personal-reservations` 또는 `organization-reservations` 포함 시 **전역 alert 생략** (페이지에서 처리) |
+| **403** (그 외) | `alert("해당 기능에 대한 권한이 없습니다...")` | — |
+
+OAuth login·기관 로그인 URL에는 Authorization 미부착 (`shouldAttachAuthorization`).
+
+### 페이지별 처리 (대표)
+
+| 상황 | 위치 | UX |
+|------|------|-----|
+| 예약 중복(403) | `help/modify.tsx` | `alert("대기중인 예약이 있는 경우 중복 예약이 불가합니다.")` |
+| 예약 실패 | `help/modify.tsx` | `alert("예약에 실패했습니다...")` |
+| API 함수 실패 | 다수 `lib/apis/*` | `null` 반환 → 페이지에서 빈 목록·alert (통일되지 않음) |
+
+### 응답 body 형태 (방어적 파싱)
+
+백엔드 스키마는 Swagger 기준이며, 프론트는 아래를 **혼용 대응**합니다.
+
+| 패턴 | 예시 | 사용처 |
+|------|------|--------|
+| `{ success, data }` | `data` 안에 실제 payload | `parseAccountMyInfoResponse` 등 |
+| 평면 객체 | 필드가 루트에 직접 | 동일 파서 fallback |
+| Spring Page | `{ content: [], ... }` | 게시판·목록 API |
+| 배열 직접 | `response.data`가 배열 | 일부 슬롯 API (`DateTimeSelector`) |
+| boolean | `check-logged-in` → `true`/`false` | `userStore.checkAuth` |
+
+신규 API 연동 시 **실제 응답 JSON 샘플**을 PR에 첨부하고(민감정보 제거), 필요하면 `parse*` 헬퍼를 추가합니다.
+
+### 알림 API (미연동)
+
+| 항목 | 상태 |
+|------|------|
+| UI | `NotificationListModal.tsx` |
+| 데이터 | 빈 배열 — `// TODO: 실제 알림 데이터를 API에서 가져오는 로직` |
+| 백엔드 | Swagger에 엔드포인트 확인 후 [KNOWN_ISSUES.md](./KNOWN_ISSUES.md) 해소 |
 
 백엔드 계약 변경 시 **이 파일과 해당 `lib/apis/*.tsx`를 함께** 수정하세요.

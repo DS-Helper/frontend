@@ -1,6 +1,7 @@
 # 로드맵
 
-우선순위는 팀·백엔드 일정에 따라 조정합니다. 백엔드 의존 항목은 [backend](https://github.com/DS-Helper/backend) 이슈와 연동하세요.
+우선순위는 팀·백엔드 일정에 따라 조정합니다. 백엔드 의존 항목은 [backend](https://github.com/DS-Helper/backend) 이슈와 연동하세요.  
+현재 미구현·제한 사항은 [KNOWN_ISSUES.md](./KNOWN_ISSUES.md)를 참고하세요.
 
 ## 단기 (프론트)
 
@@ -9,7 +10,7 @@
 | 알림 목록 API 연동 | TODO | `NotificationListModal` — 현재 빈 목록 |
 | README·온보딩 정리 | 진행됨 | `docs/` 추가 |
 | 휴지통 즐겨찾기 | 보류 | API 확정 후 UI 재도입 |
-| OAuth redirect README 구 URL 정리 | TODO | 구 `dshelper.kro.kr` 문구 제거 |
+| Netlify test 배포 브랜치·env 문서화 | TODO | [DEPLOY.md](./DEPLOY.md) 보강 |
 
 ## 중기
 
