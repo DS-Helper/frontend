@@ -44,10 +44,14 @@
 
 ## 법·정책 페이지
 
-- `/terms` — 이용약관
-- `/privacy` — 개인정보처리방침
+| 경로 | 소스 | sitemap |
+|------|------|---------|
+| `/terms` | `src/pages/terms.tsx` | `sitemap.xml.ts` |
+| `/privacy` | `src/pages/privacy.tsx` | 동일 |
 
-문구 변경은 법무·운영 검토 후 배포합니다.
+- 푸터 링크: `src/components/common/Footer.tsx`
+- 문구 변경은 법무·운영 검토 후 배포
+- **개인정보 보호책임자 연락처 등**은 페이지 본문에만 두고, `docs/`에는 복사하지 않음 ([SECURITY.md](./SECURITY.md))
 
 ## 관련 문서
 

@@ -67,10 +67,21 @@ export function Example() {
 
 상세 감사는 별도 a11y 이슈로 추적.
 
+## Figma (디자인 시안)
+
+- **팀 파일 (Main):** [Figma — Main](https://www.figma.com/design/2iAVNLVHxB1OENFZvaKy6S/Main?node-id=8-69&p=f&t=x5n2feowWrVSQfPq-0)
+- **페이지 구분:** `web`, `webapp`, `app`, `admin` 등 — 화면·플랫폼별로 프레임이 나뉘어 있음. 작업 전 해당 페이지를 확인합니다.
+- **이 레포(사용자 웹):** 주로 `web` / `webapp` 시안을 따릅니다. `admin`은 [DS-Helper/admin](https://github.com/DS-Helper/admin) 레포 쪽입니다.
+
+### 검수
+
+- 시안과 구현이 다르면 **Figma 코멘트** 또는 **GitHub PR**에서 논의 후 코드·시안을 맞춥니다.
+- 구현 시 `globals.css` 토큰·SCSS 모듈과 시안 색·간격을 맞춥니다.
+
 ## 이 레포에 없는 것
 
-- Figma 링크·디자인 시스템 패키지 — 팀 Notion/피그마가 있으면 이 절에 링크 추가
 - Tailwind — 미사용
+- Figma Variables → 코드 자동 동기화 — 없음 (수동 반영)
 
 ## 관련 문서
 

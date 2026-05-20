@@ -70,6 +70,8 @@ src/
 
 ## 인증 흐름
 
+상세·시퀀스·토큰 규칙: [AUTH.md](./AUTH.md). OAuth 콘솔 설정: [INTEGRATIONS.md](./INTEGRATIONS.md).
+
 ### 개인 (SNS)
 
 1. 로그인 페이지에서 카카오/구글/네이버 시작
@@ -117,7 +119,8 @@ src/
 ## 배포 아키텍처 (이 앱)
 
 - **dshelper.kr**: EC2, `prd` push → SSH → `npm run build` → `pm2 reload dshelper`
-- **test.dshelper.kr**: Netlify (프론트만; API는 `NEXT_PUBLIC_TEST_API_URL`)
+- **test.dshelper.kr**: Netlify (`dev` 브랜치; API는 `NEXT_PUBLIC_TEST_API_URL`, be-test는 IP 제한)
+- **admin.dshelper.kr**: Netlify — [DS-Helper/admin](https://github.com/DS-Helper/admin) (FE·BE 모노레포, 브랜치 분리)
 
 자세한 절차: [DEPLOY.md](./DEPLOY.md).
 

@@ -9,29 +9,30 @@
 
 - 프론트엔드: https://github.com/DS-Helper/frontend  
 - 백엔드: https://github.com/DS-Helper/backend  
+- 어드민: https://github.com/DS-Helper/admin  
+
+## 꼭 읽을 문서 (2개)
+
+처음 합류하거나 작업 시작 전에만 보면 됩니다. 나머지는 필요할 때 [`docs/`](./docs/)에서 찾으세요.
+
+1. **[docs/ONBOARDING.md](./docs/ONBOARDING.md)** — 로컬 실행, env, 브랜치·배포 흐름 (`ja` → `dev` → `prd`)
+2. **[CONTRIBUTING.md](./CONTRIBUTING.md)** — PR 규칙, **기능별 커밋**·브랜치별 메시지 접두사 (`feat:` / `prd:`)
 
 ## 빠른 시작
 
 ```bash
 npm install
-# .env.local 은 docs/ENV.md 참고
+# .env 는 docs/ENV.md 참고 (.env.example 복사)
 npm run dev
 ```
 
 http://localhost:3000
 
-## 문서
+## 나머지 문서
 
-전체 가이드는 [`docs/`](./docs/) 디렉터리를 보세요.
+인덱스: [docs/README.md](./docs/README.md) · Public 레포 주의: [docs/SECURITY.md](./docs/SECURITY.md)
 
-| 문서 | 설명 |
-|------|------|
-| [docs/ONBOARDING.md](./docs/ONBOARDING.md) | 로컬 셋업·OAuth·브랜치 |
-| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | 구조·인증·상태 |
-| [docs/API_FRONTEND.md](./docs/API_FRONTEND.md) | 백엔드 호출 목록 |
-| [docs/ENV.md](./docs/ENV.md) | 환경 변수 |
-| [docs/DEPLOY.md](./docs/DEPLOY.md) | EC2·Netlify 배포 |
-| [docs/WORKLOG.md](./docs/WORKLOG.md) | 브랜치별 작업 로그 |
+자주 쓰는 것만: [ARCHITECTURE](./docs/ARCHITECTURE.md) · [ENV](./docs/ENV.md) · [DEPLOY](./docs/DEPLOY.md) · [TROUBLESHOOTING](./docs/TROUBLESHOOTING.md)
 
 ## 스택
 

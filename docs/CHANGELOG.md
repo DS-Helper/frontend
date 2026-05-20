@@ -8,6 +8,8 @@
 ### Added
 
 - `docs/` 문서 세트 (온보딩, 아키텍처, API, 배포, WORKLOG 브랜치 단위 등)
+- 실무 문서: `TROUBLESHOOTING`, `AUTH`, `INTEGRATIONS`, `QA`
+- 협업 문서: `BACKEND`, `SECURITY`, `KNOWN_ISSUES`
 
 ### Changed
 

@@ -24,8 +24,27 @@ Cursor 등 AI가 이 저장소를 수정할 때 따를 규칙입니다.
 - **상태**: 서버 데이터는 React Query 우선; Zustand는 `userStore`(세션) 위주
 - **API**: 새 호출은 `src/lib/apis/`에 모듈 추가, `instance` 사용
 
+## Public 레포
+
+- `docs/`, Issue, PR, WORKLOG에 **이메일·전화·실명·테스트 계정·키 실값** 금지 — [SECURITY.md](./SECURITY.md)
+
+## 커밋 요청 워크플로
+
+사용자가 **"커밋해줘"**라고 하면, 아래 순서를 **반드시** 따릅니다. (이번에 사용자가 계획안 번호를 지정한 경우 등, 이미 합의된 계획은 승인 단계를 생략할 수 있음.)
+
+1. **분석** — `git status`, `git diff`, `git log -5` 등으로 변경 파일·브랜치·제외 대상 확인  
+2. **계획안 작성** — 커밋 단위, 메시지(`feat:` / `prd:`), 파일 목록을 표로 사용자에게 제시  
+3. **승인 대기** — 사용자가 "진행해줘" / 수정 지시할 때까지 **커밋하지 않음**  
+4. **커밋 실행** — 승인된 범위만 `git add` + `git commit`  
+5. **푸시 금지** — `git push`는 **실행하지 않음**. push는 사용자가 직접 수행  
+
+**스테이징 제외:** `.env`, 시크릿, 개인정보가 담긴 파일  
+
+팀 규칙 전체: [CONVENTIONS.md](./CONVENTIONS.md#cursor에이전트-커밋-워크플로)
+
 ## 건드리지 말 것 (확인 없이)
 
+- `git push` (커밋만 담당, push는 사람)
 - `prd` 브랜치 직접 push (자동 EC2 배포)
 - `.env` 실값·시크릿 커밋
 - `userStore`의 `DEV_MOCK_LOGGED_IN_INDIVIDUAL`을 true로 커밋
@@ -40,10 +59,12 @@ Cursor 등 AI가 이 저장소를 수정할 때 따를 규칙입니다.
 
 | 변경 유형 | 갱신 문서 |
 |-----------|-----------|
-| 새 API 사용 | API_FRONTEND.md |
-| env 키 추가 | ENV.md |
+| 새 API 사용 | API_FRONTEND.md, BACKEND.md |
+| env 키 추가 | ENV.md, INTEGRATIONS.md |
+| OAuth·로그인 변경 | AUTH.md, TROUBLESHOOTING.md |
 | 배포 절차 변경 | DEPLOY.md |
 | 구조·인증 변경 | ARCHITECTURE.md, DECISIONS.md |
+| 미구현·TODO | KNOWN_ISSUES.md, ROADMAP.md |
 | 브랜치 작업 마무리 | docs/worklog/\<branch\>.md, WORKLOG.md 인덱스 |
 
 ## 테스트
