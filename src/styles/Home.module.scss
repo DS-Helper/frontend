@@ -1,6 +1,7 @@
 .home {
   width: 100%;
   height: 100%;
+  background-color: var(--color-semantic-bg-page);
 }
 
 .homePage {
@@ -23,12 +24,14 @@
     position: relative;
     width: 100vw;
     max-width: 100vw;
-    height: min(100vw * 1024 / 1440, 78vh);
+    height: min(100vw * 1024 / 1440, 70vh);
     left: 50%;
     transform: translateX(-50%);
     overflow: hidden;
     box-sizing: border-box;
     text-align: center;
+    z-index: 0;
+    pointer-events: none;
 
     &::before {
       content: "";
@@ -39,7 +42,7 @@
       background-repeat: no-repeat;
       background-position: center 52%;
       background-size: contain;
-      transform: scale(1.5);
+      transform: scale(1.3);
       transform-origin: center center;
     }
 
@@ -49,6 +52,7 @@
       inset: 0;
       z-index: 1;
       pointer-events: none;
+      background-color: rgba(255, 255, 255, 0.3);
     }
 
     @media (max-width: 650px) {
@@ -57,7 +61,7 @@
 
       &::before,
       &::after {
-        top: -50%;
+        top: 0;
         left: 0;
         right: 0;
         bottom: auto;
@@ -66,32 +70,59 @@
 
       &::before {
         background-position: center 46%;
-        transform: scale(1.8) translateY(-15%);
+        transform: scale(1.7) translateY(-15%);
         transform-origin: center center;
       }
 
-      @media (max-width: 376px) {
+      @media (max-width: 425px) {
         &::before {
           background-position: center 60%;
-          transform: scale(1.8) translateY(-8%);
+          transform: scale(1.8) translateY(-20%);
         }
       }
     }
   }
 
+  .homePage1TitleButton {
+    position: relative;
+    cursor: pointer;
+    background-color: var(--color-semantic-bg-brand);
+    color: var(--color-semantic-text-inverse);
+    padding: 1.2rem 2.4rem;
+    border-radius: 1.2rem;
+
+    font-size: 2.2rem;
+    font-weight: 700;
+    z-index: 100;
+    pointer-events: auto;
+
+    @media (max-width: 650px) {
+      width: 10.8rem;
+      height: 4.2rem;
+      font-size: 1.6rem;
+      padding: 0;
+    }
+  }
+
   .homePage1Title {
     position: absolute;
-    top: 20rem;
+    width: 100%;
+    top: 10rem;
     left: 50%;
     transform: translateX(-50%);
     z-index: 3;
     margin: 0;
-    width: min(96%, 56rem);
-    max-width: 100vw;
     font-size: 6.6rem;
     font-weight: 700;
     pointer-events: none;
     text-align: center;
+
+    @media (max-width: 650px) {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2.4rem;
+    }
 
     @media (max-width: 431px) {
       top: 13rem;
@@ -105,31 +136,31 @@
   }
 
   .homePage1TitleLine1 {
-    display: inline-block;
-    font-size: 0.85em;
+    display: block;
+    font-size: 6.6rem;
     font-weight: 700;
   }
 
   .homePage1TitleDesktop {
-    display: inline-block;
+    display: block;
+
+    @media (max-width: 650px) {
+      display: none;
+    }
   }
 
   .homePage1TitleCompact {
     display: none;
-  }
+    font-size: 3.3rem;
+    font-weight: 700;
 
-  @media (max-width: 650px) {
-    .homePage1TitleDesktop {
-      display: none;
-    }
-
-    .homePage1TitleCompact {
-      display: inline-block;
+    @media (max-width: 650px) {
+      display: block;
     }
   }
 
   .homePage1TitleLine2 {
-    display: inline-block;
+    display: block;
     font-size: 1.08em;
     font-weight: 700;
   }

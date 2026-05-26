@@ -1,0 +1,451 @@
+// 복지 정보 제공 — 고객문의(customer) 페이지와 동일 리듬·폭(57rem) 정렬
+.background {
+  background-color: #fff;
+}
+
+.welfareInner {
+  width: 100%;
+  max-width: 57rem;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding-top: 7rem;
+  padding-bottom: 10rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  box-sizing: border-box;
+
+  @media (max-width: 611px) {
+    padding: 5.6rem 1.6rem 8rem;
+  }
+}
+
+.title {
+  width: 100%;
+  font-size: 3.2rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 1.6rem;
+  color: var(--color-semantic-text-primary);
+
+  @media (max-width: 611px) {
+    display: none;
+  }
+}
+
+.mobileTitle {
+  display: none;
+  width: 100%;
+  font-size: var(--title-L-size);
+  font-weight: var(--title-L-weight);
+  text-align: center;
+  margin: 0 0 1.2rem;
+  color: var(--color-semantic-text-primary);
+
+  @media (max-width: 611px) {
+    display: block;
+  }
+}
+
+.lead {
+  width: 100%;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #737272;
+  line-height: 1.55;
+  margin: 0 0 2rem;
+  word-break: keep-all;
+}
+
+.tabMenu {
+  width: 100%;
+  display: flex;
+}
+
+.tab {
+  width: 50%;
+  font-size: 1.5rem;
+  padding: 1rem 2.4rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--color-semantic-text-tertiary);
+  border-bottom: 1px solid var(--color-semantic-border-subtle);
+
+  @media (max-width: 611px) {
+    font-size: 1.7rem;
+  }
+
+  &.tabActive {
+    color: var(--color-semantic-text-primary);
+    border-bottom: 1px solid var(--color-semantic-border-focus);
+    font-weight: 600;
+  }
+}
+
+.tabContent {
+  width: 100%;
+  margin-top: 2.4rem;
+}
+
+.welfareForm {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.formLabel {
+  position: relative;
+  display: inline-block;
+  padding-right: 0.8rem;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #5c5c5c;
+  line-height: 1.3;
+  width: fit-content;
+}
+
+.requiredMark {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(90%, -0.15em);
+  font-size: 1.1rem;
+  line-height: 1;
+  font-weight: 600;
+  color: var(--color-semantic-text-danger);
+}
+
+.fieldHint {
+  font-size: 1.3rem;
+  color: var(--color-semantic-text-tertiary);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.welfareSelect,
+.welfareInput {
+  appearance: none;
+  width: 100%;
+  padding: 1.4rem 4rem 1.4rem 1.2rem;
+  font-family: inherit;
+  font-size: 1.7rem;
+  font-weight: 400;
+  line-height: 1.5;
+  border: 1px solid #d1d1d1;
+  border-radius: 1rem;
+  background: #fff;
+  color: #222;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: #999;
+  }
+}
+
+.welfareInput {
+  padding: 1.4rem 1.2rem;
+}
+
+.welfareSelect {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23737272' d='M1.4 0L6 4.6 10.6 0 12 1.4l-6 6-6-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1.9rem center;
+}
+
+.chipGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.chip {
+  padding: 0.6rem 1.2rem;
+  border-radius: 10rem;
+  border: 1px solid #d1d1d1;
+  background: #fff;
+  font-size: 1.5rem;
+  color: #525151;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+
+  &:hover {
+    border-color: #aeaeae;
+  }
+}
+
+.chipActive {
+  border-color: var(--color-semantic-text-brand);
+  background: var(--color-semantic-bg-brand-soft);
+  color: var(--color-semantic-text-primary);
+  font-weight: 600;
+}
+
+.chipMuted {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.dirtyBanner {
+  padding: 1.2rem 1.4rem;
+  border-radius: 0.8rem;
+  background: var(--color-semantic-bg-brand-soft);
+  border: 1px solid var(--color-primitive-primary-100);
+  font-size: 1.4rem;
+  color: var(--color-semantic-text-primary);
+  line-height: 1.45;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 1.35rem;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: var(--color-semantic-text-inverse);
+  background-color: var(--color-semantic-bg-brand);
+  border: none;
+  border-radius: 1rem;
+  margin-top: 2.4rem;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    opacity: 0.95;
+  }
+}
+
+.submitBtnDisabled {
+  background-color: var(--color-semantic-bg-disabled);
+  color: var(--color-semantic-text-disabled);
+  cursor: not-allowed;
+}
+
+.resetLink {
+  align-self: center;
+  margin-top: 0.8rem;
+  font-size: 1.5rem;
+  color: #666;
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0.4rem;
+
+  &:hover {
+    color: #333;
+  }
+}
+
+.resultList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.resultItem {
+  padding: 2.4rem 0;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  text-align: left;
+  width: 100%;
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+
+  &:hover .resultTitle {
+    text-decoration: underline;
+  }
+}
+
+.resultBadge {
+  width: fit-content;
+  font-size: 1.3rem;
+  font-weight: bold;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.4rem;
+  background-color: var(--color-semantic-bg-brand);
+  color: var(--color-semantic-text-inverse);
+}
+
+.resultTitle {
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.resultDigest {
+  font-size: 1.5rem;
+  color: #525151;
+  margin: 0;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.resultMeta {
+  font-size: var(--caption-size);
+  color: var(--color-semantic-text-tertiary);
+  line-height: 1.45;
+}
+
+.emptyBox {
+  text-align: center;
+  padding: 8rem 0;
+}
+
+.emptyMessage {
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: #8f8d8d;
+}
+
+.emptySubtext {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.resultCountRow {
+  margin-bottom: 1.2rem;
+}
+
+.demoHint {
+  font-size: 1.3rem;
+  color: var(--color-semantic-text-brand);
+  margin: 0 0 1rem;
+  text-align: center;
+}
+
+// 상세: 고객문의 답변 모달과 유사한 중앙 모달
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 2rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+
+  @media (max-width: 611px) {
+    padding: 1.8rem;
+    align-items: flex-end;
+  }
+}
+
+.modalOverlayVisible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modalPanel {
+  background: #fff;
+  border-radius: 1.2rem;
+  max-width: 48rem;
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: scale(0.96);
+  transition: transform 0.2s ease;
+
+  @media (max-width: 611px) {
+    max-height: 85vh;
+    border-radius: 1.2rem 1.2rem 0 0;
+    transform: translateY(100%);
+    max-width: 100%;
+  }
+}
+
+.modalOverlayVisible .modalPanel {
+  transform: scale(1);
+
+  @media (max-width: 611px) {
+    transform: translateY(0);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem 1.6rem;
+  border-bottom: 1px solid #eee;
+}
+
+.modalTitle {
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: #3c3b3b;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 2.8rem;
+  color: var(--color-primitive-gray-500);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.modalBody {
+  padding: 1.6rem 1.6rem 2rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+.detailBlockTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #3c3b3b;
+  margin: 0 0 0.4rem;
+}
+
+.detailBlockBody {
+  font-size: 1.5rem;
+  color: #525151;
+  margin: 0;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.modalFooter {
+  padding: 1.2rem 1.6rem 1.6rem;
+  border-top: 1px solid #eee;
+}
+
+.externalLink {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-semantic-text-brand);
+  text-decoration: underline;
+}

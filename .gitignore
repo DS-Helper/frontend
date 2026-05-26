@@ -63,3 +63,5 @@ next-env.d.ts
 .vscode/extensions.json
 
 .env
+
+.omx
