@@ -49,6 +49,10 @@ export default function Home() {
     router.push(`/helpStory/${postId}`);
   };
 
+  const handleDownloadApp = () => {
+    window.open("https://play.google.com/store/apps/details?id=com.dshelper.app", "_blank");
+  }
+
   // 버튼 목록
   const guideButtons = [
     "어떤 도움을 주나요?",
@@ -228,6 +232,9 @@ export default function Home() {
             <br />
             디에스헬퍼
           </span>
+          <button className={cn("homePage1TitleButton")} onClick={handleDownloadApp}>
+            앱 다운로드
+          </button>
         </p>
       </div>
 
