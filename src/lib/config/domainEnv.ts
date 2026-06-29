@@ -1,4 +1,4 @@
-const TEST_HOSTS = new Set(["test.dshelper.kr", "localhost", "127.0.0.1"]);
+const PRODUCTION_HOSTS = new Set(["dshelper.kr", "www.dshelper.kr", "admin.dshelper.kr"]);
 
 function normalizeHost(hostname: string): string {
   return hostname.trim().toLowerCase().split(":")[0] ?? "";
@@ -6,7 +6,7 @@ function normalizeHost(hostname: string): string {
 
 export function isTestHost(hostname: string): boolean {
   const normalized = normalizeHost(hostname);
-  return TEST_HOSTS.has(normalized);
+  return !PRODUCTION_HOSTS.has(normalized);
 }
 
 export function getClientHostname(): string {
