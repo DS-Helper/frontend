@@ -1,0 +1,104 @@
+<svg width="1440" height="1499" viewBox="0 0 1440 1499" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1440" height="1499" fill="#FFFFFF"/>
+  <rect y="0" width="1440" height="60" fill="#FFFFFF"/>
+  <line x1="0" y1="60" x2="1440" y2="60" stroke="#EEEEEE"/>
+  <text x="48" y="38" fill="#222222" font-family="Pretendard, Inter, sans-serif" font-size="22" font-weight="700">DS Helper</text>
+  <circle cx="1285" cy="30" r="14" fill="#EEEEEE"/>
+  <circle cx="1331" cy="30" r="14" fill="#EEEEEE"/>
+  <path d="M1372 22H1390M1372 30H1390M1372 38H1390" stroke="#AEAEAE" stroke-width="2.5" stroke-linecap="round"/>
+
+  <g transform="translate(396 140)" font-family="Pretendard, Inter, sans-serif">
+    <text x="0" y="0" fill="#666666" font-size="15" text-decoration="underline">목록으로</text>
+
+    <g transform="translate(0 56)">
+      <rect x="0" y="0" width="104" height="30" rx="16" fill="#0DBA53"/>
+      <text x="52" y="20" fill="#FFFFFF" font-size="14" font-weight="700" text-anchor="middle">생활지원, 주거</text>
+      <rect x="114" y="0" width="126" height="30" rx="16" fill="#F6F6F6"/>
+      <text x="177" y="20" fill="#525151" font-size="14" font-weight="500" text-anchor="middle">온라인 신청 가능</text>
+
+      <text x="0" y="78" fill="#222222" font-size="28" font-weight="700">달성군 맞춤형 생활안정 지원</text>
+      <text x="0" y="124" fill="#525151" font-size="16">
+        <tspan x="0" dy="0">갑작스러운 위기 상황으로 생계와 주거 부담이 커진 가구를 대상으로</tspan>
+        <tspan x="0" dy="27">지역 상담과 심사를 거쳐 필요한 생활안정 자원을 연결합니다.</tspan>
+      </text>
+      <line x1="0" y1="182" x2="649" y2="182" stroke="#EEEEEE"/>
+    </g>
+
+    <g transform="translate(0 280)">
+      <line x1="0" y1="0" x2="649" y2="0" stroke="#EEEEEE"/>
+      <g transform="translate(0 28)">
+        <text x="0" y="0" fill="#8F8D8D" font-size="13">제공 기관</text>
+        <text x="0" y="32" fill="#3C3B3B" font-size="15" font-weight="600">복지정책과</text>
+      </g>
+      <g transform="translate(324 28)">
+        <text x="0" y="0" fill="#8F8D8D" font-size="13">제공방식</text>
+        <text x="0" y="32" fill="#3C3B3B" font-size="15" font-weight="600">현금</text>
+      </g>
+      <g transform="translate(0 112)">
+        <text x="0" y="0" fill="#8F8D8D" font-size="13">지원주기</text>
+        <text x="0" y="32" fill="#3C3B3B" font-size="15" font-weight="600">월별</text>
+      </g>
+      <g transform="translate(324 112)">
+        <text x="0" y="0" fill="#8F8D8D" font-size="13">기준연도</text>
+        <text x="0" y="32" fill="#3C3B3B" font-size="15" font-weight="600">2026</text>
+      </g>
+      <line x1="0" y1="188" x2="649" y2="188" stroke="#EEEEEE"/>
+    </g>
+
+    <g transform="translate(0 520)">
+      <text x="0" y="0" fill="#3C3B3B" font-size="18" font-weight="700">지원대상</text>
+      <text x="0" y="42" fill="#525151" font-size="15">
+        기초생활수급자 또는 차상위 본인 부담 경감 대상 등 상세 기준은 별도 안내.
+      </text>
+      <rect x="0" y="74" width="82" height="30" rx="16" fill="#FFFFFF" stroke="#D5D5D5"/>
+      <text x="41" y="94" fill="#737272" font-size="14" text-anchor="middle">저소득층</text>
+      <rect x="90" y="74" width="104" height="30" rx="16" fill="#FFFFFF" stroke="#D5D5D5"/>
+      <text x="142" y="94" fill="#737272" font-size="14" text-anchor="middle">한부모가족</text>
+      <rect x="202" y="74" width="72" height="30" rx="16" fill="#FFFFFF" stroke="#D5D5D5"/>
+      <text x="238" y="94" fill="#737272" font-size="14" text-anchor="middle">중장년</text>
+      <rect x="282" y="74" width="58" height="30" rx="16" fill="#FFFFFF" stroke="#D5D5D5"/>
+      <text x="311" y="94" fill="#737272" font-size="14" text-anchor="middle">노년</text>
+      <line x1="0" y1="144" x2="649" y2="144" stroke="#EEEEEE"/>
+    </g>
+
+    <g transform="translate(0 704)">
+      <text x="0" y="0" fill="#3C3B3B" font-size="18" font-weight="700">선정기준</text>
+      <text x="0" y="42" fill="#525151" font-size="15">소득·재산 조사 및 면담 결과를 반영합니다.</text>
+      <line x1="0" y1="82" x2="649" y2="82" stroke="#EEEEEE"/>
+    </g>
+
+    <g transform="translate(0 826)">
+      <text x="0" y="0" fill="#3C3B3B" font-size="18" font-weight="700">지원 내용</text>
+      <text x="0" y="42" fill="#525151" font-size="15">가구당 월 30만 원 한도 내 필요 경비를 지원합니다. (예시)</text>
+      <line x1="0" y1="82" x2="649" y2="82" stroke="#EEEEEE"/>
+    </g>
+
+    <g transform="translate(0 948)">
+      <text x="0" y="0" fill="#3C3B3B" font-size="18" font-weight="700">신청 방법</text>
+      <text x="0" y="42" fill="#525151" font-size="15">읍·면·동 행정복지센터 방문 신청 또는 복지로 온라인 신청.</text>
+      <line x1="0" y1="82" x2="649" y2="82" stroke="#EEEEEE"/>
+    </g>
+
+    <g transform="translate(0 1070)">
+      <text x="0" y="0" fill="#3C3B3B" font-size="18" font-weight="700">문의처</text>
+      <text x="0" y="42" fill="#525151" font-size="15">복지정책과 053-000-0000, 복지상담 129</text>
+      <line x1="0" y1="82" x2="649" y2="82" stroke="#EEEEEE"/>
+    </g>
+
+    <g transform="translate(0 1192)">
+      <rect x="0" y="0" width="649" height="166" rx="10" fill="#FAFAFA" stroke="#EEEEEE"/>
+      <text x="24" y="38" fill="#3C3B3B" font-size="18" font-weight="700">추가 정보</text>
+      <text x="24" y="78" fill="#8F8D8D" font-size="14">제공 기관</text>
+      <text x="136" y="78" fill="#525151" font-size="14">대구광역시 달성군</text>
+      <text x="24" y="112" fill="#8F8D8D" font-size="14">신청 서식</text>
+      <text x="136" y="112" fill="#525151" font-size="14">신청서, 소득·재산 확인 서류</text>
+      <text x="24" y="146" fill="#8F8D8D" font-size="14">법적 근거</text>
+      <text x="136" y="146" fill="#525151" font-size="14">사회보장급여의 이용·제공 및 수급권자 발굴에 관한 법률</text>
+    </g>
+
+    <g transform="translate(0 1390)">
+      <rect x="0" y="0" width="649" height="50" rx="10" fill="#0DBA53"/>
+      <text x="324.5" y="31" fill="#FFFFFF" font-size="16" font-weight="600" text-anchor="middle">원문 링크 열기</text>
+    </g>
+  </g>
+</svg>

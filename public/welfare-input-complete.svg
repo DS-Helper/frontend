@@ -1,0 +1,81 @@
+<svg width="1440" height="1499" viewBox="0 0 1440 1499" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1440" height="1499" fill="#FFFFFF"/>
+  <rect y="0" width="1440" height="60" fill="#FFFFFF"/>
+  <line x1="0" y1="60" x2="1440" y2="60" stroke="#EEEEEE"/>
+  <text x="48" y="38" fill="#222222" font-family="Pretendard, Inter, sans-serif" font-size="22" font-weight="700">DS Helper</text>
+  <circle cx="1285" cy="30" r="14" fill="#EEEEEE"/>
+  <circle cx="1331" cy="30" r="14" fill="#EEEEEE"/>
+  <path d="M1372 22H1390M1372 30H1390M1372 38H1390" stroke="#AEAEAE" stroke-width="2.5" stroke-linecap="round"/>
+
+  <g font-family="Pretendard, Inter, sans-serif">
+    <g transform="translate(396 224)">
+      <text x="33" y="18" fill="#333333" font-size="15" font-weight="700" text-anchor="middle">정보 입력</text>
+      <text x="490" y="18" fill="#B8B8B8" font-size="15" font-weight="400" text-anchor="middle">추천 결과</text>
+      <line x1="0" y1="33.5" x2="324.5" y2="33.5" stroke="#3C3B3B"/>
+      <line x1="324.5" y1="33.5" x2="649" y2="33.5" stroke="#EEEEEE"/>
+    </g>
+
+    <g transform="translate(396 272)">
+      <text x="0" y="18" fill="#3C3B3B" font-size="15" font-weight="400">거주 구·군 (읍·면)</text>
+      <text x="126" y="17" fill="#FF4D6D" font-size="14" font-weight="700">*</text>
+      <rect x="0" y="45" width="649" height="55" rx="10" fill="#FFFFFF" stroke="#D5D5D5"/>
+      <text x="14" y="80" fill="#3C3B3B" font-size="17" font-weight="400">논공읍</text>
+      <path d="M616 67L624 75L632 67" stroke="#737272" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <g transform="translate(396 375)">
+      <text x="0" y="18" fill="#4B4B4B" font-size="15" font-weight="400">나이</text>
+      <text x="38" y="17" fill="#FF4D6D" font-size="14" font-weight="700">*</text>
+      <rect x="0" y="45" width="649" height="55" rx="10" fill="#FFFFFF" stroke="#D5D5D5"/>
+      <text x="14" y="80" fill="#3C3B3B" font-size="17" font-weight="400">35</text>
+    </g>
+
+    <g transform="translate(396 478)">
+      <text x="0" y="18" fill="#4B4B4B" font-size="15" font-weight="400">필요한 도움 유형</text>
+      <text x="133" y="17" fill="#FF4D6D" font-size="14" font-weight="700">*</text>
+      <rect x="0" y="46" width="74" height="34" rx="16" fill="#0DBA53"/>
+      <text x="37" y="68" fill="#FFFFFF" font-size="15" font-weight="700" text-anchor="middle">일자리</text>
+      <rect x="83" y="46" width="62" height="34" rx="16" fill="#FFFFFF" stroke="#D5D5D5"/>
+      <text x="114" y="68" fill="#AEAEAE" font-size="15" font-weight="400" text-anchor="middle">주거</text>
+      <rect x="154" y="46" width="62" height="34" rx="16" fill="#FFFFFF" stroke="#D5D5D5"/>
+      <text x="185" y="68" fill="#AEAEAE" font-size="15" font-weight="400" text-anchor="middle">교육</text>
+      <rect x="225" y="46" width="94" height="34" rx="16" fill="#FFFFFF" stroke="#D5D5D5"/>
+      <text x="272" y="68" fill="#AEAEAE" font-size="15" font-weight="400" text-anchor="middle">의료·건강</text>
+      <rect x="328" y="46" width="88" height="34" rx="16" fill="#FFFFFF" stroke="#D5D5D5"/>
+      <text x="372" y="68" fill="#AEAEAE" font-size="15" font-weight="400" text-anchor="middle">생활지원</text>
+    </g>
+
+    <g transform="translate(396 560)">
+      <text x="0" y="18" fill="#4B4B4B" font-size="15" font-weight="400">해당 조건</text>
+      <rect x="0" y="46" width="92" height="34" rx="16" fill="#0DBA53"/>
+      <text x="46" y="68" fill="#FFFFFF" font-size="15" font-weight="700" text-anchor="middle">선택안함</text>
+      <rect x="101" y="46" width="92" height="34" rx="16" fill="#FFFFFF" stroke="#D5D5D5"/>
+      <text x="147" y="68" fill="#AEAEAE" font-size="15" font-weight="400" text-anchor="middle">저소득층</text>
+      <rect x="202" y="46" width="78" height="34" rx="16" fill="#FFFFFF" stroke="#D5D5D5"/>
+      <text x="241" y="68" fill="#AEAEAE" font-size="15" font-weight="400" text-anchor="middle">장애인</text>
+      <rect x="289" y="46" width="104" height="34" rx="16" fill="#FFFFFF" stroke="#D5D5D5"/>
+      <text x="341" y="68" fill="#AEAEAE" font-size="15" font-weight="400" text-anchor="middle">한부모가족</text>
+      <rect x="402" y="46" width="68" height="34" rx="16" fill="#FFFFFF" stroke="#D5D5D5"/>
+      <text x="436" y="68" fill="#AEAEAE" font-size="15" font-weight="400" text-anchor="middle">청년</text>
+    </g>
+
+    <g transform="translate(396 782)">
+      <rect x="0" y="0" width="649" height="50" rx="10" fill="#0DBA53"/>
+      <text x="324.5" y="31" fill="#FFFFFF" font-size="16" font-weight="400" text-anchor="middle">추천 받기</text>
+      <text x="324.5" y="120" fill="#666666" font-size="15" font-weight="400" text-anchor="middle" text-decoration="underline">입력 초기화</text>
+    </g>
+  </g>
+
+  <rect y="1089" width="1440" height="410" fill="#F5F5F5"/>
+  <circle cx="282" cy="1161" r="24" fill="#BCBCBC"/>
+  <text x="282" y="1170" fill="#FFFFFF" font-family="Pretendard, Inter, sans-serif" font-size="25" font-weight="700" text-anchor="middle">N</text>
+  <circle cx="356" cy="1161" r="24" fill="#BCBCBC"/>
+  <text x="720" y="1148" fill="#4B4B4B" font-family="Pretendard, Inter, sans-serif" font-size="15" font-weight="700">운영자 정보</text>
+  <text x="720" y="1180" fill="#666666" font-family="Pretendard, Inter, sans-serif" font-size="15">DS Helper 팀</text>
+  <text x="720" y="1209" fill="#666666" font-family="Pretendard, Inter, sans-serif" font-size="15">대표: 신인호</text>
+  <text x="720" y="1266" fill="#4B4B4B" font-family="Pretendard, Inter, sans-serif" font-size="15" font-weight="700">연락처</text>
+  <text x="720" y="1297" fill="#666666" font-family="Pretendard, Inter, sans-serif" font-size="15">전화번호 : 010-5250-9548 | 이메일 : dshelper77@gmail.com</text>
+  <text x="720" y="1349" fill="#4B4B4B" font-family="Pretendard, Inter, sans-serif" font-size="15" font-weight="700">이용약관</text>
+  <text x="720" y="1385" fill="#4B4B4B" font-family="Pretendard, Inter, sans-serif" font-size="15" font-weight="700">개인정보처리방침</text>
+  <text x="720" y="1442" fill="#4B4B4B" font-family="Pretendard, Inter, sans-serif" font-size="15" font-weight="700">© 2025 DS Helper. All rights reserved.</text>
+</svg>

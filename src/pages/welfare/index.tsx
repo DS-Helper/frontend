@@ -1,110 +1,25 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import classNames from "classnames/bind";
 import { useRouter } from "next/router";
+import { IoIosArrowDown } from "react-icons/io";
+import {
+  DALSEONG_SIGUNGU_OPTIONS,
+  DALSEONG_SIDO_OPTIONS,
+  WELFARE_INTRS_THEMA_OPTIONS,
+  WELFARE_TRGTER_OPTIONS,
+  getWelfareProfile,
+  getWelfareRecommendations,
+  getMockWelfareRecommendations,
+  postWelfareRecommend,
+} from "@/lib/apis/welfare";
 import styles from "@/styles/Welfare.module.scss";
+import type { WelfareListItem, WelfareRecommendationParams } from "@/types/welfare";
 
 const cn = classNames.bind(styles);
+const RECOMMENDATION_PAGE_SIZE = 5;
+const WELFARE_PAGE_CACHE_KEY = "factory.welfare.pageState.v1";
 
-/** 공공 API 원문 값을 가정한 목업 (실연동 시 그대로 치환) */
-const MOCK_INTRS_THEMA = [
-  { code: "THEMA01", label: "일자리" },
-  { code: "THEMA02", label: "주거" },
-  { code: "THEMA03", label: "교육" },
-  { code: "THEMA04", label: "의료·건강" },
-  { code: "THEMA05", label: "생활지원" },
-] as const;
-
-const MOCK_TRGTER = [
-  { code: "TRG01", label: "저소득층" },
-  { code: "TRG02", label: "장애인" },
-  { code: "TRG03", label: "한부모가족" },
-  { code: "TRG04", label: "청년" },
-] as const;
-
-/** 대구 달성군 주민 대상: 시·도 없이 구·군(읍·면) 단일 선택 */
-const DALSEONG_SIGUNGU_OPTIONS = [
-  { value: "", label: "구·군을 선택하세요" },
-  { value: "논공읍", label: "논공읍" },
-  { value: "다사읍", label: "다사읍" },
-  { value: "유가읍", label: "유가읍" },
-  { value: "옥포면", label: "옥포면" },
-  { value: "현풍읍", label: "현풍읍" },
-  { value: "화원읍", label: "화원읍" },
-  { value: "가창면", label: "가창면" },
-  { value: "하빈면", label: "하빈면" },
-  { value: "구지면", label: "구지면" },
-] as const;
-
-type WelfareListItem = {
-  servId: string;
-  servNm: string;
-  servDgst: string;
-  trgterIndvdlArray: string;
-  srvPvsnNm: string;
-  rprsCtadr: string;
-};
-
-type WelfareDetail = WelfareListItem & {
-  tgtrDtlCn: string;
-  alwServCn: string;
-  slctCritCn: string;
-  applmetList: string;
-  inqplCtadrList: string;
-  inqplHmpgReldList: string;
-};
-
-const MOCK_DETAIL_BY_ID: Record<string, WelfareDetail> = {
-  "mock-1": {
-    servId: "mock-1",
-    servNm: "달성군 맞춤형 생활안정 지원",
-    servDgst: "위기 가구에 한시적 생계·주거 비용을 지원합니다.",
-    trgterIndvdlArray: "저소득층, 한부모가족",
-    srvPvsnNm: "현금 지급",
-    rprsCtadr: "달성군 복지정책과 053-000-0000",
-    tgtrDtlCn: "기초생활수급자 또는 차상위 본인 부담 경감 대상 등 상세 기준은 별도 안내.",
-    alwServCn: "가구당 월 30만 원 한도 내 필요 경비를 지원합니다. (예시)",
-    slctCritCn: "소득·재산 조사 및 면담 결과를 반영합니다.",
-    applmetList: "읍·면·동 행정복지센터 방문 신청 또는 복지로 온라인 신청.",
-    inqplCtadrList: "복지정책과 053-000-0000, 복지상담 129",
-    inqplHmpgReldList: "https://www.bokjiro.go.kr",
-  },
-  "mock-2": {
-    servId: "mock-2",
-    servNm: "청년 취업 역량 강화 교육비 지원",
-    servDgst: "구직 활동 중인 청년 대상 교육·자격 취득 비용을 지원합니다.",
-    trgterIndvdlArray: "청년",
-    srvPvsnNm: "교육비 환급",
-    rprsCtadr: "고용센터 1577-7114",
-    tgtrDtlCn: "만 18~34세 미취업 청년 (예시)",
-    alwServCn: "연 1회 최대 50만 원 한도 (예시)",
-    slctCritCn: "선착순 또는 심사 순으로 선정될 수 있습니다.",
-    applmetList: "온라인 신청 후 서류 제출.",
-    inqplCtadrList: "1577-7114",
-    inqplHmpgReldList: "",
-  },
-  "mock-3": {
-    servId: "mock-3",
-    servNm: "의료비 본인부담 경감 대상자 건강검진",
-    servDgst: "건강검진 비용 일부를 지원하여 조기 발견을 돕습니다.",
-    trgterIndvdlArray: "차상위계층, 장애인",
-    srvPvsnNm: "바우처",
-    rprsCtadr: "국민건강보험 1577-1000",
-    tgtrDtlCn: "지역별 세부 기준에 따릅니다.",
-    alwServCn: "검진 항목에 따라 상이합니다.",
-    slctCritCn: "건강보험 자격 확인 결과에 따릅니다.",
-    applmetList: "지정 의료기관 방문 또는 앱 신청.",
-    inqplCtadrList: "1577-1000",
-    inqplHmpgReldList: "https://www.nhis.or.kr",
-  },
-};
-
-function buildSnapshot(input: {
-  residenceSigungu: string;
-  age: string;
-  themaCodes: string[];
-  noneTarget: boolean;
-  targetCodes: string[];
-}): string {
+function buildSnapshot(input: WelfareRecommendationParams): string {
   return JSON.stringify({
     ...input,
     themaCodes: [...input.themaCodes].sort(),
@@ -112,28 +27,36 @@ function buildSnapshot(input: {
   });
 }
 
-function mockRecommend(input: { forceEmpty: boolean }): WelfareListItem[] {
-  if (input.forceEmpty) return [];
-  const base = Object.values(MOCK_DETAIL_BY_ID).map(
-    (d): WelfareListItem => ({
-      servId: d.servId,
-      servNm: d.servNm,
-      servDgst: d.servDgst,
-      trgterIndvdlArray: d.trgterIndvdlArray,
-      srvPvsnNm: d.srvPvsnNm,
-      rprsCtadr: d.rprsCtadr,
-    })
-  );
-  return [base[0], base[1]];
-}
-
 type WelfareTab = "input" | "results";
+
+type WelfarePageCache = {
+  version: 1;
+  activeTab: WelfareTab;
+  residenceSido: string;
+  residenceSigungu: string;
+  age: string;
+  themaCodes: string[];
+  noneTarget: boolean;
+  targetCodes: string[];
+  lastSnapshot: string | null;
+  results: WelfareListItem[] | null;
+  resultPage: number;
+  totalCount: number;
+  hasMore: boolean;
+};
 
 export default function WelfarePage() {
   const router = useRouter();
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const sidoDropdownRef = useRef<HTMLDivElement | null>(null);
+  const sigunguDropdownRef = useRef<HTMLDivElement | null>(null);
+  const profileLoadedRef = useRef(false);
 
   const [activeTab, setActiveTab] = useState<WelfareTab>("input");
+  const [residenceSido, setResidenceSido] = useState("대구광역시");
   const [residenceSigungu, setResidenceSigungu] = useState("");
+  const [sidoMenuOpen, setSidoMenuOpen] = useState(false);
+  const [sigunguMenuOpen, setSigunguMenuOpen] = useState(false);
   const [age, setAge] = useState("");
   const [themaCodes, setThemaCodes] = useState<string[]>([]);
   const [noneTarget, setNoneTarget] = useState(true);
@@ -141,21 +64,27 @@ export default function WelfarePage() {
 
   const [lastSnapshot, setLastSnapshot] = useState<string | null>(null);
   const [results, setResults] = useState<WelfareListItem[] | null>(null);
-  const [detail, setDetail] = useState<WelfareDetail | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [resultPage, setResultPage] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoadingResults, setIsLoadingResults] = useState(false);
+  const [resultError, setResultError] = useState("");
+  const [cacheReady, setCacheReady] = useState(false);
+  const [restoredFromCache, setRestoredFromCache] = useState(false);
 
   const forceEmptyDemo = router.query.demo === "empty";
 
   const currentSnapshot = useMemo(
     () =>
       buildSnapshot({
+        residenceSido,
         residenceSigungu,
         age,
         themaCodes,
         noneTarget,
         targetCodes,
       }),
-    [residenceSigungu, age, themaCodes, noneTarget, targetCodes]
+    [residenceSido, residenceSigungu, age, themaCodes, noneTarget, targetCodes]
   );
 
   const isDirty =
@@ -181,35 +110,243 @@ export default function WelfarePage() {
     );
   };
 
+  const selectedSidoLabel =
+    DALSEONG_SIDO_OPTIONS.find((o) => o.value === residenceSido)?.label ?? "";
+  const selectedSigunguLabel =
+    DALSEONG_SIGUNGU_OPTIONS.find((o) => o.value === residenceSigungu)?.label ?? "";
+
   const formValid =
+    Boolean(residenceSido) &&
     Boolean(residenceSigungu) &&
     age.trim() !== "" &&
     !Number.isNaN(Number(age)) &&
     themaCodes.length > 0;
 
-  const handleSubmit = useCallback(() => {
-    if (!formValid) return;
-    const snap = buildSnapshot({
+  const recommendationParams = useMemo<WelfareRecommendationParams>(
+    () => ({
+      residenceSido,
       residenceSigungu,
       age,
       themaCodes,
       noneTarget,
       targetCodes,
-    });
+    }),
+    [residenceSido, residenceSigungu, age, themaCodes, noneTarget, targetCodes]
+  );
+
+  const loadRecommendationPage = useCallback(
+    async (nextPage: number, replace = false) => {
+      setIsLoadingResults(true);
+      setResultError("");
+
+      try {
+        const requestParams = {
+          ...recommendationParams,
+          page: nextPage,
+          size: RECOMMENDATION_PAGE_SIZE,
+        };
+        const apiRes = forceEmptyDemo ? null : await getWelfareRecommendations(requestParams);
+        const res =
+          apiRes ??
+          (await getMockWelfareRecommendations({
+            ...requestParams,
+            forceEmpty: forceEmptyDemo,
+          }));
+
+        setResults((prev) => (replace ? res.items : [...(prev ?? []), ...res.items]));
+        setResultPage(res.page);
+        setTotalCount(res.totalCount);
+        setHasMore(res.hasMore);
+      } catch (e) {
+        console.error(e);
+        setResultError("복지 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
+        if (replace) {
+          setResults([]);
+          setTotalCount(0);
+          setHasMore(false);
+        }
+      } finally {
+        setIsLoadingResults(false);
+      }
+    },
+    [forceEmptyDemo, recommendationParams]
+  );
+
+  const handleSubmit = useCallback(() => {
+    if (!formValid || isLoadingResults) return;
+    const snap = buildSnapshot(recommendationParams);
     setLastSnapshot(snap);
-    setResults(mockRecommend({ forceEmpty: forceEmptyDemo }));
+    setResults([]);
+    setResultPage(0);
+    setTotalCount(0);
+    setHasMore(false);
+    setIsLoadingResults(true);
     setActiveTab("results");
+    void (async () => {
+      await postWelfareRecommend(recommendationParams);
+      await loadRecommendationPage(0, true);
+    })();
+  }, [formValid, isLoadingResults, loadRecommendationPage, recommendationParams]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    try {
+      const raw = window.sessionStorage.getItem(WELFARE_PAGE_CACHE_KEY);
+      if (!raw) return;
+
+      const parsed = JSON.parse(raw) as Partial<WelfarePageCache>;
+      if (parsed.version !== 1) return;
+
+      setRestoredFromCache(true);
+      setActiveTab(parsed.activeTab === "results" ? "results" : "input");
+      setResidenceSido(typeof parsed.residenceSido === "string" ? parsed.residenceSido : "대구광역시");
+      setResidenceSigungu(
+        typeof parsed.residenceSigungu === "string" ? parsed.residenceSigungu : ""
+      );
+      setAge(typeof parsed.age === "string" ? parsed.age : "");
+      setThemaCodes(Array.isArray(parsed.themaCodes) ? parsed.themaCodes : []);
+      setNoneTarget(typeof parsed.noneTarget === "boolean" ? parsed.noneTarget : true);
+      setTargetCodes(Array.isArray(parsed.targetCodes) ? parsed.targetCodes : []);
+      setLastSnapshot(typeof parsed.lastSnapshot === "string" ? parsed.lastSnapshot : null);
+      setResults(Array.isArray(parsed.results) ? parsed.results : null);
+      setResultPage(typeof parsed.resultPage === "number" ? parsed.resultPage : 0);
+      setTotalCount(typeof parsed.totalCount === "number" ? parsed.totalCount : 0);
+      setHasMore(typeof parsed.hasMore === "boolean" ? parsed.hasMore : false);
+    } catch (e) {
+      console.error(e);
+      window.sessionStorage.removeItem(WELFARE_PAGE_CACHE_KEY);
+    } finally {
+      setCacheReady(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!cacheReady || profileLoadedRef.current) return;
+
+    profileLoadedRef.current = true;
+    let canceled = false;
+
+    void (async () => {
+      const profile = await getWelfareProfile();
+      if (!profile || canceled || restoredFromCache) return;
+
+      setResidenceSido(profile.residenceSido || "대구광역시");
+      setResidenceSigungu(profile.residenceSigungu || "");
+      setAge(profile.age || "");
+      setThemaCodes(profile.themaCodes);
+      setNoneTarget(profile.noneTarget);
+      setTargetCodes(profile.noneTarget ? [] : profile.targetCodes);
+    })();
+
+    return () => {
+      canceled = true;
+    };
+  }, [cacheReady, restoredFromCache]);
+
+  useEffect(() => {
+    if (!cacheReady || typeof window === "undefined") return;
+
+    const cache: WelfarePageCache = {
+      version: 1,
+      activeTab,
+      residenceSido,
+      residenceSigungu,
+      age,
+      themaCodes,
+      noneTarget,
+      targetCodes,
+      lastSnapshot,
+      results,
+      resultPage,
+      totalCount,
+      hasMore,
+    };
+
+    window.sessionStorage.setItem(WELFARE_PAGE_CACHE_KEY, JSON.stringify(cache));
   }, [
-    formValid,
-    residenceSigungu,
+    activeTab,
     age,
-    themaCodes,
+    cacheReady,
+    hasMore,
+    lastSnapshot,
     noneTarget,
+    residenceSido,
+    residenceSigungu,
+    resultPage,
+    results,
     targetCodes,
-    forceEmptyDemo,
+    themaCodes,
+    totalCount,
+  ]);
+
+  useEffect(() => {
+    if (!sidoMenuOpen && !sigunguMenuOpen) return;
+
+    const close = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (sidoDropdownRef.current && !sidoDropdownRef.current.contains(target)) {
+        setSidoMenuOpen(false);
+      }
+      if (sigunguDropdownRef.current && !sigunguDropdownRef.current.contains(target)) {
+        setSigunguMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [sidoMenuOpen, sigunguMenuOpen]);
+
+  useEffect(() => {
+    if (!sidoMenuOpen && !sigunguMenuOpen) return;
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSidoMenuOpen(false);
+        setSigunguMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [sidoMenuOpen, sigunguMenuOpen]);
+
+  useEffect(() => {
+    const target = sentinelRef.current;
+    if (
+      !target ||
+      activeTab !== "results" ||
+      results === null ||
+      isDirty ||
+      !hasMore ||
+      isLoadingResults
+    ) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          void loadRecommendationPage(resultPage + 1);
+        }
+      },
+      { rootMargin: "240px 0px" }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [
+    activeTab,
+    hasMore,
+    isDirty,
+    isLoadingResults,
+    loadRecommendationPage,
+    resultPage,
+    results,
   ]);
 
   const resetForm = () => {
+    setResidenceSido("대구광역시");
     setResidenceSigungu("");
     setAge("");
     setThemaCodes([]);
@@ -217,19 +354,15 @@ export default function WelfarePage() {
     setTargetCodes([]);
     setResults(null);
     setLastSnapshot(null);
+    setResultPage(0);
+    setTotalCount(0);
+    setHasMore(false);
+    setResultError("");
     setActiveTab("input");
   };
 
   const openDetail = (id: string) => {
-    const row = MOCK_DETAIL_BY_ID[id];
-    if (!row) return;
-    setDetail(row);
-    setModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalOpen(false);
-    setTimeout(() => setDetail(null), 280);
+    void router.push(`/welfare/${id}`);
   };
 
   const leadCopy =
@@ -273,34 +406,138 @@ export default function WelfarePage() {
         <div className={cn("tabContent")}>
           {activeTab === "input" && (
             <div className={cn("welfareForm")}>
-              <p className={cn("fieldHint")}>
-                생애주기는 입력하신 나이를 시스템에서 자동 변환해 추천에만 사용합니다.
-                (화면에 별도로 표시하지 않습니다.)
-              </p>
-
               <div className={cn("formGroup")}>
-                <label className={cn("formLabel")} htmlFor="welfare-residence">
-                  거주 구·군 (읍·면)
+                <label className={cn("formLabel")} htmlFor="welfare-sido">
+                  거주 시도
                   <span className={cn("requiredMark")} aria-hidden>
                     *
                   </span>
                 </label>
-                <p className={cn("fieldHint")}>
-                  대구 달성군 거주 기준입니다. 행정구역에 맞게 하나만 선택해 주세요.
-                </p>
-                <select
-                  id="welfare-residence"
-                  className={cn("welfareSelect")}
-                  value={residenceSigungu}
-                  onChange={(e) => setResidenceSigungu(e.target.value)}
-                  aria-label="거주 구군 읍면 선택"
+                <div
+                  className={cn("customSelectWrapper", {
+                    customSelectWrapperOpen: sidoMenuOpen,
+                  })}
+                  ref={sidoDropdownRef}
                 >
-                  {DALSEONG_SIGUNGU_OPTIONS.map((o) => (
-                    <option key={o.value || "placeholder"} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
+                  <button
+                    id="welfare-sido"
+                    type="button"
+                    className={cn("welfareSelectTrigger", {
+                      welfareSelectTriggerPlaceholder: residenceSido === "",
+                    })}
+                    onClick={() => {
+                      setSidoMenuOpen((open) => !open);
+                      setSigunguMenuOpen(false);
+                    }}
+                    aria-haspopup="listbox"
+                    aria-expanded={sidoMenuOpen}
+                    aria-controls="welfare-sido-listbox"
+                  >
+                    <span className={cn("welfareSelectTriggerText")}>
+                      {selectedSidoLabel || "\u200b"}
+                    </span>
+                    <IoIosArrowDown
+                      className={cn("welfareSelectChevron", {
+                        welfareSelectChevronOpen: sidoMenuOpen,
+                      })}
+                      aria-hidden
+                    />
+                  </button>
+                  {sidoMenuOpen && (
+                    <ul
+                      id="welfare-sido-listbox"
+                      className={cn("welfareSelectList")}
+                      role="listbox"
+                      aria-label="거주 시도 선택"
+                    >
+                      {DALSEONG_SIDO_OPTIONS.map((option) => (
+                        <li key={option.value || "placeholder"} role="presentation">
+                          <button
+                            type="button"
+                            role="option"
+                            aria-selected={residenceSido === option.value}
+                            className={cn("welfareSelectOption", {
+                              welfareSelectOptionActive: residenceSido === option.value,
+                            })}
+                            onClick={() => {
+                              setResidenceSido(option.value);
+                              setSidoMenuOpen(false);
+                            }}
+                          >
+                            {option.label}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+
+              <div className={cn("formGroup")}>
+                <label className={cn("formLabel")} htmlFor="welfare-residence">
+                  거주 구·군
+                  <span className={cn("requiredMark")} aria-hidden>
+                    *
+                  </span>
+                </label>
+                <div
+                  className={cn("customSelectWrapper", {
+                    customSelectWrapperOpen: sigunguMenuOpen,
+                  })}
+                  ref={sigunguDropdownRef}
+                >
+                  <button
+                    id="welfare-residence"
+                    type="button"
+                    className={cn("welfareSelectTrigger", {
+                      welfareSelectTriggerPlaceholder: residenceSigungu === "",
+                    })}
+                    onClick={() => {
+                      setSigunguMenuOpen((open) => !open);
+                      setSidoMenuOpen(false);
+                    }}
+                    aria-haspopup="listbox"
+                    aria-expanded={sigunguMenuOpen}
+                    aria-controls="welfare-sigungu-listbox"
+                  >
+                    <span className={cn("welfareSelectTriggerText")}>
+                      {selectedSigunguLabel || "\u200b"}
+                    </span>
+                    <IoIosArrowDown
+                      className={cn("welfareSelectChevron", {
+                        welfareSelectChevronOpen: sigunguMenuOpen,
+                      })}
+                      aria-hidden
+                    />
+                  </button>
+                  {sigunguMenuOpen && (
+                    <ul
+                      id="welfare-sigungu-listbox"
+                      className={cn("welfareSelectList")}
+                      role="listbox"
+                      aria-label="거주 구군 선택"
+                    >
+                      {DALSEONG_SIGUNGU_OPTIONS.map((option) => (
+                        <li key={option.value || "placeholder"} role="presentation">
+                          <button
+                            type="button"
+                            role="option"
+                            aria-selected={residenceSigungu === option.value}
+                            className={cn("welfareSelectOption", {
+                              welfareSelectOptionActive: residenceSigungu === option.value,
+                            })}
+                            onClick={() => {
+                              setResidenceSigungu(option.value);
+                              setSigunguMenuOpen(false);
+                            }}
+                          >
+                            {option.label}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
 
               <div className={cn("formGroup")}>
@@ -331,12 +568,8 @@ export default function WelfarePage() {
                     *
                   </span>
                 </span>
-                <p className={cn("fieldHint")}>
-                  공공데이터 API의 <code>intrsThemaArray</code> 값과 동일한 코드로 연동한다고
-                  가정한 목록입니다. 복수 선택 가능합니다.
-                </p>
                 <div className={cn("chipGroup")} role="group" aria-label="도움 유형">
-                  {MOCK_INTRS_THEMA.map((t) => (
+                  {WELFARE_INTRS_THEMA_OPTIONS.map((t) => (
                     <button
                       key={t.code}
                       type="button"
@@ -351,10 +584,6 @@ export default function WelfarePage() {
 
               <div className={cn("formGroup")}>
                 <span className={cn("formLabel")}>해당 조건</span>
-                <p className={cn("fieldHint")}>
-                  <code>trgterIndvdlArray</code> 매칭용. &apos;선택안함&apos;을 누르면 다른
-                  조건이 해제됩니다. 선택 사항입니다.
-                </p>
                 <div className={cn("chipGroup")} role="group" aria-label="지원대상 조건">
                   <button
                     type="button"
@@ -363,7 +592,7 @@ export default function WelfarePage() {
                   >
                     선택안함
                   </button>
-                  {MOCK_TRGTER.map((t) => (
+                  {WELFARE_TRGTER_OPTIONS.map((t) => (
                     <button
                       key={t.code}
                       type="button"
@@ -392,7 +621,7 @@ export default function WelfarePage() {
                 disabled={!formValid}
                 onClick={handleSubmit}
               >
-                추천 받기
+                {isLoadingResults ? "추천 불러오는 중" : "추천 받기"}
               </button>
               <button type="button" className={cn("resetLink")} onClick={resetForm}>
                 입력 초기화
@@ -415,7 +644,18 @@ export default function WelfarePage() {
                     결과가 갱신됩니다.
                   </p>
                 </div>
-              ) : results.length === 0 ? (
+              ) : resultError ? (
+                <div className={cn("emptyBox")}>
+                  <p className={cn("emptyMessage")}>{resultError}</p>
+                  <button
+                    type="button"
+                    className={cn("retryButton")}
+                    onClick={() => loadRecommendationPage(0, true)}
+                  >
+                    다시 불러오기
+                  </button>
+                </div>
+              ) : results.length === 0 && !isLoadingResults ? (
                 <div className={cn("emptyBox")}>
                   <p className={cn("emptyMessage")}>조건에 맞는 혜택이 없습니다</p>
                   <p className={cn("fieldHint", "emptySubtext")}>
@@ -425,7 +665,9 @@ export default function WelfarePage() {
                 </div>
               ) : (
                 <>
-                  <p className={cn("resultMeta", "resultCountRow")}>총 {results.length}건</p>
+                  <p className={cn("resultMeta", "resultCountRow")}>
+                    총 {totalCount}건 중 {results.length}건 표시
+                  </p>
                   <ul className={cn("resultList")}>
                     {results.map((item) => (
                       <li key={item.servId}>
@@ -437,99 +679,33 @@ export default function WelfarePage() {
                           <span className={cn("resultBadge")}>추천</span>
                           <h3 className={cn("resultTitle")}>{item.servNm}</h3>
                           <p className={cn("resultDigest")}>{item.servDgst}</p>
+                          <div className={cn("resultInfoGrid")}>
+                            <span>
+                              제공 기관 {item.bizChrDepNm || item.jurOrgNm || item.jurMnofNm || "—"}
+                            </span>
+                            <span>지원대상 {item.trgterIndvdlNmArray || item.trgterIndvdlArray || "—"}</span>
+                            <span>제공방식 {item.srvPvsnSm || item.srvPvsnNm || "—"}</span>
+                            <span>지원주기 {item.sprtCycNm || "—"}</span>
+                          </div>
                           <p className={cn("resultMeta")}>
-                            지원대상 {item.trgterIndvdlArray || "—"} · 제공방식{" "}
-                            {item.srvPvsnNm || "—"}
+                            온라인 신청 {item.onapPsbltYn === "Y" ? "가능" : "확인 필요"}
                           </p>
-                          <p className={cn("resultMeta")}>문의 {item.rprsCtadr || "—"}</p>
                         </button>
                       </li>
                     ))}
                   </ul>
+                  <div ref={sentinelRef} className={cn("scrollSentinel")} aria-hidden />
+                  {isLoadingResults && (
+                    <div className={cn("loadingBox")} role="status">
+                      복지 데이터를 불러오는 중입니다.
+                    </div>
+                  )}
+                  {!hasMore && results.length > 0 && (
+                    <p className={cn("endMessage")}>모든 추천 복지 데이터를 확인했습니다.</p>
+                  )}
                 </>
               )}
             </div>
-          )}
-        </div>
-      </div>
-
-      <div
-        className={cn("modalOverlay", { modalOverlayVisible: modalOpen })}
-        onClick={closeModal}
-        role="presentation"
-      >
-        <div
-          className={cn("modalPanel")}
-          onClick={(e) => e.stopPropagation()}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="welfare-detail-title"
-        >
-          {detail && (
-            <>
-              <div className={cn("modalHeader")}>
-                <h2 id="welfare-detail-title" className={cn("modalTitle")}>
-                  {detail.servNm}
-                </h2>
-                <button
-                  type="button"
-                  className={cn("modalClose")}
-                  onClick={closeModal}
-                  aria-label="닫기"
-                >
-                  ×
-                </button>
-              </div>
-              <div className={cn("modalBody")}>
-                <div>
-                  <h3 className={cn("detailBlockTitle")}>지원대상</h3>
-                  <p className={cn("detailBlockBody")}>{detail.tgtrDtlCn || "—"}</p>
-                </div>
-                <div>
-                  <h3 className={cn("detailBlockTitle")}>지원 내용</h3>
-                  <p className={cn("detailBlockBody")}>{detail.alwServCn || "—"}</p>
-                </div>
-                <div>
-                  <h3 className={cn("detailBlockTitle")}>선정기준</h3>
-                  <p className={cn("detailBlockBody")}>{detail.slctCritCn || "—"}</p>
-                </div>
-                <div>
-                  <h3 className={cn("detailBlockTitle")}>제공방식</h3>
-                  <p className={cn("detailBlockBody")}>{detail.srvPvsnNm || "—"}</p>
-                </div>
-                <div>
-                  <h3 className={cn("detailBlockTitle")}>신청 방법</h3>
-                  <p className={cn("detailBlockBody")}>{detail.applmetList || "—"}</p>
-                </div>
-                <div>
-                  <h3 className={cn("detailBlockTitle")}>문의처</h3>
-                  <p className={cn("detailBlockBody")}>
-                    {[detail.inqplCtadrList, detail.rprsCtadr].filter(Boolean).join(" / ") ||
-                      "—"}
-                  </p>
-                </div>
-                <div>
-                  <h3 className={cn("detailBlockTitle")}>신청기한</h3>
-                  <p className={cn("detailBlockBody")}>
-                    {/** 목업: API 필드 연동 시 `applPd` 등으로 교체 */ "—"}
-                  </p>
-                </div>
-              </div>
-              <div className={cn("modalFooter")}>
-                {detail.inqplHmpgReldList ? (
-                  <a
-                    href={detail.inqplHmpgReldList}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={cn("externalLink")}
-                  >
-                    원문·외부 상세 페이지로 이동
-                  </a>
-                ) : (
-                  <p className={cn("fieldHint")}>등록된 원문 링크가 없습니다.</p>
-                )}
-              </div>
-            </>
           )}
         </div>
       </div>
