@@ -12,6 +12,11 @@ declare global {
       getLng(): number;
     }
 
+    class LatLngBounds {
+      getSouthWest(): LatLng;
+      getNorthEast(): LatLng;
+    }
+
     class Size {
       constructor(width: number, height: number);
     }
@@ -34,6 +39,8 @@ declare global {
         options: { center: LatLng; level: number }
       );
       setCenter(latlng: LatLng): void;
+      getCenter(): LatLng;
+      getBounds(): LatLngBounds;
       panTo(latlng: LatLng): void;
       relayout(): void;
     }
