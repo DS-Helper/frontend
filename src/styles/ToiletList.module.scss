@@ -1,0 +1,405 @@
+$pageMinHeight: calc(100vh - 6rem);
+
+.pageRoot {
+  box-sizing: border-box;
+}
+
+.desktopOnlyMessage {
+  display: none;
+}
+
+.mobileMain {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: $pageMinHeight;
+  height: $pageMinHeight;
+}
+
+.mapShell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+
+.geoCheckingPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem 1.6rem;
+  min-height: 0;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.geoCheckingMessage {
+  margin: 0;
+  font-size: var(--caption-size);
+  font-weight: var(--caption-weight);
+  line-height: 1.55;
+}
+
+.mapErrorBanner {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 1rem 1.4rem;
+  font-size: var(--caption-size);
+  font-weight: var(--caption-weight);
+  line-height: 1.45;
+  color: var(--color-semantic-text-danger);
+  background: var(--color-semantic-bg-danger-soft);
+  border-bottom: 1px solid var(--color-semantic-border-danger);
+}
+
+.mapContainer {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+/* mapContainer와 flex 형제로 두면 지도 높이를 절반으로 밀어내므로 오버레이로 띄운다 */
+.toiletsLoadingBanner {
+  position: absolute;
+  top: 1.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  padding: 0.8rem 1.6rem;
+  border-radius: 50rem;
+  background: rgba(47, 59, 53, 0.78);
+  box-shadow: 0 0.2rem 0.8rem rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+}
+
+.toiletsLoadingBannerText {
+  margin: 0;
+  font-size: var(--caption-size);
+  font-weight: var(--caption-weight);
+  line-height: 1.4;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.bottomSheetBackdrop {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  z-index: 20;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: rgba(47, 59, 53, 0.35);
+  cursor: pointer;
+  animation: bottomSheetBackdropFadeIn 0.28s ease-out both;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.bottomSheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 21;
+  padding: 2.4rem 1.6rem 5.6rem;
+  box-sizing: border-box;
+  border-radius: 2.4rem 2.4rem 0 0;
+  background: var(--color-semantic-bg-page);
+  box-shadow: 0 -0.4rem 2.4rem rgba(47, 59, 53, 0.12);
+  transform: translate3d(0, 0, 0);
+  animation: mapTapSheetSlideUp 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.bottomSheetSrTitle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.bottomSheetTopRow {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.6rem;
+}
+
+.bottomSheetTextCol {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.bottomSheetIconGroup {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.bottomSheetBadge {
+  align-self: flex-start;
+  padding: 0.4rem 0.8rem;
+  border-radius: 50rem;
+  font-size: var(--label-S-size);
+  font-weight: var(--label-S-weight);
+  line-height: 1.2;
+  color: var(--color-semantic-text-inverse);
+  background: var(--color-semantic-bg-brand);
+}
+
+.bottomSheetName {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-primitive-gray-800);
+  word-break: keep-all;
+}
+
+.bottomSheetHours {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: var(--body-M-weight);
+  line-height: 1.45;
+  color: var(--color-primitive-gray-700);
+}
+
+.bottomSheetDirections {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 4.8rem;
+  border: none;
+  border-radius: 1rem;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--color-semantic-text-inverse);
+  background: var(--color-semantic-bg-brand);
+  cursor: pointer;
+  padding: 1.1rem 0;
+}
+
+@keyframes mapTapSheetSlideUp {
+  from {
+    transform: translate3d(0, 100%, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes mapTapSheetSlideDown {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 100%, 0);
+  }
+}
+
+@keyframes bottomSheetBackdropFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes bottomSheetBackdropFadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.bottomSheetBackdropClosing {
+  animation: bottomSheetBackdropFadeOut 0.28s ease-in forwards;
+  pointer-events: none;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.mapTapSheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 21;
+  padding: 1.2rem 1.6rem 5.6rem;
+  box-sizing: border-box;
+  border-radius: 2.4rem 2.4rem 0 0;
+  background: var(--color-semantic-bg-page);
+  box-shadow: 0 -0.4rem 2.4rem rgba(47, 59, 53, 0.12);
+  transform: translate3d(0, 0, 0);
+  animation: mapTapSheetSlideUp 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+/* .mapTapSheet 보다 뒤에 두어 닫기 애니메이션이 열기 animation을 덮도록 함 */
+.mapTapSheet.mapTapSheetClosing {
+  animation: mapTapSheetSlideDown 0.32s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  pointer-events: none;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.bottomSheet.bottomSheetClosing {
+  animation: mapTapSheetSlideDown 0.32s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  pointer-events: none;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.mapTapSheetGrabber {
+  display: block;
+  width: 4rem;
+  height: 0.4rem;
+  margin: 0 auto 1.6rem;
+  border: none;
+  border-radius: 50rem;
+  background: var(--color-primitive-gray-300);
+}
+
+.mapTapSheetAddress {
+  margin: 0 0 0.6rem;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-semantic-bg-brand);
+  word-break: keep-all;
+}
+
+.mapTapSheetDistance {
+  margin: 0 0 1.2rem;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--color-primitive-gray-700);
+}
+
+.mapTapSheetDivider {
+  height: 1px;
+  margin: 0 0 1.6rem;
+  background: var(--color-primitive-gray-200);
+}
+
+.mapTapSheetActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+}
+
+.mapTapSheetIconGroup {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-shrink: 0;
+}
+
+.mapTapSheetIconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.mapTapSheetNavGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex: 1;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.mapTapSheetNavButton {
+  flex: 1;
+  max-width: 10rem;
+  min-height: 4rem;
+  padding: 0.8rem 1.2rem;
+  border: none;
+  border-radius: 50rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.mapTapSheetNavButtonDepart {
+  color: var(--color-semantic-bg-brand);
+  background: var(--color-semantic-bg-brand-soft, rgba(25, 139, 230, 0.12));
+}
+
+.mapTapSheetNavButtonArrive {
+  color: var(--color-semantic-text-inverse);
+  background: var(--color-semantic-bg-brand);
+}
+
+@media (min-width: 612px) {
+  .pageRoot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: $pageMinHeight;
+  }
+
+  .desktopOnlyMessage {
+    display: block;
+    margin: 0;
+    text-align: center;
+    font-size: 1.7rem;
+    font-weight: 500;
+    color: var(--color-primitive-gray-800);
+  }
+
+  .mobileMain {
+    display: none;
+  }
+}
