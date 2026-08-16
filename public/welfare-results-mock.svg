@@ -1,0 +1,77 @@
+<svg width="1440" height="1499" viewBox="0 0 1440 1499" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1440" height="1499" fill="#FFFFFF"/>
+  <rect y="0" width="1440" height="60" fill="#FFFFFF"/>
+  <line x1="0" y1="60" x2="1440" y2="60" stroke="#EEEEEE"/>
+  <text x="48" y="38" fill="#222222" font-family="Pretendard, Inter, sans-serif" font-size="22" font-weight="700">DS Helper</text>
+  <circle cx="1285" cy="30" r="14" fill="#EEEEEE"/>
+  <circle cx="1331" cy="30" r="14" fill="#EEEEEE"/>
+  <path d="M1372 22H1390M1372 30H1390M1372 38H1390" stroke="#AEAEAE" stroke-width="2.5" stroke-linecap="round"/>
+
+  <g font-family="Pretendard, Inter, sans-serif">
+    <g transform="translate(396 224)">
+      <text x="33" y="18" fill="#B8B8B8" font-size="15" font-weight="400" text-anchor="middle">정보 입력</text>
+      <text x="490" y="18" fill="#333333" font-size="15" font-weight="700" text-anchor="middle">추천 결과</text>
+      <line x1="0" y1="33.5" x2="324.5" y2="33.5" stroke="#EEEEEE"/>
+      <line x1="324.5" y1="33.5" x2="649" y2="33.5" stroke="#3C3B3B"/>
+    </g>
+
+    <g transform="translate(396 286)">
+      <text x="0" y="0" fill="#AEAEAE" font-size="14">총 18건 중 5건 표시</text>
+
+      <g transform="translate(0 34)">
+        <rect x="0" y="0" width="44" height="28" rx="4" fill="#0DBA53"/>
+        <text x="22" y="19" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">추천</text>
+        <text x="0" y="62" fill="#000000" font-size="17" font-weight="600">달성군 맞춤형 생활안정 지원</text>
+        <text x="0" y="94" fill="#525151" font-size="15">위기 가구에 한시적 생계·주거 비용을 지원합니다.</text>
+        <text x="0" y="124" fill="#AEAEAE" font-size="14">지원대상 저소득층, 한부모가족 · 제공방식 현금 지급</text>
+        <text x="0" y="151" fill="#AEAEAE" font-size="14">문의 달성군 복지정책과 053-000-0000</text>
+        <line x1="0" y1="184" x2="649" y2="184" stroke="#EEEEEE"/>
+      </g>
+
+      <g transform="translate(0 244)">
+        <rect x="0" y="0" width="44" height="28" rx="4" fill="#0DBA53"/>
+        <text x="22" y="19" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">추천</text>
+        <text x="0" y="62" fill="#000000" font-size="17" font-weight="600">청년 취업 역량 강화 교육비 지원</text>
+        <text x="0" y="94" fill="#525151" font-size="15">구직 활동 중인 청년 대상 교육·자격 취득 비용을 지원합니다.</text>
+        <text x="0" y="124" fill="#AEAEAE" font-size="14">지원대상 청년 · 제공방식 교육비 환급</text>
+        <text x="0" y="151" fill="#AEAEAE" font-size="14">문의 고용센터 1577-7114</text>
+        <line x1="0" y1="184" x2="649" y2="184" stroke="#EEEEEE"/>
+      </g>
+
+      <g transform="translate(0 454)">
+        <rect x="0" y="0" width="44" height="28" rx="4" fill="#0DBA53"/>
+        <text x="22" y="19" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">추천</text>
+        <text x="0" y="62" fill="#000000" font-size="17" font-weight="600">의료비 본인부담 경감 대상자 건강검진</text>
+        <text x="0" y="94" fill="#525151" font-size="15">건강검진 비용 일부를 지원하여 조기 발견을 돕습니다.</text>
+        <text x="0" y="124" fill="#AEAEAE" font-size="14">지원대상 차상위계층, 장애인 · 제공방식 바우처</text>
+        <text x="0" y="151" fill="#AEAEAE" font-size="14">문의 국민건강보험 1577-1000</text>
+        <line x1="0" y1="184" x2="649" y2="184" stroke="#EEEEEE"/>
+      </g>
+
+      <g transform="translate(0 664)">
+        <rect x="0" y="0" width="44" height="28" rx="4" fill="#0DBA53"/>
+        <text x="22" y="19" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">추천</text>
+        <text x="0" y="62" fill="#000000" font-size="17" font-weight="600">아동 돌봄 공백 긴급 지원</text>
+        <text x="0" y="94" fill="#525151" font-size="15">보호자의 일시적 부재로 돌봄이 필요한 아동에게 서비스를 연결합니다.</text>
+        <text x="0" y="124" fill="#AEAEAE" font-size="14">지원대상 아동, 한부모가족 · 제공방식 돌봄서비스</text>
+        <text x="0" y="151" fill="#AEAEAE" font-size="14">문의 아이돌봄 상담 1577-2514</text>
+        <line x1="0" y1="184" x2="649" y2="184" stroke="#EEEEEE"/>
+      </g>
+
+      <g transform="translate(0 874)">
+        <rect x="0" y="0" width="44" height="28" rx="4" fill="#0DBA53"/>
+        <text x="22" y="19" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">추천</text>
+        <text x="0" y="62" fill="#000000" font-size="17" font-weight="600">고령자 주거환경 개선 지원</text>
+        <text x="0" y="94" fill="#525151" font-size="15">안전손잡이, 문턱 제거 등 생활 안전을 위한 주거 개선을 지원합니다.</text>
+        <text x="0" y="124" fill="#AEAEAE" font-size="14">지원대상 노인, 저소득층 · 제공방식 현물 지원</text>
+        <text x="0" y="151" fill="#AEAEAE" font-size="14">문의 주거복지 상담 1600-1004</text>
+        <line x1="0" y1="184" x2="649" y2="184" stroke="#EEEEEE"/>
+      </g>
+    </g>
+  </g>
+
+  <rect y="1370" width="1440" height="129" fill="#F5F5F5"/>
+  <text x="720" y="1418" fill="#4B4B4B" font-family="Pretendard, Inter, sans-serif" font-size="15" font-weight="700">운영자 정보</text>
+  <text x="720" y="1450" fill="#666666" font-family="Pretendard, Inter, sans-serif" font-size="15">DS Helper 팀 · 전화번호 : 010-5250-9548 | 이메일 : dshelper77@gmail.com</text>
+  <text x="720" y="1485" fill="#4B4B4B" font-family="Pretendard, Inter, sans-serif" font-size="15" font-weight="700">© 2025 DS Helper. All rights reserved.</text>
+</svg>

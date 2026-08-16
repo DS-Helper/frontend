@@ -34,11 +34,12 @@ export default function Sidebar({ onClose }: { onClose: () => void }) {
         </div>
         <ul className={cn("sidebarMenuList")}>
           <li><Link href="/help">도움 요청하기</Link></li>
-          <li><Link href="/helpList">도움 요청 내역</Link></li>
           <li onClick={handleCustomer} style={{cursor:"pointer"}}>고객 문의</li>
           <li><Link href="/helpStory">도와드린 이야기</Link></li>
           <li><Link href="/board">소통방</Link></li>
           <li><Link href="/trash-bin-list">쓰레기통 찾기</Link></li>
+          <li><Link href="/toilet-list">화장실 찾기</Link></li>
+          <li><Link href="/welfare">복지 혜택</Link></li>
           <li onClick={handleLogoutClick} style={{ cursor: 'pointer' }}>로그아웃</li>
         </ul>
       </div>
